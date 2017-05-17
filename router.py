@@ -19,7 +19,6 @@ from vendor import vendor_setup
 from vendor import trip_router
 from api import api_category
 from api import api_activity
-from api import api_blog
 from api import api_setup
 from api import api_customer_profile
 from api import api_order
@@ -165,7 +164,6 @@ def map():
         (r"/bf/api/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)", getattr(api_activity, 'ApiActivityInfoXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/members", getattr(api_activity, 'ApiActivityMemberListXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/share", getattr(api_activity, 'ApiActivityShareXHR')),
-        (r"/bf/api/vendors/([a-z0-9]*)/articles/([a-z0-9]*)/paragraphs", getattr(api_blog, 'ApiBlogParagraphListXHR')),
 
 
         (r"/bf/api/vendors/([a-z0-9]*)/orders", getattr(api_order, 'ApiOrdersXHR')),
