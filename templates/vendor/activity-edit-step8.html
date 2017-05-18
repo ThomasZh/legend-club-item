@@ -65,8 +65,8 @@
             <div class="left"></div>
             <div class="right">
               <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step1">
-              <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
-              <div class="count">{{activity['member_min']}}-{{activity['member_max']}}</div>
+              <span class="count_top"><i class="fa fa-info-circle"></i> 商品信息</span>
+              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
               <span class="count_bottom"><i class="green">Step1 </i> 基本信息</span>
               </a>
             </div>
@@ -74,34 +74,30 @@
           <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
             <div class="left"></div>
             <div class="right">
+              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step8">
+              <span class="count_top"><i class="fa fa-cny"></i> 费用说明</span>
+              <div class="count green"><i class="glyphicon glyphicon-yen"></i></div>
+              <span class="count_bottom"><i class="red">Step2 </i> 编辑</span>
+              </a>
+            </div>
+          </div>
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step7">
+              <span class="count_top"><i class="fa fa-info-circle"></i> 商品信息</span>
+              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
+              <span class="count_bottom"><i class="green">Step3 </i> 详情</span>
+              </a>
+            </div>
+          </div>
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
               <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step2">
-              <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
+              <span class="count_top"><i class="fa fa-info-circle"></i> 商品信息</span>
               <div class="count"><i class="fa fa-wechat"></i></div>
-              <span class="count_bottom"><i class="green">Step2 </i> 二维码</span>
-              </a>
-            </div>
-          </div>
-          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-            <div class="left"></div>
-            <div class="right">
-              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step3">
-              <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
-              {% if cret_template %}
-              <div class="count">{{cret_template['mileage']}}<small>km</small></div>
-              {% else %}
-              <div class="count">0<small>km</small></div>
-              {% end %}
-              <span class="count_bottom"><i class="green">Step3 </i> 证书</span>
-              </a>
-            </div>
-          </div>
-          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-            <div class="left"></div>
-            <div class="right">
-              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step4">
-              <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
-              <div class="count">{{ bonus }}<small>积分</small></div>
-              <span class="count_bottom"><i class="green">Step4 </i> 分享</span>
+              <span class="count_bottom"><i class="green">Step4 </i> 二维码</span>
               </a>
             </div>
           </div>
@@ -119,57 +115,12 @@
               </a>
             </div>
           </div>
-          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-            <div class="left"></div>
-            <div class="right">
-              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step6">
-              <span class="count_top"><i class="fa fa-user"></i> 会员报名</span>
-              {% if activity_counter and activity_counter.has_key('apply') %}
-              <div class="count">{{ activity_counter['apply'] }}<small>人次</small></div>
-              {% else %}
-              <div class="count">0 <small>人次</small></div>
-              {% end %}
-              <span class="count_bottom"><i class="green">Step6  </i> 报名信息</span>
-              </a>
-            </div>
-          </div>
-          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-            <div class="left"></div>
-            <div class="right">
-              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step7">
-              <span class="count_top"><i class="fa fa-calendar"></i> 详细行程</span>
-              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
-              <span class="count_bottom"><i class="green">Step7 </i> 编辑</span>
-              </a>
-            </div>
-          </div>
-          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-            <div class="left"></div>
-            <div class="right">
-              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step8">
-              <span class="count_top"><i class="fa fa-money"></i> 费用说明</span>
-              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
-              <span class="count_bottom"><i class="red">Step8 </i> 编辑</span>
-              </a>
-            </div>
-          </div>
-          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-            <div class="left"></div>
-            <div class="right">
-              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step9">
-              <span class="count_top"><i class="fa fa-suitcase"></i> 备注描述</span>
-              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
-              <span class="count_bottom"><i class="green">Step9 </i> 编辑</span>
-              </a>
-            </div>
-          </div>
-
         </div>
         <!-- /top tiles -->
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3>活动 <small>费用注意：基本费用必填，且不能修改名称！ </small></h3>
+              <h3>商品 <small>费用注意：基本费用必填，且不能修改名称！ </small></h3>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -179,7 +130,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>活动费用 </h2>
+                  <h2>商品费用 </h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                     </li>
@@ -371,10 +322,7 @@
       c.empty();
     }
   </script>
-
-
   <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
-
   <!-- bootstrap progress js -->
   <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
   <!-- icheck -->
@@ -383,7 +331,6 @@
   <script src="{{ static_url('admin/js/custom.js') }}"></script>
   <!-- pace -->
   <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
-
   <!-- form validation -->
   <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
 

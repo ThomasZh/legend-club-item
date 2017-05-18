@@ -510,14 +510,12 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         access_token = self.get_access_token()
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        triprouters = trip_router_dao.trip_router_dao().query_by_vendor(vendor_id)
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-create-step1.html',
                 vendor_id=vendor_id,
                 access_token=access_token,
                 ops=ops,
                 counter=counter,
-                triprouters=triprouters,
                 categorys=categorys)
 
     def post(self, vendor_id):
@@ -529,61 +527,15 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         _title = self.get_argument("title", "")
         _bk_img_url = self.get_argument("bk_img_url", "")
         _category = self.get_argument("category", "")
-        _triprouter = self.get_argument("triprouter","")
-
-        private = self.get_argument("private", "")
-        logging.info("got private %r", private)
-
-        cash_only = self.get_argument("cash_only", "")
-        logging.info("got cash_only %r", cash_only)
-
-        subtitle = self.get_argument("subtitle", "")
-        _begin_time = self.get_argument("begin_time", "")
-        _begin_time = float(date_timestamp(_begin_time)) # %m/%d/%Y -> timestamp
-        _end_time = self.get_argument("end_time", "")
-        _end_time = float(date_timestamp(_end_time)) # %m/%d/%Y -> timestamp
-        _apply_end_time = self.get_argument("apply_end_time", "")
-        _apply_end_time = float(date_timestamp(_apply_end_time)) # %m/%d/%Y -> timestamp
-        mileage = self.get_argument("mileage", "")
-        _strength = self.get_argument("strength", "")
-        _scenery = self.get_argument("scenery", "")
-        _road_info = self.get_argument("road_info", "")
-        _kickoff = self.get_argument("kickoff", "")
-        _member_min = self.get_argument("member_min", "")
-        _member_max = self.get_argument("member_max", "")
-
-        # create activity
-        # _activity_id = str(uuid.uuid1()).replace('-', '')
-        # json = {"_id":_activity_id, "vendor_id":vendor_id,
-        #         "status":ACTIVITY_STATUS_DRAFT, "popular":False,
-        #         "private":private, "cash_only":cash_only,
-        #         "create_time":_timestamp, "last_update_time":_timestamp,
-        #         "title":_title, "bk_img_url":_bk_img_url, "category":_category, "triprouter":_triprouter, "subtitle":subtitle,
-        #         "begin_time":_begin_time, "end_time":_end_time, "apply_end_time":_apply_end_time,
-        #         "mileage":mileage, "strength":_strength, "scenery":_scenery, "road_info":_road_info, "kickoff":_kickoff,
-        #         "ext_fee_template":[], "base_fee_template":[],
-        #         "member_min":_member_min, "member_max":_member_max, "notes":'' }
-        # activity_dao.activity_dao().create(json)
 
         activity = {
             "club_id":vendor_id,
             "title":_title,
-            "subtitle":subtitle,
             "img":_bk_img_url,
-            "category_id":_category,
-            "triprouter_id":_triprouter,
-            "begin_time":_begin_time, "end_time":_end_time, "apply_end_time":_apply_end_time,
-            "mileage":mileage,
-            "amount":0,
-            "private":private,
-            "cash_only":cash_only,
-            "strength":_strength, "scenery":_scenery, "road_info":_road_info, "kickoff":_kickoff,
-            "ext_fee_template":[], "base_fee_template":[],
-            "member_min":_member_min, "member_max":_member_max,
-            "notes":''
+            "category_id":_category
         }
         headers = {"Authorization":"Bearer "+access_token}
-        url = API_DOMAIN + "/api/activities"
+        url = API_DOMAIN + "/api/items"
         _json = json_encode(activity)
         http_client = HTTPClient()
         response = http_client.fetch(url, method="POST", headers=headers, body=_json)
@@ -592,7 +544,7 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         rs = data['rs']
         _activity_id = rs["_id"]
 
-        article = {'_id':_activity_id, 'title':_title, 'subtitle':subtitle, 'img':_bk_img_url,'paragraphs':''}
+        article = {'_id':_activity_id, 'title':_title, 'subtitle':_title, 'img':_bk_img_url, 'paragraphs':''}
         self.create_article(article)
 
         wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
@@ -616,110 +568,7 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
                 "qrcode_url":qrcode_url, "wx_qrcode_url":wx_qrcode_url}
         group_qrcode_dao.group_qrcode_dao().create(json)
 
-        # create cretificate
-        json = {"_id":_activity_id,
-                "create_time":_timestamp, "last_update_time":_timestamp,
-                "mileage":0, "hours":0, "height":0, "slope_length":0, "speed":0,
-                "road_map_url":"", "contour_map_url":""}
-        cret_template_dao.cret_template_dao().create(json)
-
-        # create bonus
-        json = {"_id":_activity_id,
-                "create_time":_timestamp, "last_update_time":_timestamp,
-                "activity_shared":0, "cret_shared":0}
-        bonus_template_dao.bonus_template_dao().create(json)
-
         counter = self.get_counter(vendor_id)
-        self.render('vendor/activity-create-step2.html',
-                vendor_id=vendor_id,
-                ops=ops,
-                counter=counter,
-                activity_id=_activity_id)
-
-
-class VendorActivityCreateStep2Handler(AuthorizationHandler):
-    @tornado.web.authenticated  # if no session, redirect to login page
-    def get(self, vendor_id, activity_id):
-        logging.info("got vendor_id %r in uri", vendor_id)
-        logging.info("got activity_id %r in uri", activity_id)
-
-        ops = self.get_ops_info()
-        access_token = self.get_access_token()
-
-        counter = self.get_counter(vendor_id)
-        self.render('vendor/activity-create-step2.html',
-                vendor_id=vendor_id,
-                access_token=access_token,
-                ops=ops,
-                counter=counter,
-                activity_id=activity_id)
-
-
-    @tornado.web.authenticated  # if no session, redirect to login page
-    def post(self, vendor_id, activity_id):
-        logging.info("got vendor_id %r in uri", vendor_id)
-        logging.info("got activity_id %r in uri", activity_id)
-
-        ops = self.get_ops_info()
-
-        slope_length = self.get_argument("slope_length", "")
-        mileage = self.get_argument("mileage", "")
-        hours = self.get_argument("hours", "")
-        height = self.get_argument("height", "")
-        speed = self.get_argument("speed", "")
-        road_map_url = self.get_argument("road_map_url", "")
-        contour_map_url = self.get_argument("contour_map_url", "")
-
-        _timestamp = time.time()
-        json = {"_id":activity_id,
-                "last_update_time":_timestamp,
-                "slope_length":slope_length, "mileage":mileage, "hours":hours, "height":height, "speed":speed,
-                "road_map_url":road_map_url, "contour_map_url":contour_map_url}
-
-        cret_template_dao.cret_template_dao().update(json);
-
-        counter = self.get_counter(vendor_id)
-        self.render('vendor/activity-create-step3.html',
-                vendor_id=vendor_id,
-                ops=ops,
-                counter=counter,
-                activity_id=activity_id)
-
-
-class VendorActivityCreateStep3Handler(AuthorizationHandler):
-    @tornado.web.authenticated  # if no session, redirect to login page
-    def get(self, vendor_id, activity_id):
-        logging.info("got vendor_id %r in uri", vendor_id)
-        logging.info("got activity_id %r in uri", activity_id)
-
-        ops = self.get_ops_info()
-        access_token = self.get_access_token()
-
-        counter = self.get_counter(vendor_id)
-        self.render('vendor/activity-create-step3.html',
-                vendor_id=vendor_id,
-                access_token=access_token,
-                ops=ops,
-                counter=counter,
-                activity_id=activity_id)
-
-
-    @tornado.web.authenticated  # if no session, redirect to login page
-    def post(self, vendor_id, activity_id):
-        logging.info("got vendor_id %r in uri", vendor_id)
-        logging.info("got activity_id %r in uri", activity_id)
-
-        ops = self.get_ops_info()
-
-        activity_shared = self.get_argument("activity_shared", "")
-        cret_shared = self.get_argument("cret_shared", "")
-
-        _timestamp = time.time()
-        json = {"_id":activity_id,
-                "last_update_time":_timestamp,
-                "activity_shared":activity_shared, "cret_shared":cret_shared}
-        bonus_template_dao.bonus_template_dao().update(json);
-
         self.redirect('/vendors/' + vendor_id + '/activitys/draft')
 
 
@@ -733,33 +582,8 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         access_token = self.get_access_token()
 
         activity = self.get_activity(activity_id)
-        # _activity = activity_dao.activity_dao().query(activity_id)
-        activity['begin_time'] = timestamp_date(float(activity['begin_time'])) # timestamp -> %m/%d/%Y
-        activity['end_time'] = timestamp_date(float(activity['end_time'])) # timestamp -> %m/%d/%Y
-        activity['apply_end_time'] = timestamp_date(float(activity['apply_end_time'])) # timestamp -> %m/%d/%Y
 
-        triprouters = trip_router_dao.trip_router_dao().query_by_vendor(vendor_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        cret_template = cret_template_dao.cret_template_dao().query(activity_id)
-        bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
-
-        try:
-            bonus_template['activity_shared']
-        except:
-            bonus_template['activity_shared'] = 0
-        try:
-            bonus_template['cret_shared']
-        except:
-            bonus_template['cret_shared'] = 0
-        try:
-            cret_template['mileage']
-        except:
-            cret_template['mileage'] = 0
-        try:
-            activity['private']
-        except:
-            activity['private'] = 0
-        bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
 
         counter = self.get_counter(vendor_id)
         activity_counter = self.get_counter(activity_id)
@@ -769,10 +593,7 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
                 ops=ops,
                 activity_id=activity_id,
                 counter=counter, activity_counter=activity_counter,
-                triprouters=triprouters,
-                activity=activity, categorys=categorys,
-                bonus=bonus,
-                cret_template=cret_template)
+                activity=activity, categorys=categorys)
 
 
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -786,52 +607,11 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         _title = self.get_argument("title", "")
         img = self.get_argument("img", "")
         _category = self.get_argument("category", "")
-        _triprouter = self.get_argument("triprouter","")
-        private = self.get_argument("private", "")
-        logging.info("got private %r", private)
-        cash_only = self.get_argument("cash_only", "")
-        logging.info("got cash_only %r", cash_only)
-        subtitle = self.get_argument("subtitle", "")
-        _begin_time = self.get_argument("begin_time", "")
-        _begin_time = float(date_timestamp(_begin_time)) # %m/%d/%Y -> timestamp
-        _end_time = self.get_argument("end_time", "")
-        _end_time = float(date_timestamp(_end_time)) # %m/%d/%Y -> timestamp
-        _apply_end_time = self.get_argument("apply_end_time", "")
-        _apply_end_time = float(date_timestamp(_apply_end_time)) # %m/%d/%Y -> timestamp
-        mileage = self.get_argument("mileage", "")
-        _strength = self.get_argument("strength", "")
-        _scenery = self.get_argument("scenery", "")
-        _road_info = self.get_argument("road_info", "")
-        _kickoff = self.get_argument("kickoff", "")
-        _member_min = self.get_argument("member_min", "")
-        _member_max = self.get_argument("member_max", "")
-        logging.info("got _title %r", _title)
-
-        # _timestamp = time.time()
-        # json = {"_id":activity_id,
-        #         "last_update_time":_timestamp,
-        #         "private":private,
-        #         "title":_title, "bk_img_url":_bk_img_url, "category":_category, "triprouter":_triprouter ,"subtitle":subtitle,
-        #         "begin_time":_begin_time, "end_time":_end_time, "apply_end_time":_apply_end_time,
-        #         "mileage":mileage, "strength":_strength, "scenery":_scenery, "road_info":_road_info, "kickoff":_kickoff,
-        #         "member_min":_member_min, "member_max":_member_max}
-        # activity_dao.activity_dao().update(json);
 
         activity = {
             "title":_title,
-            "subtitle":subtitle,
             "img":img,
-            "category_id":_category,
-            "triprouter_id":_triprouter,
-            "begin_time":_begin_time, "end_time":_end_time, "apply_end_time":_apply_end_time,
-            "mileage":mileage,
-            # "amount":0,
-            "private":private,
-            "cash_only":cash_only,
-            "strength":_strength, "scenery":_scenery, "road_info":_road_info, "kickoff":_kickoff,
-            # "ext_fee_template":[], "base_fee_template":[],
-            "member_min":_member_min, "member_max":_member_max,
-            "notes":''
+            "category_id":_category
         }
         headers = {"Authorization":"Bearer "+access_token}
         url = API_DOMAIN + "/api/activities/"+ activity_id
@@ -855,9 +635,6 @@ class VendorActivityDetailStep2Handler(AuthorizationHandler):
         activity = self.get_activity(activity_id)
         # activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        cret_template = cret_template_dao.cret_template_dao().query(activity_id)
-        bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
-        bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
         try:
             qrcode['wx_qrcode_url']
@@ -878,8 +655,6 @@ class VendorActivityDetailStep2Handler(AuthorizationHandler):
                 activity_id=activity_id,
                 counter=counter, activity_counter=activity_counter,
                 activity=activity, categorys=categorys,
-                bonus=bonus,
-                cret_template=cret_template,
                 qrcode=qrcode)
 
     @tornado.web.authenticated  # if no session, redirect to login page
@@ -1020,9 +795,6 @@ class VendorActivityDetailStep5Handler(AuthorizationHandler):
         activity = self.get_activity(activity_id)
         # activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        cret_template = cret_template_dao.cret_template_dao().query(activity_id)
-        bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
-        bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
         counter = self.get_counter(vendor_id)
@@ -1033,9 +805,7 @@ class VendorActivityDetailStep5Handler(AuthorizationHandler):
                 ops=ops,
                 activity_id=activity_id,
                 counter=counter, activity_counter=activity_counter,
-                activity=activity, categorys=categorys,
-                bonus=bonus,
-                cret_template=cret_template)
+                activity=activity, categorys=categorys)
 
 
 class VendorActivityDetailStep6Handler(AuthorizationHandler):
@@ -1099,14 +869,11 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         activity = self.get_activity(activity_id)
         # activity = activity_dao.activity_dao().query(activity_id)
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        cret_template = cret_template_dao.cret_template_dao().query(activity_id)
-        bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
-        bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
         article = self.get_article(activity_id)
         if not article:
-            article = {'_id':activity_id, 'title':activity['title'], 'subtitle':activity['subtitle'], 'img':activity['bk_img_url'],'paragraphs':''}
+            article = {'_id':activity_id, 'title':activity['title'], 'subtitle':[], 'img':activity['img'],'paragraphs':''}
             self.create_article(article)
 
         counter = self.get_counter(vendor_id)
@@ -1118,8 +885,6 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
                 travel_id=activity_id,
                 counter=counter, activity_counter=activity_counter,
                 activity=activity, categorys=categorys,
-                bonus=bonus,
-                cret_template=cret_template,
                 article=article)
 
 
@@ -1135,15 +900,12 @@ class VendorActivityDetailStep7Handler(AuthorizationHandler):
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         applys = apply_dao.apply_dao().query_by_activity(activity_id)
         orders = order_dao.order_dao().query_by_activity(activity_id)
-        cret_template = cret_template_dao.cret_template_dao().query(activity_id)
-        bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
-        bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
         content = self.get_argument("content","")
         logging.info("got content %r", content)
 
-        article = {'_id':activity_id ,'title':activity['title'], 'subtitle':activity['subtitle'], 'img':activity['img'],'paragraphs':content}
+        article = {'_id':activity_id ,'title':activity['title'], 'img':activity['img'],'paragraphs':content}
         self.update_article(article)
 
         self.redirect('/vendors/' + vendor_id + '/activitys/' + activity_id + '/detail/step7')
@@ -1159,6 +921,7 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
         access_token = self.get_access_token()
 
         activity = self.get_activity(activity_id)
+        logging.info("got activity %r", activity)
         # activity = activity_dao.activity_dao().query(activity_id)
         for base_fee_template in activity['base_fee_template']:
             base_fee_template['fee'] = float(base_fee_template['fee']) / 100
@@ -1166,9 +929,6 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
             ext_fee_template['fee'] = float(ext_fee_template['fee']) / 100
 
         categorys = category_dao.category_dao().query_by_vendor(vendor_id)
-        cret_template = cret_template_dao.cret_template_dao().query(activity_id)
-        bonus_template = bonus_template_dao.bonus_template_dao().query(activity_id)
-        bonus = int(bonus_template['activity_shared']) + int(bonus_template['cret_shared'])
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
 
         counter = self.get_counter(vendor_id)
@@ -1178,9 +938,7 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
                 access_token=access_token,
                 ops=ops,
                 counter=counter, activity_counter=activity_counter,
-                activity=activity, categorys=categorys,
-                bonus=bonus,
-                cret_template=cret_template)
+                activity=activity, categorys=categorys)
 
     @tornado.web.authenticated  # if no session, redirect to login page
     def post(self, vendor_id, activity_id):

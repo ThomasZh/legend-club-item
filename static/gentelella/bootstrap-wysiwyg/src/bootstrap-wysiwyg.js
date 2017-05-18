@@ -170,16 +170,18 @@
                         $.when(readFileIntoDataUrl(fileInfo)).done(function() {
 
                             var imgFile = uploadUpyun(fileInfo, "file");
-                            $('#loadingToast').show();
+                            // $('#loadingToast').show();
+                            $.showLoading("图片上传中...");
                             var times = 0;
                             document.addEventListener('uploaded', function(e) {
-                                console.log(e);
+                                // console.log(e);
                                 if (times == 0) {
                                   // FIXME 将图片展示在编辑框内
                                   execCommand('insertimage', imgFile);
 
                                   editor.trigger('image-inserted');
-                                  $('#loadingToast').hide();
+                                  // $('#loadingToast').hide();
+                                  $.hideLoading();
                                 }
                                 times++;
                             });

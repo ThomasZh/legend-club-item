@@ -130,7 +130,7 @@ class BaseHandler(tornado.web.RequestHandler):
     def get_activity(self, activity_id):
         headers = {"Authorization":"Bearer "+DEFAULT_USER_ID}
 
-        url = API_DOMAIN + "/api/activities/"+activity_id
+        url = API_DOMAIN + "/api/items/"+activity_id
         http_client = HTTPClient()
         response = http_client.fetch(url, method="GET", headers=headers)
         logging.info("got get_activity response.body=[%r]", response.body)

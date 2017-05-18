@@ -56,8 +56,6 @@ def map():
         (r'/vendors/([a-z0-9]*)/activitys/completed', getattr(vendor_activity, 'VendorActivityCompletedHandler')),
         (r'/vendors/([a-z0-9]*)/activitys/recruit', getattr(vendor_activity, 'VendorActivityRecruitHandler')),
         (r'/vendors/([a-z0-9]*)/activitys/create/step1', getattr(vendor_activity, 'VendorActivityCreateStep1Handler')),
-        (r'/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/create/step2', getattr(vendor_activity, 'VendorActivityCreateStep2Handler')),
-        (r'/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/create/step3', getattr(vendor_activity, 'VendorActivityCreateStep3Handler')),
         (r'/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/detail/step1', getattr(vendor_activity, 'VendorActivityDetailStep1Handler')),
         (r'/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/detail/step2', getattr(vendor_activity, 'VendorActivityDetailStep2Handler')),
         (r'/vendors/([a-z0-9]*)/activitys/([a-z0-9]*)/detail/step3', getattr(vendor_activity, 'VendorActivityDetailStep3Handler')),

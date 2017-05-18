@@ -56,7 +56,7 @@
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3> 活动 <small> 草稿箱</small> </h3>
+              <h3> 商品 <small> 草稿箱</small> </h3>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -65,7 +65,7 @@
             <div class="col-md-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>草稿箱</h2>
+                  <h2>草稿箱<small>(未上架的商品)</sma></h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a href="/vendors/{{ vendor_id }}/activitys/create/step1" class="btn btn-success btn-xs">
                       <i class="fa fa-plus"></i> 添加 </a>
@@ -111,9 +111,6 @@
   <!-- pace -->
   <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
   <script src="{{ static_url('weui/js/weui.js') }}"></script>
-  <!-- daterangepicker -->
-  <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
-  <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
 
   <script>
   function confirms(id,fun,mess){
@@ -127,10 +124,9 @@
   };
   function publish(id){
     console.log(id);
-
     $.ajax({
       type: "POST",
-      url: "{{ API_DOMAIN }}/api/activities/"+id+"/publish",
+      url: "{{ API_DOMAIN }}/api/items/"+id+"/publish",
       dataType: "json",
       headers: {"Authorization":"Bearer {{access_token}}"},
       contentType: 'application/json',
@@ -153,7 +149,7 @@
 
     $.ajax({
       type: "DELETE",
-      url: "{{ API_DOMAIN }}/api/activities/"+id,
+      url: "{{ API_DOMAIN }}/api/items/"+id,
       dataType: "json",
       headers: {"Authorization":"Bearer {{access_token}}"},
       contentType: 'application/json',
@@ -182,7 +178,7 @@
           var total_page = 0;//总页数
 
           function gotoPage(pageNum) {
-            $.get("{{ API_DOMAIN }}/api/activities?filter=club&club_id={{ vendor_id }}&_status=10&page="+pageNum+"&limit="+limit+"",function(data,status){
+            $.get("{{ API_DOMAIN }}/api/items?filter=club&club_id={{ vendor_id }}&_status=10&page="+pageNum+"&limit="+limit+"",function(data,status){
                   // console.log(data);
                   data_obj = JSON.parse(data);
                   data = data_obj.rs;
@@ -195,9 +191,6 @@
               for (var i in pageData) {
                 var inner_html = '<div class="col-md-3 col-xs-12 widget widget_tally_box">';
                 inner_html += '<div class="x_panel ui-ribbon-container fixed_height_360">';
-                if (pageData[i].private == 1){
-                   inner_html += '<div class="ui-ribbon-wrapper"><div class="ui-ribbon">私有</div></div>';
-                }
                 inner_html += '<div class="x_content">';
                 inner_html += '<div class="thumbnail">';
                 inner_html += '<div class="image view view-first">';
@@ -208,9 +201,9 @@
                 inner_html += '<p>'+getLocalTime(pageData[i].create_time)+'</p>';
                 inner_html += '<div class="divider"></div>'
                 inner_html += '<p>';
-                inner_html += '<a onclick="confirms(\''+pageData[i]._id+'\',dele,\'确定删除该活动吗？\')" class="btn ap_del btn-danger btn-xs">';
+                inner_html += '<a onclick="confirms(\''+pageData[i]._id+'\',dele,\'确定删除该商品吗？\')" class="btn ap_del btn-danger btn-xs">';
                 inner_html += '<i class="fa fa-trash-o"></i> 删除 </a>';
-                inner_html += '<a onclick="confirms(\''+pageData[i]._id+'\',publish,\'确定发布该活动吗？\')" class="btn ap_del btn-success btn-xs">';
+                inner_html += '<a onclick="confirms(\''+pageData[i]._id+'\',publish,\'确定上架该商品吗？\')" class="btn ap_del btn-success btn-xs">';
                 inner_html += '<i class="fa fa-check-circle"></i> 发布 </a>';
                 inner_html += '</p></div></div></div>';
 

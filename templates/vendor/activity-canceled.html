@@ -61,7 +61,7 @@
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3> 活动 <small> 已取消</small> </h3>
+              <h3> 商品 <small> 已取消</small> </h3>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -103,16 +103,7 @@
     </div>
 
   </div>
-
-  <div id="custom_notifications" class="custom-notifications dsp_none">
-    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
-    </ul>
-    <div class="clearfix"></div>
-    <div id="notif-group" class="tabbed_notifications"></div>
-  </div>
-
   <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
-
   <!-- bootstrap progress js -->
   <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
   <!-- icheck -->
@@ -137,7 +128,7 @@
 
         $.ajax({
           type: "POST",
-          url: "{{ API_DOMAIN }}/api/activities/"+id+"/cancel",
+          url: "{{ API_DOMAIN }}/api/items/"+id+"/cancel",
           dataType: "json",
           headers: {"Authorization":"Bearer {{access_token}}"},
           contentType: 'application/json',
@@ -164,7 +155,7 @@
           var total_page = 0;//总页数
 
       function gotoPage(pageNum) {
-          $.get("{{ API_DOMAIN }}/api/activities?filter=club&club_id={{ vendor_id }}&_status=5&page="+pageNum+"&limit="+limit+"",function(data,status){
+          $.get("{{ API_DOMAIN }}/api/items?filter=club&club_id={{ vendor_id }}&_status=5&page="+pageNum+"&limit="+limit+"",function(data,status){
                 // console.log(data);
                 data_obj = JSON.parse(data);
                 data = data_obj.rs;
@@ -177,9 +168,6 @@
             for (var i in pageData) {
               var inner_html = '<div class="col-md-3 col-xs-12 widget widget_tally_box">';
               inner_html += '<div class="x_panel ui-ribbon-container fixed_height_360">';
-              if (pageData[i].private == 1){
-                 inner_html += '<div class="ui-ribbon-wrapper"><div class="ui-ribbon">私有</div></div>';
-              }
               inner_html += '<div class="x_content">';
               inner_html += '<div class="thumbnail">';
               inner_html += '<div class="image view view-first">';

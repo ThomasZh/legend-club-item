@@ -11,6 +11,8 @@
   <title>骑无止境</title>
 
   <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="{{ static_url('jquery-weui/lib/weui.min.css') }}">
+  <link rel="stylesheet" href="{{ static_url('jquery-weui/css/jquery-weui.min.css') }}">
   <link href="{{ static_url('gentelella/bootstrap/dist/css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('gentelella/fontawesome/css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('gentelella/animate.css/animate.min.css') }}" rel="stylesheet">
@@ -71,8 +73,8 @@
             <div class="left"></div>
             <div class="right">
               <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step1">
-              <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
-              <div class="count">{{activity['member_min']}}-{{activity['member_max']}}</div>
+              <span class="count_top"><i class="fa fa-info-circle"></i> 商品信息</span>
+              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
               <span class="count_bottom"><i class="green">Step1 </i> 基本信息</span>
               </a>
             </div>
@@ -80,34 +82,30 @@
           <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
             <div class="left"></div>
             <div class="right">
+              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step8">
+              <span class="count_top"><i class="fa fa-cny"></i> 费用说明</span>
+              <div class="count"><i class="glyphicon glyphicon-yen"></i></div>
+              <span class="count_bottom"><i class="green">Step2 </i> 编辑</span>
+              </a>
+            </div>
+          </div>
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
+              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step7">
+              <span class="count_top"><i class="fa fa-info-circle"></i> 商品信息</span>
+              <div class="count green"><i class="glyphicon glyphicon-pencil"></i></div>
+              <span class="count_bottom"><i class="red">Step3 </i> 详情</span>
+              </a>
+            </div>
+          </div>
+          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
+            <div class="left"></div>
+            <div class="right">
               <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step2">
-              <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
+              <span class="count_top"><i class="fa fa-info-circle"></i> 商品信息</span>
               <div class="count"><i class="fa fa-wechat"></i></div>
-              <span class="count_bottom"><i class="green">Step2 </i> 二维码</span>
-              </a>
-            </div>
-          </div>
-          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-            <div class="left"></div>
-            <div class="right">
-              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step3">
-              <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
-              {% if cret_template %}
-              <div class="count">{{cret_template['mileage']}}<small>km</small></div>
-              {% else %}
-              <div class="count">0<small>km</small></div>
-              {% end %}
-              <span class="count_bottom"><i class="green">Step3 </i> 证书</span>
-              </a>
-            </div>
-          </div>
-          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-            <div class="left"></div>
-            <div class="right">
-              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step4">
-              <span class="count_top"><i class="fa fa-info-circle"></i> 活动信息</span>
-              <div class="count">{{ bonus }}<small>积分</small></div>
-              <span class="count_bottom"><i class="green">Step4 </i> 分享</span>
+              <span class="count_bottom"><i class="green">Step4 </i> 二维码</span>
               </a>
             </div>
           </div>
@@ -121,62 +119,17 @@
               {% else %}
               <div class="count">0 <small>笔</small></div>
               {% end %}
-              <span class="count_bottom"><i class="red">Step5 </i> 付费信息</span>
+              <span class="count_bottom"><i class="green">Step5 </i> 付费信息</span>
               </a>
             </div>
           </div>
-          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-            <div class="left"></div>
-            <div class="right">
-              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step6">
-              <span class="count_top"><i class="fa fa-user"></i> 会员报名</span>
-              {% if activity_counter and activity_counter.has_key('apply') %}
-              <div class="count">{{ activity_counter['apply'] }}<small>人次</small></div>
-              {% else %}
-              <div class="count">0 <small>人次</small></div>
-              {% end %}
-              <span class="count_bottom"><i class="green">Step6  </i> 报名信息</span>
-              </a>
-            </div>
-          </div>
-          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-            <div class="left"></div>
-            <div class="right">
-              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step7">
-              <span class="count_top"><i class="fa fa-calendar"></i> 详细行程</span>
-              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
-              <span class="count_bottom"><i class="red">Step7 </i> 编辑</span>
-              </a>
-            </div>
-          </div>
-          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-            <div class="left"></div>
-            <div class="right">
-              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step8">
-              <span class="count_top"><i class="fa fa-money"></i> 费用说明</span>
-              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
-              <span class="count_bottom"><i class="green">Step8 </i> 编辑</span>
-              </a>
-            </div>
-          </div>
-          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-            <div class="left"></div>
-            <div class="right">
-              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step9">
-              <span class="count_top"><i class="fa fa-suitcase"></i> 备注描述</span>
-              <div class="count"><i class="glyphicon glyphicon-pencil"></i></div>
-              <span class="count_bottom"><i class="green">Step9 </i> 编辑</span>
-              </a>
-            </div>
-          </div>
-
         </div>
         <!-- /top tiles -->
 
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3>活动 <small> 编辑</small></h3>
+              <h3>商品 <small> 编辑</small></h3>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -186,7 +139,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>详细行程 <small>可以直接编辑</small></h2>
+                  <h2>详细描述 <small>可以直接编辑</small></h2>
 
                   <div class="clearfix"></div>
                 </div>
@@ -194,27 +147,6 @@
 
                   <form id="create-form" class="form-horizontal form-label-left" enctype="multipart/form-data" method="post" action="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step7">
                       <div class="form-group">
-                          <!-- uploading toast -->
-                          <div id="loadingToast" class="weui_loading_toast" style="display:none;">
-                              <div class="weui_mask_transparent"></div>
-                              <div class="weui_toast">
-                                  <div class="weui_loading">
-                                      <div class="weui_loading_leaf weui_loading_leaf_0"></div>
-                                      <div class="weui_loading_leaf weui_loading_leaf_1"></div>
-                                      <div class="weui_loading_leaf weui_loading_leaf_2"></div>
-                                      <div class="weui_loading_leaf weui_loading_leaf_3"></div>
-                                      <div class="weui_loading_leaf weui_loading_leaf_4"></div>
-                                      <div class="weui_loading_leaf weui_loading_leaf_5"></div>
-                                      <div class="weui_loading_leaf weui_loading_leaf_6"></div>
-                                      <div class="weui_loading_leaf weui_loading_leaf_7"></div>
-                                      <div class="weui_loading_leaf weui_loading_leaf_8"></div>
-                                      <div class="weui_loading_leaf weui_loading_leaf_9"></div>
-                                      <div class="weui_loading_leaf weui_loading_leaf_10"></div>
-                                      <div class="weui_loading_leaf weui_loading_leaf_11"></div>
-                                  </div>
-                                  <p class="weui_toast_content">图片上传中...</p>
-                              </div>
-                          </div>
 
                           <div class="form-group">
                               <div class="col-md-12 col-sm-12 col-xs-12">
@@ -315,14 +247,11 @@
                 </div>
               </div>
             </div>
-
           </div>
-        </div>
-
         <!-- footer content -->
         {% module Template("vendor/footer-block.html") %}
         <!-- /footer content -->
-
+      </div>
       </div>
       <!-- /page content -->
     </div>
@@ -338,6 +267,7 @@
   <script src="{{ static_url('gentelella/moment/min/moment.min.js') }}" type="text/javascript"></script>
   <script src="{{ static_url('gentelella/bootstrap-daterangepicker/daterangepicker.js') }}" type="text/javascript"></script>
   <!-- bootstrap-wysiwyg -->
+  <script src="{{ static_url('jquery-weui/js/jquery-weui.min.js') }}"></script>
   <script src="{{ static_url('gentelella/bootstrap-wysiwyg/src/bootstrap-wysiwyg.js') }}"></script>
   <script src="{{ static_url('gentelella/jquery.hotkeys/jquery.hotkeys.js') }}"></script>
   <script src="{{ static_url('gentelella/google-code-prettify/src/prettify.js') }}"></script>
@@ -388,12 +318,12 @@
                   var file1 = document.getElementById('file1').files[0];
                   //alert(file.name);
                   var imgUrl = uploadUpyun(file1, 'file1');
-                  $('#loadingToast').show();
+                  // $.showLoading("图片上传中...");
                   document.getElementById("img").value = imgUrl;
               }
               document.addEventListener('uploaded',function(e) {
                 //alert('uploaded');
-                $('#loadingToast').hide();
+                // $.hideLoading();
               });
 
               function uuid() {
@@ -432,7 +362,6 @@
                   var d = new Date();
                   var month = d.getMonth() + 1;
                   var filename = '/articles/bg/' + d.getFullYear() + '/' + month + '/' + d.getDate() + '/' + uuid() + ext;
-                  console.log(filename);
                   instance.upload(filename);
 
 

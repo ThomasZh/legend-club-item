@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>骑无止境 ｜ 招募中</title>
+  <title>骑无止境 ｜ 销售中</title>
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="{{ static_url('weui/lib/weui.css') }}">
@@ -60,7 +60,7 @@
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3> 活动 <small> 招募中</small> </h3>
+              <h3> 商品 </h3>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -69,7 +69,7 @@
             <div class="col-md-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>招募中 <small> 招募中 </small></h2>
+                  <h2>销售中</h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                     </li>
@@ -134,36 +134,13 @@
 
         $.ajax({
           type: "POST",
-          url: "{{ API_DOMAIN }}/api/activities/"+id+"/cancel",
+          url: "{{ API_DOMAIN }}/api/items/"+id+"/unpublish",
           dataType: "json",
           headers: {"Authorization":"Bearer {{access_token}}"},
           contentType: 'application/json',
           success: function(data, status, xhr) {
               weui.Loading.success();
-              location.href = "/vendors/{{vendor_id}}/activitys/canceled";
-          },
-          error: function(XMLHttpRequest, textStatus, errorThrown) {
-            console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
-            $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
-          },
-          complete: function(XMLHttpRequest, textStatus) {
-            this; // 调用本次AJAX请求时传递的options参数
-          }
-        });
-      };
-
-      function starts(id){
-        console.log(id);
-
-        $.ajax({
-          type: "POST",
-          url: "{{ API_DOMAIN }}/api/activities/"+id+"/kickoff",
-          dataType: "json",
-          headers: {"Authorization":"Bearer {{access_token}}"},
-          contentType: 'application/json',
-          success: function(data, status, xhr) {
-              weui.Loading.success();
-              location.href = "/vendors/{{vendor_id}}/activitys/doing";
+              location.href = "/vendors/{{vendor_id}}/activitys/draft";
           },
           error: function(XMLHttpRequest, textStatus, errorThrown) {
             console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
@@ -180,7 +157,7 @@
 
         $.ajax({
           type: "POST",
-          url: "{{ API_DOMAIN }}/api/activities/"+id+"/popular",
+          url: "{{ API_DOMAIN }}/api/items/"+id+"/popular",
           dataType: "json",
           headers: {"Authorization":"Bearer {{access_token}}"},
           contentType: 'application/json',
@@ -207,7 +184,7 @@
           var total_page = 0;//总页数
 
       function gotoPage(pageNum) {
-          $.get("{{ API_DOMAIN }}/api/activities?filter=club&club_id={{ vendor_id }}&_status=20&page="+pageNum+"&limit="+limit+"",function(data,status){
+          $.get("{{ API_DOMAIN }}/api/items?filter=club&club_id={{ vendor_id }}&_status=20&page="+pageNum+"&limit="+limit+"",function(data,status){
                 // console.log(data);
                 data_obj = JSON.parse(data);
                 data = data_obj.rs;
@@ -220,9 +197,6 @@
             for (var i in pageData) {
               var inner_html = '<div class="col-md-3 col-xs-12 widget widget_tally_box">';
               inner_html += '<div class="x_panel ui-ribbon-container fixed_height_360">';
-              if (pageData[i].private == 1){
-                 inner_html += '<div class="ui-ribbon-wrapper"><div class="ui-ribbon">私有</div></div>';
-              }
               inner_html += '<div class="x_content">';
               inner_html += '<div class="thumbnail">';
               inner_html += '<div class="image view view-first">';
@@ -233,14 +207,12 @@
               inner_html += '<p>'+getLocalTime(pageData[i].create_time)+'</p>';
               inner_html += '<div class="divider"></div>'
               inner_html += '<p>';
-              inner_html += '<a onclick="confirms(\''+pageData[i]._id+'\',cancel,\'确定取消活动吗？\')" class="btn ap_del btn-danger btn-xs">';
+              inner_html += '<a onclick="confirms(\''+pageData[i]._id+'\',cancel,\'确定下架商品吗？\')" class="btn ap_del btn-danger btn-xs">';
               inner_html += '<i class="fa fa-trash-o"></i> 取消 </a>';
               if (pageData[i].popular != 1){
-                inner_html += '<a onclick="confirms(\''+pageData[i]._id+'\',popular,\'确定设置为热门活动吗？\')" class="btn ap_del btn-info btn-xs">';
+                inner_html += '<a onclick="confirms(\''+pageData[i]._id+'\',popular,\'确定设置为热门商品吗？\')" class="btn ap_del btn-info btn-xs">';
                 inner_html += '<i class="fa fa-pencil-square-o"></i> 设置热门 </a>';
               }
-              inner_html += '<a onclick="confirms(\''+pageData[i]._id+'\',starts,\'确定开始活动吗？\')" class="btn ap_del btn-success btn-xs">';
-              inner_html += '<i class="fa fa-check-circle"></i> 开始 </a>';
               inner_html += '</p></div></div></div>';
 
               $('#x_Box').append(inner_html);
