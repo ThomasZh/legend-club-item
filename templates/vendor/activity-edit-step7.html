@@ -435,6 +435,9 @@
 
                 $("#state_btn").on("click",function(){
                   // console.log($("#editor").html());
+                  if($("#editor").html() == ""){
+                    return false;
+                  }
                   $("#editor_input").val($("#editor").html());
                   $("#create-form").submit();
 
