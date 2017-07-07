@@ -206,16 +206,17 @@ class VendorOrderInfoHandler(AuthorizationHandler):
         access_token = self.get_access_token()
 
         ops = self.get_ops_info()
+        #
+        # order_index = self.get_order_index(order_id)
+        # logging.info("got order_index %r in uri", order_index)
 
-        order_index = self.get_order_index(order_id)
-        logging.info("got order_index %r in uri", order_index)
-        order_index['create_time'] = timestamp_datetime(order_index['create_time'])
-        order_index['booking_time'] = timestamp_datetime(order_index['booking_time'])
         order = self.get_symbol_object(order_id)
+        logging.info("got order %r in uri", order)
 
         for base_fee in order['base_fees']:
             # 价格转换成元
             order['activity_amount'] = float(base_fee['fee']) / 100
+
         if not order.has_key('activity_amount'):
             order['activity_amount'] = 0
 
@@ -230,29 +231,34 @@ class VendorOrderInfoHandler(AuthorizationHandler):
         for insurance in order['insurances']:
             # 价格转换成元
             insurance['fee'] = float(insurance['fee']) / 100
-
+        order['create_time'] = timestamp_datetime(order['create_time'])
         order['amount'] = float(order['amount']) / 100
         order['points_used'] = float(order['points_used']) / 100
-        order_index['actual_payment'] = float(order_index['actual_payment']) / 100
-        order_index['amount'] = float(order_index['amount']) / 100
+        # order['actual_payment'] = float(order['actual_payment']) / 100
+        # order['amount'] = float(order['amount']) / 100
 
-        params = {"filter":"order", "order_id":order_id, "page":1, "limit":20}
-        url = url_concat(API_DOMAIN + "/api/applies", params)
-        http_client = HTTPClient()
-        headers = {"Authorization":"Bearer " + access_token}
-        response = http_client.fetch(url, method="GET", headers=headers)
-        logging.info("got response.body %r", response.body)
-        data = json_decode(response.body)
-        rs = data['rs']
-        applies = rs['data']
-
-        for _apply in applies:
-            # 下单时间，timestamp -> %m月%d 星期%w
-            _apply['create_time'] = timestamp_datetime(float(_apply['create_time']))
-            if _apply['gender'] == 'male':
-                _apply['gender'] = u'男'
-            else:
-                _apply['gender'] = u'女'
+        # params = {"filter":"order", "order_id":order_id, "page":1, "limit":20}
+        # url = url_concat(API_DOMAIN + "/api/applies", params)
+        # http_client = HTTPClient()
+        # headers = {"Authorization":"Bearer " + access_token}
+        # response = http_client.fetch(url, method="GET", headers=headers)
+        # logging.info("got response.body %r", response.body)
+        # data = json_decode(response.body)
+        # rs = data['rs']
+        applies = order['items']
+        logging.info("get applies %r",applies)
+        for applys in applies:
+            logging.info(applys['fee'])
+            applys['fee'] = float(applys['fee']) / 100
+            # applys['total_fee'] = applys['fee']*applys['quantity']
+        #
+        # for _apply in applies:
+        #     # 下单时间，timestamp -> %m月%d 星期%w
+        #     _apply['create_time'] = timestamp_datetime(float(_apply['create_time']))
+        #     if _apply['gender'] == 'male':
+        #         _apply['gender'] = u'男'
+        #     else:
+        #         _apply['gender'] = u'女'
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/order-detail.html',
@@ -260,6 +266,5 @@ class VendorOrderInfoHandler(AuthorizationHandler):
                 ops=ops,
                 access_token=access_token,
                 counter=counter,
-                order_index=order_index,
                 order=order,
                 applies=applies)
