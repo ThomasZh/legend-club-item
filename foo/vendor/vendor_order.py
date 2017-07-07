@@ -248,9 +248,9 @@ class VendorOrderInfoHandler(AuthorizationHandler):
         applies = order['items']
         logging.info("get applies %r",applies)
         for applys in applies:
-            logging.info(applys['fee'])
+            applys['total_fee'] = float(applys['fee'])*float(applys['quantity']) / 100
             applys['fee'] = float(applys['fee']) / 100
-            # applys['total_fee'] = applys['fee']*applys['quantity']
+
         #
         # for _apply in applies:
         #     # 下单时间，timestamp -> %m月%d 星期%w
