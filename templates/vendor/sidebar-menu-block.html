@@ -5,16 +5,11 @@
     <h3>管理员</h3>
     <ul class="nav side-menu">
       <li><a><i class="fa fa-bicycle"></i> 商品 <span class="fa fa-chevron-down"></span></a>
-        <ul class="nav child_menu" style="display: none">
+        <ul class="nav child_menu">
+          <li><a href="/vendors/{{ vendor_id }}/categorys">分类</a></li>
           <li><a href="/vendors/{{ vendor_id }}/activitys/pop">热门</a></li>
           <li><a href="/vendors/{{ vendor_id }}/activitys/draft">草稿箱</a></li>
           <li><a href="/vendors/{{ vendor_id }}/activitys/recruit">销售中</a></li>
-        </ul>
-      </li>
-      <li><a><i class="fa  fa-tag"></i> 分类 <span class="fa fa-chevron-down"></span></a>
-        <ul class="nav child_menu" style="display: none">
-          <li><a href="＃">一级分类</a></li>
-          <li><a href="＃">二级分类</a></li>
         </ul>
       </li>
     {% if counter and counter.has_key('activity_order') and counter['activity_order'] != "0" %}

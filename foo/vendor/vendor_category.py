@@ -62,7 +62,17 @@ class VendorCategoryListHandler(AuthorizationHandler):
 
         ops = self.get_ops_info()
 
-        categorys = category_dao.category_dao().query_by_vendor(vendor_id)
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
+
+        url = API_DOMAIN + "/api/def/leagues/"+ LEAGUE_ID +"/categories"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        categorys = data['rs']
+
         counter = self.get_counter(vendor_id)
         self.render('vendor/category-list.html',
                 vendor_id=vendor_id,
@@ -70,8 +80,37 @@ class VendorCategoryListHandler(AuthorizationHandler):
                 counter=counter,
                 categorys=categorys)
 
+# 二级分类
+class VendorCategorySecondaryHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
 
-# /vendors/<string:vendor_id>/categorys/create
+        ops = self.get_ops_info()
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
+
+        category_id = self.get_argument('category_id','')
+        logging.info("get category_id",category_id)
+
+        url = API_DOMAIN + "/api/def/categories/"+ category_id +"/level2"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        second_categorys = data['rs']
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/category-second.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                counter=counter,
+                category_id=category_id,
+                second_categorys=second_categorys)
+
+
+# /vendors/<string:vendor_id>/categorys/create first_category
 class VendorCategoryCreateHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
@@ -86,25 +125,231 @@ class VendorCategoryCreateHandler(AuthorizationHandler):
                 counter=counter)
 
     @tornado.web.authenticated  # if no session, redirect to login page
-    def post(self, vendor_id):
-        logging.info("got vendor_id %r in uri", vendor_id)
+    def post(self,vendor_id):
+        logging.info("GET vendor_id %r", vendor_id)
+
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
 
         ops = self.get_ops_info()
 
         title = self.get_argument("title", "")
-        desc = self.get_argument("desc", "")
-        bk_img_url = self.get_argument("bk_img_url", "")
         logging.debug("got param title %r", title)
-        logging.debug("got param desc %r", desc)
-        logging.debug("got param bk_img_url %r", bk_img_url)
 
-        _id = str(uuid.uuid1()).replace('-', '')
-        logging.info("create categroy _id %r", _id)
-        categroy = {"_id":_id, "vendor_id":vendor_id,
-                "title":title, "desc":desc ,"bk_img_url":bk_img_url}
-        category_dao.category_dao().create(categroy);
+        categroy = {"league_id":LEAGUE_ID, "parent_id":"00000000000000000000000000000000", "level":1,
+                    "title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png",}
+
+        url = API_DOMAIN+"/api/def/categories"
+        http_client = HTTPClient()
+        headers={"Authorization":"Bearer "+access_token}
+        _json = json_encode(categroy)
+        logging.info("request %r body %r", url, _json)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
 
         self.redirect('/vendors/' + vendor_id + '/categorys')
+
+
+# /create second_category
+class VendorCategoryCreateSecondHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        category_id = self.get_argument('category_id','')
+        logging.info("get category_id",category_id)
+
+        ops = self.get_ops_info()
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/category-second-create.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                category_id=category_id,
+                counter=counter)
+
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def post(self,vendor_id):
+        logging.info("GET vendor_id %r", vendor_id)
+
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
+
+        ops = self.get_ops_info()
+
+        title = self.get_argument("title", "")
+        logging.debug("got param title %r", title)
+
+        parent_id = self.get_argument('category_id','')
+        logging.info("get parent_id",parent_id)
+
+        categroy = {"league_id":LEAGUE_ID, "parent_id":parent_id, "level":2,
+                    "title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png",}
+
+        url = API_DOMAIN+"/api/def/categories"
+        http_client = HTTPClient()
+        headers={"Authorization":"Bearer "+access_token}
+        _json = json_encode(categroy)
+        logging.info("request %r body %r", url, _json)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+
+        self.redirect('/vendors/' + vendor_id + '/categorys/secondary?category_id='+parent_id)
+
+
+# /品牌 brand
+class VendorCategorySecondaryBrandHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
+
+        second_categorys_id = self.get_argument('second_categorys_id','')
+        logging.info("get second_categorys_id",second_categorys_id)
+
+        url = API_DOMAIN + "/api/def/categories/"+ second_categorys_id +"/brands"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        second_brands = data['rs']
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/category-brand.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                counter=counter,
+                second_categorys_id=second_categorys_id,
+                second_brands=second_brands)
+
+
+# /create 品牌
+class VendorCategoryCreateBrandHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        second_categorys_id = self.get_argument('second_categorys_id','')
+        logging.info("get second_categorys_id",second_categorys_id)
+
+        ops = self.get_ops_info()
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/category-brand-create.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                second_categorys_id=second_categorys_id,
+                counter=counter)
+
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def post(self,vendor_id):
+        logging.info("GET vendor_id %r", vendor_id)
+
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
+
+        ops = self.get_ops_info()
+
+        title = self.get_argument("title", "")
+        logging.debug("got param title %r", title)
+
+        second_categorys_id = self.get_argument('second_categorys_id','')
+        logging.info("get second_categorys_id",second_categorys_id)
+
+        categroy = {"category_id":second_categorys_id, "title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png",}
+
+        url = API_DOMAIN+"/api/def/brands"
+        http_client = HTTPClient()
+        headers={"Authorization":"Bearer "+access_token}
+        _json = json_encode(categroy)
+        logging.info("request %r body %r", url, _json)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+
+        self.redirect('/vendors/' + vendor_id + '/categorys/secondary/brand?second_categorys_id='+second_categorys_id)
+
+
+# /规格spec
+class VendorCategorySecondarySpecHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
+
+        second_categorys_id = self.get_argument('second_categorys_id','')
+        logging.info("get second_categorys_id",second_categorys_id)
+
+        url = API_DOMAIN + "/api/def/categories/"+ second_categorys_id +"/specs"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        second_specs = data['rs']
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/category-spec.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                counter=counter,
+                second_categorys_id=second_categorys_id,
+                second_specs=second_specs)
+
+
+# /create 规格
+class VendorCategoryCreateSpecHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        second_categorys_id = self.get_argument('second_categorys_id','')
+        logging.info("get second_categorys_id",second_categorys_id)
+
+        ops = self.get_ops_info()
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/category-spec-create.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                second_categorys_id=second_categorys_id,
+                counter=counter)
+
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def post(self,vendor_id):
+        logging.info("GET vendor_id %r", vendor_id)
+
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
+
+        ops = self.get_ops_info()
+
+        title = self.get_argument("title", "")
+        logging.debug("got param title %r", title)
+
+        second_categorys_id = self.get_argument('second_categorys_id','')
+        logging.info("get second_categorys_id",second_categorys_id)
+
+        unit = self.get_argument('unit','')
+        logging.info("get unit",unit)
+
+        categroy = {"category_id":second_categorys_id, "title":title, 'amount':0, 'unit':unit, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png",}
+
+        url = API_DOMAIN+"/api/def/specs"
+        http_client = HTTPClient()
+        headers={"Authorization":"Bearer "+access_token}
+        _json = json_encode(categroy)
+        logging.info("request %r body %r", url, _json)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+
+        self.redirect('/vendors/' + vendor_id + '/categorys/secondary/spec?second_categorys_id='+second_categorys_id)
 
 
 # /vendors/<string:vendor_id>/categorys/<string:category_id>/edit

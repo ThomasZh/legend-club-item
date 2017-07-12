@@ -26,16 +26,6 @@
   <!-- fileinput -->
   <link rel="stylesheet" href="{{ static_url("css/fileinput.min.css")}}">
 
-  <!--[if lt IE 9]>
-        <script src="../assets/js/ie8-responsive-file-warning.js"></script>
-        <![endif]-->
-
-  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-  <!--[if lt IE 9]>
-          <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-          <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-        <![endif]-->
-
 </head>
 
 
@@ -77,7 +67,7 @@
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3>活动 <small> 创建分类</small></h3>
+              <h3>商品 <small> 添加品牌</small></h3>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -87,7 +77,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>活动分类信息 <small>*为必填项</small></h2>
+                  <h2>商品分类信息 <small>*为必填项</small></h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                     </li>
@@ -99,11 +89,11 @@
                 <div class="x_content">
                   <br />
                   <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
-                    action="/vendors/{{ vendor_id }}/categorys/create" method="POST">
+                    action="/vendors/{{ vendor_id }}/categorys/secondary/creat/brand" method="POST">
   					        {% raw xsrf_form_html() %}
-
+                    <input type="hidden" name="second_categorys_id" value="{{ second_categorys_id }}">
                     <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">分类名称 <span class="required">*</span>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">品牌名称 <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
                         <input type="text" id="title" name="title" required="required" class="form-control col-md-7 col-xs-12">
@@ -113,7 +103,7 @@
                     <div class="form-group">
                       <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
                         <button type="button" class="btn btn-primary" onclick="history.go(-1);">重置</button>
-                        <button type="submit" class="btn btn-success">创建</button>
+                        <button type="submit" class="btn btn-success">添加</button>
                       </div>
                     </div>
                   </form>

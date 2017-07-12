@@ -44,7 +44,21 @@ def map():
         # vendor category
         (r'/', getattr(vendor_category, 'VendorIndexHandler')),
         (r'/vendors/([a-z0-9]*)/categorys', getattr(vendor_category, 'VendorCategoryListHandler')),
+        # 二级分类
+        (r'/vendors/([a-z0-9]*)/categorys/secondary', getattr(vendor_category, 'VendorCategorySecondaryHandler')),
+        # 品牌
+        (r'/vendors/([a-z0-9]*)/categorys/secondary/brand', getattr(vendor_category, 'VendorCategorySecondaryBrandHandler')),
+        # 规格
+        (r'/vendors/([a-z0-9]*)/categorys/secondary/spec', getattr(vendor_category, 'VendorCategorySecondarySpecHandler')),
+        # 创建一级分类
         (r'/vendors/([a-z0-9]*)/categorys/create', getattr(vendor_category, 'VendorCategoryCreateHandler')),
+        # 创建二级分类
+        (r'/vendors/([a-z0-9]*)/categorys/create/second', getattr(vendor_category, 'VendorCategoryCreateSecondHandler')),
+        # 创建品牌
+        (r'/vendors/([a-z0-9]*)/categorys/secondary/creat/brand', getattr(vendor_category, 'VendorCategoryCreateBrandHandler')),
+        # 创建规格
+        (r'/vendors/([a-z0-9]*)/categorys/secondary/creat/spec', getattr(vendor_category, 'VendorCategoryCreateSpecHandler')),
+
         (r'/vendors/([a-z0-9]*)/categorys/([a-z0-9]*)/edit', getattr(vendor_category, 'VendorCategoryEditHandler')),
         (r'/vendors/([a-z0-9]*)/categorys/([a-z0-9]*)/delete', getattr(vendor_category, 'VendorCategoryDeleteHandler')),
 

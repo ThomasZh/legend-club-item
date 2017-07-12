@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>骑无止境 | 分类</title>
+  <title>骑无止境 | 二级分类品牌</title>
 
   <!-- Bootstrap core CSS -->
   <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -68,11 +68,11 @@
             <div class="col-md-6 col-sm-6 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>分类 <small>一级分类</small></h2>
+                  <h2>分类 <small>一级分类</small>&nbsp><small>二级分类</small>&nbsp><small>品牌</small></h2>
 
                   <ul class="nav navbar-right panel_toolbox">
-                  	<li><a href="/vendors/{{ vendor_id }}/categorys/create" class="btn btn-success btn-xs">
-                      <i class="fa fa-plus"></i> 添加 </a>
+                  	<li><a href="/vendors/{{ vendor_id }}/categorys/secondary/creat/brand?second_categorys_id={{ second_categorys_id }}" class="btn btn-success btn-xs">
+                      <i class="fa fa-plus"></i> 添加品牌 </a>
                   	</li>
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                     </li>
@@ -93,7 +93,7 @@
                     </thead>
                     <tbody>
                     <input type="hidden" value="{{ i=1 }}"></input>
-                    {% for category in categorys %}
+                    {% for category in second_brands %}
                       <tr>
                         <th scope="row">{{ i }}</th>
                         <td>{{ category["title"] }}</td>
@@ -102,8 +102,6 @@
                             <i class="fa fa-pencil"></i> 编辑 </a>
                           <a href="/vendors/{{ vendor_id }}/categorys/{{ category['_id'] }}/delete" class="btn btn-danger btn-xs">
                             <i class="fa fa-trash-o"></i> 删除 </a>
-                          <a href="/vendors/{{ vendor_id }}/categorys/secondary?category_id={{ category['_id'] }}" class="btn btn-success btn-xs">
-                            <i class="fa fa-eye"></i> 查看二级分类 </a>
                         </td>
                       </tr>
                       <input type="hidden" value="{{ i=i+1 }}"></input>
