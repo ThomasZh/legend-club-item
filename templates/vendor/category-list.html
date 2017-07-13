@@ -11,6 +11,8 @@
   <title>骑无止境 | 分类</title>
 
   <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
+  <link rel="stylesheet" href="{{ static_url('weui/css/jquery-weui.min.css') }}">
   <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
@@ -98,9 +100,9 @@
                         <th scope="row">{{ i }}</th>
                         <td>{{ category["title"] }}</td>
                         <td>
-                          <a href="/vendors/{{ vendor_id }}/categorys/{{ category['_id'] }}/edit" class="btn btn-info btn-xs">
+                          <a data_id = "{{ category['_id'] }}" class="btn btn-info btn-xs cate-edit">
                             <i class="fa fa-pencil"></i> 编辑 </a>
-                          <a href="/vendors/{{ vendor_id }}/categorys/{{ category['_id'] }}/delete" class="btn btn-danger btn-xs">
+                          <a data_id = "{{ category['_id'] }}" class="btn btn-danger btn-xs cate-dele">
                             <i class="fa fa-trash-o"></i> 删除 </a>
                           <a href="/vendors/{{ vendor_id }}/categorys/secondary?category_id={{ category['_id'] }}" class="btn btn-success btn-xs">
                             <i class="fa fa-eye"></i> 查看二级分类 </a>
@@ -127,27 +129,95 @@
     </div>
 
   </div>
-
-  <div id="custom_notifications" class="custom-notifications dsp_none">
-    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
-    </ul>
-    <div class="clearfix"></div>
-    <div id="notif-group" class="tabbed_notifications"></div>
-  </div>
-
   <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
-
   <!-- bootstrap progress js -->
   <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
   <!-- icheck -->
   <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
-
   <script src="{{ static_url('admin/js/custom.js') }}"></script>
   <!-- pace -->
   <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
   <!-- form validation -->
   <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+  <script src="{{ static_url('weui/js/jquery-weui.min.js') }}"></script>
+  <script type="text/javascript">
+  $(function(){
+    // 分类删除
+      function dele(category_id){
+        $.ajax({
+          type: "DELETE",
+          url: "{{ API_DOMAIN }}/api/def/categories/"+category_id,
+          dataType: "json",
+          headers: {"Authorization":"Bearer {{access_token}}"},
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
 
+          },
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+            $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+          },
+          complete: function(XMLHttpRequest, textStatus) {
+            this; // 调用本次AJAX请求时传递的options参数
+          }
+        });
+      };
+      // 分类编辑
+      function cateEidt(category_id,title){
+        var data= {"title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png"};
+        var _json = JSON.stringify(data);
+        $.ajax({
+          type: "PUT",
+          url: "{{ API_DOMAIN }}/api/def/categories/"+category_id,
+          dataType: "json",
+          data:_json,
+          headers: {"Authorization":"Bearer {{access_token}}"},
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+
+          },
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+            $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+          },
+          complete: function(XMLHttpRequest, textStatus) {
+            this; // 调用本次AJAX请求时传递的options参数
+          }
+        });
+      };
+
+      $(document).on('click','.cate-dele',function(){
+        category_id = $(this).attr('data_id');
+        var _this = $(this);
+        $.confirm('确定删除该分类吗？',function(){
+          dele(category_id);
+          _this.parent().parent().remove();
+        },function(){
+            // 取消操作
+        })
+
+      });
+      // 修改操作
+      $(document).on('click','.cate-edit',function(){
+        $(this).html('<i class="fa fa-save"></i> 保存')
+        var old_text = $(this).parent().prev().text();
+        var input = $('<input type="text" class="c-edit" value="'+old_text+'" style="width:100px;" />');
+        $(this).parent().prev().html(input);
+        $(this).removeClass('cate-edit').addClass('cate-save');
+      }).on('click','.cate-save',function(){
+        var title = $(".c-edit").val();
+        if(title == ""){
+          $.alert('分类名不能为空！');
+          return false;
+        }
+        var _id = $(this).attr('data_id');
+        cateEidt(_id,title);
+        $(this).parent().prev().html(title);
+        $(this).html('<i class="fa fa-pencil"></i> 编辑');
+        $(this).removeClass('cate-save').addClass('cate-edit');
+      });
+  })
+  </script>
 </body>
 
 </html>

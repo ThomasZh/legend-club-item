@@ -76,6 +76,8 @@ class VendorCategoryListHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/category-list.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
+                API_DOMAIN=API_DOMAIN,
                 ops=ops,
                 counter=counter,
                 categorys=categorys)
@@ -104,6 +106,8 @@ class VendorCategorySecondaryHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/category-second.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
+                API_DOMAIN=API_DOMAIN,
                 ops=ops,
                 counter=counter,
                 category_id=category_id,
@@ -221,6 +225,8 @@ class VendorCategorySecondaryBrandHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/category-brand.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
+                API_DOMAIN=API_DOMAIN,
                 ops=ops,
                 counter=counter,
                 second_categorys_id=second_categorys_id,
@@ -297,6 +303,8 @@ class VendorCategorySecondarySpecHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/category-spec.html',
                 vendor_id=vendor_id,
+                access_token=access_token,
+                API_DOMAIN=API_DOMAIN,
                 ops=ops,
                 counter=counter,
                 second_categorys_id=second_categorys_id,

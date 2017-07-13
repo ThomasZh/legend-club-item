@@ -65,7 +65,7 @@
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3>活动 <small> 创建分类</small></h3>
+              <h3>商品 <small> 创建二级分类</small></h3>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -75,7 +75,7 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>活动分类信息 <small>*为必填项</small></h2>
+                  <h2>商品分类信息 <small>*为必填项</small></h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                     </li>
@@ -91,7 +91,7 @@
   					        {% raw xsrf_form_html() %}
                     <input type="hidden" name="category_id" value="{{ category_id }}">
                     <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">分类名称 <span class="required">*</span>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">二级分类名称 <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
                         <input type="text" id="title" name="title" required="required" class="form-control col-md-7 col-xs-12">
@@ -101,7 +101,7 @@
                     <div class="form-group">
                       <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
                         <button type="button" class="btn btn-primary" onclick="history.go(-1);">重置</button>
-                        <button type="submit" class="btn btn-success">创建</button>
+                        <button type="submit" class="btn btn-success">添加</button>
                       </div>
                     </div>
                   </form>

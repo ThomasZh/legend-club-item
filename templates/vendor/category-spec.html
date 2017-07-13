@@ -11,6 +11,8 @@
   <title>骑无止境 | 二级分类规格</title>
 
   <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
+  <link rel="stylesheet" href="{{ static_url('weui/css/jquery-weui.min.css') }}">
   <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
@@ -56,7 +58,7 @@
               <h3>
                     商品
                     <small>
-                        分类（用户导航页的菜单项，以4项为宜）
+                        规格分类（用户导航页的菜单项）
                     </small>
                 </h3>
             </div>
@@ -94,15 +96,15 @@
                     </thead>
                     <tbody>
                     <input type="hidden" value="{{ i=1 }}"></input>
-                    {% for category in second_specs %}
+                    {% for spec in second_specs %}
                       <tr>
                         <th scope="row">{{ i }}</th>
-                        <td>{{ category["title"] }}</td>
-                        <td>{{ category["unit"] }}</td>
+                        <td>{{ spec["title"] }}</td>
+                        <td>{{ spec["unit"] }}</td>
                         <td>
-                          <a href="/vendors/{{ vendor_id }}/categorys/{{ category['_id'] }}/edit" class="btn btn-info btn-xs">
+                          <a data_id = "{{ spec['_id'] }}" class="btn btn-info btn-xs spec-edit">
                             <i class="fa fa-pencil"></i> 编辑 </a>
-                          <a href="/vendors/{{ vendor_id }}/categorys/{{ category['_id'] }}/delete" class="btn btn-danger btn-xs">
+                          <a data_id = "{{ spec['_id'] }}" class="btn btn-danger btn-xs spec-dele">
                             <i class="fa fa-trash-o"></i> 删除 </a>
                         </td>
                       </tr>
@@ -127,27 +129,101 @@
     </div>
 
   </div>
-
-  <div id="custom_notifications" class="custom-notifications dsp_none">
-    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
-    </ul>
-    <div class="clearfix"></div>
-    <div id="notif-group" class="tabbed_notifications"></div>
-  </div>
-
   <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
-
   <!-- bootstrap progress js -->
   <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
   <!-- icheck -->
   <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
-
   <script src="{{ static_url('admin/js/custom.js') }}"></script>
   <!-- pace -->
   <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
   <!-- form validation -->
   <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+  <script src="{{ static_url('weui/js/jquery-weui.min.js') }}"></script>
+  <script type="text/javascript">
+  $(function(){
+    function dele(_id){
+      $.ajax({
+        type: "DELETE",
+        url: "{{ API_DOMAIN }}/api/def/specs/"+_id,
+        dataType: "json",
+        headers: {"Authorization":"Bearer {{access_token}}"},
+        contentType: 'application/json',
+        success: function(data, status, xhr) {
 
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+          $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+        },
+        complete: function(XMLHttpRequest, textStatus) {
+          this; // 调用本次AJAX请求时传递的options参数
+        }
+      });
+    };
+
+    // 分类编辑
+    function cateEidt(category_id,title,unit){
+      var data= {"title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png","amount":0, "unit":unit};
+      var _json = JSON.stringify(data);
+      $.ajax({
+        type: "PUT",
+        url: "{{ API_DOMAIN }}/api/def/specs/"+category_id,
+        dataType: "json",
+        data:_json,
+        headers: {"Authorization":"Bearer {{access_token}}"},
+        contentType: 'application/json',
+        success: function(data, status, xhr) {
+
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+          $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+        },
+        complete: function(XMLHttpRequest, textStatus) {
+          this; // 调用本次AJAX请求时传递的options参数
+        }
+      });
+    };
+
+    $(document).on('click','.spec-dele',function(){
+      spec_id = $(this).attr('data_id');
+      var _this = $(this);
+      $.confirm('确定删除该规格吗？',function(){
+        dele(spec_id);
+        _this.parent().parent().remove();
+      },function(){
+          // 取消操作
+      })
+    });
+
+    // 修改操作
+    $(document).on('click','.spec-edit',function(){
+      $(this).html('<i class="fa fa-save"></i> 保存')
+      var old_name_text = $(this).parent().prev().prev().text();
+      var old_unit_text = $(this).parent().prev().text();
+      var name_input = $('<input type="text" class="c-edit" value="'+old_name_text+'" style="width:100px;" />');
+      var unit_input = $('<input type="text" class="c-unit" value="'+old_unit_text+'" style="width:100px;" />');
+      $(this).parent().prev().prev().html(name_input);
+      $(this).parent().prev().html(unit_input);
+      $(this).removeClass('spec-edit').addClass('spec-save');
+    }).on('click','.spec-save',function(){
+      var title = $(".c-edit").val();
+      var unit = $(".c-unit").val();
+      if(title == "" || unit == ""){
+        $.alert('填写不完整！');
+        return false;
+      }
+      var _id = $(this).attr('data_id');
+      cateEidt(_id,title,unit);
+      $(this).parent().prev().prev().html(title);
+      $(this).parent().prev().html(unit);
+      $(this).html('<i class="fa fa-pencil"></i> 编辑');
+      $(this).removeClass('spec-save').addClass('spec-edit');
+    });
+
+  })
+  </script>
 </body>
 
 </html>
