@@ -100,7 +100,7 @@
                         <th scope="row">{{ i }}</th>
                         <td>{{ category["title"] }}</td>
                         <td>
-                          <a class="btn btn-info btn-xs s-cate-edit">
+                          <a data_id = "{{ category['_id'] }}" class="btn btn-info btn-xs s-cate-edit">
                             <i class="fa fa-pencil"></i> 编辑 </a>
                           <a data_id = "{{ category['_id'] }}" class="btn btn-danger btn-xs s-cate-dele">
                             <i class="fa fa-trash-o"></i> 删除 </a>
