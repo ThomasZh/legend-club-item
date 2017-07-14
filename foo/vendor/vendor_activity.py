@@ -508,12 +508,21 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
 
         ops = self.get_ops_info()
         access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
 
-        categorys = category_dao.category_dao().query_by_vendor(vendor_id)
+        url = API_DOMAIN + "/api/def/leagues/"+ LEAGUE_ID +"/categories"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        categorys = data['rs']
+
         counter = self.get_counter(vendor_id)
         self.render('vendor/activity-create-step1.html',
                 vendor_id=vendor_id,
                 access_token=access_token,
+                API_DOMAIN=API_DOMAIN,
                 ops=ops,
                 counter=counter,
                 categorys=categorys)
@@ -527,12 +536,19 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         _title = self.get_argument("title", "")
         _bk_img_url = self.get_argument("bk_img_url", "")
         _category = self.get_argument("category", "")
+        second_category = self.get_argument("second-category", "")
+        brand = self.get_argument("brand", "")
+        logging.info ("get _category %r", _category)
+        logging.info ("get second_category %r", second_category)
+        logging.info ("get brand %r", brand)
 
         activity = {
             "club_id":vendor_id,
             "title":_title,
             "img":_bk_img_url,
-            "category_id":_category
+            "category_id":_category,
+            "level2_category_id":second_category,
+            "brand_id":brand
         }
         headers = {"Authorization":"Bearer "+access_token}
         url = API_DOMAIN + "/api/items"
@@ -579,20 +595,47 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         logging.info("got activity_id %r in uri", activity_id)
 
         ops = self.get_ops_info()
-        access_token = self.get_access_token()
-
         activity = self.get_activity(activity_id)
 
-        categorys = category_dao.category_dao().query_by_vendor(vendor_id)
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
+
+        url = API_DOMAIN + "/api/def/leagues/"+ LEAGUE_ID +"/categories"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        categorys = data['rs']
+
+        url = API_DOMAIN + "/api/def/categories/"+ activity['category_id'] +"/level2"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        second_categorys = data['rs']
+
+        url = API_DOMAIN + "/api/def/categories/"+ activity['level2_category_id'] +"/brands"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        brands = data['rs']
 
         counter = self.get_counter(vendor_id)
         activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step1.html',
                 vendor_id=vendor_id,
                 access_token=access_token,
+                API_DOMAIN=API_DOMAIN,
                 ops=ops,
                 activity_id=activity_id,
-                counter=counter, activity_counter=activity_counter,
+                counter=counter,
+                activity_counter=activity_counter,
+                second_categorys=second_categorys,
+                brands=brands,
                 activity=activity, categorys=categorys)
 
 
@@ -607,11 +650,18 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         _title = self.get_argument("title", "")
         img = self.get_argument("img", "")
         _category = self.get_argument("category", "")
+        second_category = self.get_argument("second-category", "")
+        brand = self.get_argument("brand", "")
+        logging.info ("get _category %r", _category)
+        logging.info ("get second_category %r", second_category)
+        logging.info ("get brand %r", brand)
 
         activity = {
             "title":_title,
             "img":img,
-            "category_id":_category
+            "category_id":_category,
+            "level2_category_id":second_category,
+            "brand_id":brand
         }
         headers = {"Authorization":"Bearer "+access_token}
         url = API_DOMAIN + "/api/activities/"+ activity_id
@@ -922,23 +972,39 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
 
         activity = self.get_activity(activity_id)
         logging.info("got activity %r", activity)
+
+        url = API_DOMAIN + "/api/def/categories/"+ activity['level2_category_id'] +"/specs"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        specs = data['rs']
+
+        url = API_DOMAIN + "/api/items/"+ activity_id +"/specs"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        item_specs = data['rs']
+
         # activity = activity_dao.activity_dao().query(activity_id)
-        for base_fee_template in activity['base_fee_template']:
-            base_fee_template['fee'] = float(base_fee_template['fee']) / 100
-        for ext_fee_template in activity['ext_fee_template']:
-            ext_fee_template['fee'] = float(ext_fee_template['fee']) / 100
+        for item_spec in item_specs:
+            item_spec['amount'] = float(item_spec['amount']) / 100
 
-        categorys = category_dao.category_dao().query_by_vendor(vendor_id)
         qrcode = group_qrcode_dao.group_qrcode_dao().query(activity_id)
-
         counter = self.get_counter(vendor_id)
         activity_counter = self.get_counter(activity_id)
         self.render('vendor/activity-edit-step8.html',
                 vendor_id=vendor_id,
                 access_token=access_token,
                 ops=ops,
-                counter=counter, activity_counter=activity_counter,
-                activity=activity, categorys=categorys)
+                specs=specs,
+                item_specs=item_specs,
+                counter=counter,
+                activity_counter=activity_counter,
+                activity=activity)
 
     @tornado.web.authenticated  # if no session, redirect to login page
     def post(self, vendor_id, activity_id):
@@ -949,41 +1015,39 @@ class VendorActivityDetailStep8Handler(AuthorizationHandler):
         access_token = self.get_access_token()
 
         # 生成基本服务
-        base_serv_names = self.get_arguments("base_serv_name")
-        logging.info("got base_serv_names %r",base_serv_names)
-        base_serv_fees = self.get_arguments("base_serv_fee")
-        logging.info("got base_serv_fees %r",base_serv_fees)
-        base_fee_template = []
-        base_num = 0
-        for base_name in base_serv_names:
-            base_fee = base_serv_fees[base_num]
+        spec_ids = self.get_arguments("spec_id")
+        logging.info("got spec_ids %r",spec_ids)
+        amounts = self.get_arguments("amount")
+        logging.info("got amounts %r",amounts)
+        specs = []
+        _num = 0
+        for spec_id in spec_ids:
+            amount = amounts[_num]
             # 价格转换成分
-            base_fee = int(float(base_fee) * 100)
-            base_fee_id = str(uuid.uuid1()).replace('-', '')
-            base_json = {'_id':base_fee_id, 'name':base_name, 'fee':base_fee}
-            base_fee_template.append(base_json)
-            base_num = base_num + 1
+            amount = int(float(amount) * 100)
+            spec = {'spec_id':spec_id, 'amount':amount}
+            specs.append(spec)
+            _num = _num + 1
 
         # 生成附加服务
-        ext_serv_names = self.get_arguments("ext_serv_name")
-        ext_serv_fees = self.get_arguments("ext_serv_fee")
-        ext_fee_template = []
-        ext_num = 0
-        for ext_name in ext_serv_names:
-            ext_fee = ext_serv_fees[ext_num]
-            # 价格转换成分
-            ext_fee = int(float(ext_fee) * 100)
-            ext_fee_id = str(uuid.uuid1()).replace('-', '')
-            ext_json = {'_id':ext_fee_id, 'name':ext_name, 'fee':ext_fee}
-            ext_fee_template.append(ext_json)
-            ext_num = ext_num + 1
+        # ext_serv_names = self.get_arguments("ext_serv_name")
+        # ext_serv_fees = self.get_arguments("ext_serv_fee")
+        # ext_fee_template = []
+        # ext_num = 0
+        # for ext_name in ext_serv_names:
+        #     ext_fee = ext_serv_fees[ext_num]
+        #     # 价格转换成分
+        #     ext_fee = int(float(ext_fee) * 100)
+        #     ext_fee_id = str(uuid.uuid1()).replace('-', '')
+        #     ext_json = {'_id':ext_fee_id, 'name':ext_name, 'fee':ext_fee}
+        #     ext_fee_template.append(ext_json)
+        #     ext_num = ext_num + 1
 
-        json = {"ext_fee_template":ext_fee_template, "base_fee_template":base_fee_template}
         # activity_dao.activity_dao().update(json);
 
         headers = {"Authorization":"Bearer "+access_token}
-        url = API_DOMAIN + "/api/activities/"+ activity_id
-        _json = json_encode(json)
+        url = API_DOMAIN + "/api/items/"+ activity_id +"/specs"
+        _json = json_encode(specs)
         http_client = HTTPClient()
         response = http_client.fetch(url, method="PUT", headers=headers, body=_json)
         logging.info("update fee response.body=[%r]", response.body)

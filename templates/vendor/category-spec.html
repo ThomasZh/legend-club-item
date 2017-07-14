@@ -70,7 +70,9 @@
             <div class="col-md-6 col-sm-6 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>分类 <small>一级分类</small>&nbsp><small>二级分类</small>&nbsp><small>规格</small></h2>
+                  <h2>分类 <small><a href="/vendors/{{ vendor_id }}/categorys">{{ second_category_info['parent_title'] }}</a></small>
+                    &nbsp><small><a href="/vendors/{{ vendor_id }}/categorys/secondary?category_id={{ second_category_info['parent_id'] }}">{{ second_category_info['title'] }}</a></small>
+                    &nbsp><small>规格</small></h2>
 
                   <ul class="nav navbar-right panel_toolbox">
                   	<li><a href="/vendors/{{ vendor_id }}/categorys/secondary/creat/spec?second_categorys_id={{ second_categorys_id }}" class="btn btn-success btn-xs">

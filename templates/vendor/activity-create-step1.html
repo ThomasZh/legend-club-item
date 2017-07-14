@@ -90,14 +90,14 @@
                     {% raw xsrf_form_html() %}
 
                     <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">标题 <span class="required">*</span>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">商品标题 <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
                         <input type="text" id="title" name="title" required="required" class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
                     <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="bk_img_url">背景图片 <span class="required">*</span>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="bk_img_url">商品图片 <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
                         <input type="file" id="file" name="file" required="required" class="form-control col-md-7 col-xs-12">
@@ -105,14 +105,28 @@
                       </div>
                     </div>
                     <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12">分类</label>
-                      <div class="col-md-6 col-sm-6 col-xs-12">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-4">分类选择 <span class="required">*</span></label>
+                      <div class="col-md-1 col-sm-6 col-xs-12">
                         <select class="form-control" id="category" name="category">
+                          <option value="one">一级分类</option>
                         {% for category in categorys %}
                           <option value="{{category['_id']}}">{{category['title']}}</option>
                         {% end %}
                         </select>
                       </div>
+
+                      <div class="col-md-1 col-sm-6 col-xs-12">
+                        <select class="form-control" id="s-category" name="second-category" disabled="true">
+                          <option value="two">二级分类</option>
+                        </select>
+                      </div>
+
+                      <div class="col-md-1 col-sm-6 col-xs-12">
+                        <select class="form-control" id="brand" name="brand" disabled="true">
+                          <option value="brand">品牌</option>
+                        </select>
+                      </div>
+
                     </div>
                     <div class="ln_solid"></div>
                     <div class="form-group">
@@ -146,7 +160,6 @@
   <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
   <!-- icheck -->
   <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
-
   <script src="{{ static_url('admin/js/custom.js') }}"></script>
   <!-- pace -->
   <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
@@ -160,6 +173,75 @@
 	<script src="{{ static_url("js/upyun-mu.js")}}"></script>
 
   <script>
+  $(function(){
+    $("#category").change(function(){
+      var one_id = $(this).children('option:selected').val();
+      if(one_id != 'one'){
+        $.ajax({
+          type: "GET",
+          url: "{{ API_DOMAIN }}/api/def/categories/"+one_id+"/level2",
+          dataType: "json",
+          headers: {"Authorization":"Bearer {{access_token}}"},
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+            $("#s-category").attr('disabled',false);
+            $("#s-category").empty();
+            var dataObj = data.rs;
+            var option = '';
+            for (var i=0;i<dataObj.length;i++){
+                option += '<option value="'+dataObj[i]['_id']+'">'+dataObj[i]['title']+'</option>';
+            }
+            $("#s-category").append('<option value="two">二级分类</option>');
+            $("#s-category").append(option);
+            // var two_id = $("#s-category").children('option:selected').val()
+            // 选择二级菜单时候的操作
+            $("#s-category").change(function(){
+              var two_id = $(this).children('option:selected').val();
+                $.ajax({
+                  type: "GET",
+                  url: "{{ API_DOMAIN }}/api/def/categories/"+two_id+"/brands",
+                  dataType: "json",
+                  headers: {"Authorization":"Bearer {{access_token}}"},
+                  contentType: 'application/json',
+                  success: function(data, status, xhr) {
+                    console.log(data);
+                    $("#brand").attr('disabled',false);
+                    $("#brand").empty();
+                    var dataObj = data.rs;
+                    var b_option = '';
+                    for (var i=0;i<dataObj.length;i++){
+                        b_option += '<option value="'+dataObj[i]['_id']+'">'+dataObj[i]['title']+'</option>';
+                    }
+                    $("#brand").append(b_option);
+
+                  },
+                  error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+                    $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+                  },
+                  complete: function(XMLHttpRequest, textStatus) {
+                    this; // 调用本次AJAX请求时传递的options参数
+                  }
+                });
+            })
+          },
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+            $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+          },
+          complete: function(XMLHttpRequest, textStatus) {
+            this; // 调用本次AJAX请求时传递的options参数
+          }
+        });
+      }else{
+        $("#s-category").empty().append('<option value="two">二级分类</option>');
+        $("#s-category").attr('disabled',true);
+      }
+
+    });
+
+  });
+
 		// with plugin options
 		$("#file").fileinput({
 			'showCaption': false,
@@ -218,49 +300,8 @@
 			instance.upload(filename);
 
 			return 'https://tripc2c-club-title.b0.upaiyun.com' + filename;
-		}
+		};
 
-    // initialize the validator function
-    validator.message['date'] = 'not a real date';
-
-    // validate a field on "blur" event, a 'select' on 'change' event & a '.reuired' classed multifield on 'keyup':
-    $('form')
-      .on('blur', 'input[required], input.optional, select.required', validator.checkField)
-      .on('change', 'select.required', validator.checkField)
-      .on('keypress', 'input[required][pattern]', validator.keypress);
-
-    $('.multi.required')
-      .on('keyup blur', 'input', function() {
-        validator.checkField.apply($(this).siblings().last()[0]);
-      });
-
-    // bind the validation to the form submit event
-    //$('#send').click('submit');//.prop('disabled', true);
-
-    $('form').submit(function(e) {
-      e.preventDefault();
-      var submit = true;
-      // evaluate the form using generic validaing
-      if (!validator.checkAll($(this))) {
-        submit = false;
-      }
-
-      if (submit) {
-        this.submit();
-      }
-      return false;
-    });
-
-    /* FOR DEMO ONLY */
-    $('#vfields').change(function() {
-      $('form').toggleClass('mode2');
-    }).prop('checked', false);
-
-    $('#alerts').change(function() {
-      validator.defaults.alerts = (this.checked) ? false : true;
-      if (this.checked)
-        $('form .alert').remove();
-    }).prop('checked', false);
   </script>
 
 </body>

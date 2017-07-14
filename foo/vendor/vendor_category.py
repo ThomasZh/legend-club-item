@@ -95,6 +95,15 @@ class VendorCategorySecondaryHandler(AuthorizationHandler):
         category_id = self.get_argument('category_id','')
         logging.info("get category_id",category_id)
 
+        # TODO: get second_category info
+        url = API_DOMAIN + "/api/def/categories/"+ category_id
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        second_category_info = data['rs']
+
         url = API_DOMAIN + "/api/def/categories/"+ category_id +"/level2"
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
@@ -111,6 +120,7 @@ class VendorCategorySecondaryHandler(AuthorizationHandler):
                 ops=ops,
                 counter=counter,
                 category_id=category_id,
+                second_category_info=second_category_info,
                 second_categorys=second_categorys)
 
 
@@ -214,6 +224,15 @@ class VendorCategorySecondaryBrandHandler(AuthorizationHandler):
         second_categorys_id = self.get_argument('second_categorys_id','')
         logging.info("get second_categorys_id",second_categorys_id)
 
+        # TODO: get second_category info
+        url = API_DOMAIN + "/api/def/categories/"+ second_categorys_id
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        second_category_info = data['rs']
+
         url = API_DOMAIN + "/api/def/categories/"+ second_categorys_id +"/brands"
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
@@ -229,6 +248,7 @@ class VendorCategorySecondaryBrandHandler(AuthorizationHandler):
                 API_DOMAIN=API_DOMAIN,
                 ops=ops,
                 counter=counter,
+                second_category_info=second_category_info,
                 second_categorys_id=second_categorys_id,
                 second_brands=second_brands)
 
@@ -292,6 +312,15 @@ class VendorCategorySecondarySpecHandler(AuthorizationHandler):
         second_categorys_id = self.get_argument('second_categorys_id','')
         logging.info("get second_categorys_id",second_categorys_id)
 
+        # TODO: get second_category info
+        url = API_DOMAIN + "/api/def/categories/"+ second_categorys_id
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        second_category_info = data['rs']
+
         url = API_DOMAIN + "/api/def/categories/"+ second_categorys_id +"/specs"
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
@@ -308,6 +337,7 @@ class VendorCategorySecondarySpecHandler(AuthorizationHandler):
                 ops=ops,
                 counter=counter,
                 second_categorys_id=second_categorys_id,
+                second_category_info=second_category_info,
                 second_specs=second_specs)
 
 
