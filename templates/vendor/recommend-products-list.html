@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>骑无止境 | 一键购物商品列表</title>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
+  <link rel="stylesheet" href="{{ static_url('weui/css/jquery-weui.min.css') }}">
+  <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
+  <!-- Custom styling plus plugins -->
+  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
+</head>
+<body class="nav-md">
+  <div class="container body">
+    <div class="main_container">
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+
+          <!-- navigation title -->
+          {% module Template("vendor/nav-title-block.html", ops=ops) %}
+          <!-- /navigation title -->
+          <div class="clearfix"></div>
+
+          <!-- menu prile quick info -->
+          {% module Template("vendor/menu-prile-quick-info-block.html", ops=ops) %}
+          <!-- /menu prile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          {% module Template("vendor/sidebar-menu-block.html", vendor_id=vendor_id, counter=counter) %}
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      {% module Template("vendor/top-nav-block.html", ops=ops) %}
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+        <div class="">
+
+          <div class="page-title">
+            <div class="title_left">
+              <h3>
+                    商品
+                    <small>
+                        一键购物商品（用户导航页的菜单项）
+                    </small>
+                </h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>商品 <small>详情</small></h2>
+
+                  <ul class="nav navbar-right panel_toolbox">
+                  	<li><a href="javascript:;" id="add-btn" class="btn btn-success btn-xs">
+                      <i class="fa fa-plus"></i> 添加 </a>
+                  	</li>
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>名称</th>
+                        <th>规格</th>
+                        <th>个数</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    <input type="hidden" value="{{ i=1 }}"></input>
+                    {% for category in recommend_categorys %}
+                      <tr>
+                        <th scope="row">{{ i }}</th>
+                        <td>{{ category["title"] }}</td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                          <a data_id = "{{ category['_id'] }}" class="btn btn-info btn-xs cate-edit">
+                            <i class="fa fa-pencil"></i> 编辑 </a>
+                          <a data_id = "{{ category['_id'] }}" class="btn btn-danger btn-xs cate-dele">
+                            <i class="fa fa-trash-o"></i> 删除 </a>
+                        </td>
+                      </tr>
+                      <input type="hidden" value="{{ i=i+1 }}"></input>
+                    {% end %}
+                    </tbody>
+                  </table>
+
+                </div> <!-- x_content -->
+              </div> <!-- x_panel -->
+            </div> <!-- column -->
+
+          </div> <!-- row -->
+        </div>
+
+        <!-- footer content -->
+        {% module Template("vendor/footer-block.html") %}
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+    </div>
+
+  </div>
+  <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
+  <!-- bootstrap progress js -->
+  <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
+  <!-- icheck -->
+  <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
+  <script src="{{ static_url('admin/js/custom.js') }}"></script>
+  <!-- pace -->
+  <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
+  <!-- form validation -->
+  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+  <script src="{{ static_url('weui/js/jquery-weui.min.js') }}"></script>
+  <script type="text/javascript">
+  $(function(){
+      var num = $('.table tbody').children("tr").length;
+
+      $(document).on('click','#add-btn',function(){
+        var html = '<tr>';
+            html += '<th scope="row">'+num+'</th>';
+            html +=  '<td><input type="text" /></td>';
+            html +=  '<td>';
+            html +=  '<a class="btn btn-info btn-xs cate-edit">';
+            html +=  '<i class="fa fa-pencil"></i> 保存 </a>';
+            html +=  '<a class="btn btn-danger btn-xs cate-dele">';
+            html +=  '<i class="fa fa-trash-o"></i> 删除 </a>';
+            html +=  '<a href="#" class="btn btn-success btn-xs">';
+            html +=  '<i class="fa fa-eye"></i> 推荐商品 </a>';
+            html +=  '</td></tr>';
+          $('.table tbody').append(html);
+          num +=1;
+      }).on('click','.cate-edit',function(){
+        var _this = $(this);
+        var title = $(this).parent().prev().children().val();
+        var data = {'title':title, 'league_id':"{{ LEAGUE_ID }}"}
+        var _json = JSON.stringify(data);
+            console.log(_json);
+          $.ajax({
+            type: "POST",
+            url: "{{ API_DOMAIN }}/api/item-recommend/categories",
+            dataType: "json",
+            data:_json,
+            headers: {"Authorization":"Bearer {{access_token}}"},
+            contentType: 'application/json',
+            success: function(data, status, xhr) {
+              if(data.err_code == 200){
+                _this.parent().prev().html(title);
+                _this.html('<i class="fa fa-pencil">编辑');
+              }
+
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+              console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+              $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+            },
+            complete: function(XMLHttpRequest, textStatus) {
+              this; // 调用本次AJAX请求时传递的options参数
+            }
+          });
+      })
+
+    // 分类删除
+      function dele(category_id){
+        $.ajax({
+          type: "DELETE",
+          url: "{{ API_DOMAIN }}/api/item-recommend/categories/"+category_id,
+          dataType: "json",
+          headers: {"Authorization":"Bearer {{access_token}}"},
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+
+          },
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+            $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+          },
+          complete: function(XMLHttpRequest, textStatus) {
+            this; // 调用本次AJAX请求时传递的options参数
+          }
+        });
+      };
+      // 分类编辑
+      function cateEidt(category_id,title){
+        var data= {"title":title};
+        var _json = JSON.stringify(data);
+        $.ajax({
+          type: "PUT",
+          url: "{{ API_DOMAIN }}/api/item-recommend/categories/"+category_id,
+          dataType: "json",
+          data:_json,
+          headers: {"Authorization":"Bearer {{access_token}}"},
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+
+          },
+          error: function(XMLHttpRequest, textStatus, errorThrown) {
+            console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+            $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+          },
+          complete: function(XMLHttpRequest, textStatus) {
+            this; // 调用本次AJAX请求时传递的options参数
+          }
+        });
+      };
+
+      $(document).on('click','.cate-dele',function(){
+        category_id = $(this).attr('data_id');
+        var _this = $(this);
+        $.confirm('确定删除该分类吗？',function(){
+          dele(category_id);
+          _this.parent().parent().remove();
+        },function(){
+            // 取消操作
+        })
+
+      });
+      // 修改操作
+      $(document).on('click','.cate-edit',function(){
+        $(this).html('<i class="fa fa-save"></i> 保存')
+        var old_text = $(this).parent().prev().text();
+        var input = $('<input type="text" class="c-edit" value="'+old_text+'" style="width:100px;" />');
+        $(this).parent().prev().html(input);
+        $(this).removeClass('cate-edit').addClass('cate-save');
+      }).on('click','.cate-save',function(){
+        var title = $(".c-edit").val();
+        if(title == ""){
+          $.alert('分类名不能为空！');
+          return false;
+        }
+        var _id = $(this).attr('data_id');
+        cateEidt(_id,title);
+        $(this).parent().prev().html(title);
+        $(this).html('<i class="fa fa-pencil"></i> 编辑');
+        $(this).removeClass('cate-save').addClass('cate-edit');
+      });
+
+  })
+  </script>
+</body>
+
+</html>

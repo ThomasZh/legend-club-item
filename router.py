@@ -11,6 +11,7 @@ from foo import comm
 from foo.auth import auth_email
 from foo.auth import auth_phone
 from vendor import vendor_category
+from vendor import vendor_recommend
 from vendor import vendor_activity
 from vendor import vendor_order
 from vendor import vendor_customer
@@ -58,9 +59,13 @@ def map():
         (r'/vendors/([a-z0-9]*)/categorys/secondary/creat/brand', getattr(vendor_category, 'VendorCategoryCreateBrandHandler')),
         # 创建规格
         (r'/vendors/([a-z0-9]*)/categorys/secondary/creat/spec', getattr(vendor_category, 'VendorCategoryCreateSpecHandler')),
-
         (r'/vendors/([a-z0-9]*)/categorys/([a-z0-9]*)/edit', getattr(vendor_category, 'VendorCategoryEditHandler')),
         (r'/vendors/([a-z0-9]*)/categorys/([a-z0-9]*)/delete', getattr(vendor_category, 'VendorCategoryDeleteHandler')),
+
+        # recommend category
+        (r'/vendors/([a-z0-9]*)/recommend/categorys', getattr(vendor_recommend, 'VendorRecommendCategoryListHandler')),
+        (r'/vendors/([a-z0-9]*)/recommend/products', getattr(vendor_recommend, 'VendorRecommendProductsListHandler')),
+
 
         # vendor activity
         (r'/vendors/([a-z0-9]*)/activitys/draft', getattr(vendor_activity, 'VendorActivityDraftHandler')),
