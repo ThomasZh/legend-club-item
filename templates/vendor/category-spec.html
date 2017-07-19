@@ -90,17 +90,16 @@
                   <table class="table table-striped">
                     <thead>
                       <tr>
-                        <th>#</th>
+                        <th>序号</th>
                         <th>名称</th>
                         <th>单位</th>
                         <th>操作</th>
                       </tr>
                     </thead>
                     <tbody>
-                    <input type="hidden" value="{{ i=1 }}"></input>
                     {% for spec in second_specs %}
                       <tr>
-                        <th scope="row">{{ i }}</th>
+                        <th scope="row">{{ spec['_seq'] }}</th>
                         <td>{{ spec["title"] }}</td>
                         <td>{{ spec["unit"] }}</td>
                         <td>
@@ -110,7 +109,6 @@
                             <i class="fa fa-trash-o"></i> 删除 </a>
                         </td>
                       </tr>
-                      <input type="hidden" value="{{ i=i+1 }}"></input>
                     {% end %}
                     </tbody>
                   </table>
@@ -165,9 +163,10 @@
     };
 
     // 分类编辑
-    function cateEidt(category_id,title,unit){
-      var data= {"title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png","amount":0, "unit":unit};
+    function cateEidt(category_id,title,unit,seq_num){
+      var data= {"title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png","amount":0, "unit":unit, "_seq":seq_num};
       var _json = JSON.stringify(data);
+      console.log(_json);
       $.ajax({
         type: "PUT",
         url: "{{ API_DOMAIN }}/api/def/specs/"+category_id,
@@ -204,22 +203,27 @@
       $(this).html('<i class="fa fa-save"></i> 保存')
       var old_name_text = $(this).parent().prev().prev().text();
       var old_unit_text = $(this).parent().prev().text();
+      var old_num = $(this).parent().prev().prev().prev().text();
       var name_input = $('<input type="text" class="c-edit" value="'+old_name_text+'" style="width:100px;" />');
       var unit_input = $('<input type="text" class="c-unit" value="'+old_unit_text+'" style="width:100px;" />');
+      var seq_input = $('<input type="number" class="seq-edit" value="'+old_num+'" style="width:100px;" />');
       $(this).parent().prev().prev().html(name_input);
       $(this).parent().prev().html(unit_input);
+      $(this).parent().prev().prev().prev().html(seq_input);
       $(this).removeClass('spec-edit').addClass('spec-save');
     }).on('click','.spec-save',function(){
       var title = $(".c-edit").val();
       var unit = $(".c-unit").val();
-      if(title == "" || unit == ""){
+      var seq_num = $(".seq-edit").val();
+      if(title == "" || unit == "" || seq_num == ""){
         $.alert('填写不完整！');
         return false;
       }
       var _id = $(this).attr('data_id');
-      cateEidt(_id,title,unit);
+      cateEidt(_id,title,unit,seq_num);
       $(this).parent().prev().prev().html(title);
       $(this).parent().prev().html(unit);
+      $(this).parent().prev().prev().prev().html(seq_num);
       $(this).html('<i class="fa fa-pencil"></i> 编辑');
       $(this).removeClass('spec-save').addClass('spec-edit');
     });

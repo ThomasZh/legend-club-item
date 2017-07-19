@@ -664,7 +664,7 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
             "brand_id":brand
         }
         headers = {"Authorization":"Bearer "+access_token}
-        url = API_DOMAIN + "/api/activities/"+ activity_id
+        url = API_DOMAIN + "/api/items/"+ activity_id
         _json = json_encode(activity)
         http_client = HTTPClient()
         response = http_client.fetch(url, method="PUT", headers=headers, body=_json)

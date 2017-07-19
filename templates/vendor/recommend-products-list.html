@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>骑无止境 | 一键购物商品列表</title>
+  <title>骑无止境 | 预估商品列表</title>
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
@@ -58,7 +58,7 @@
               <h3>
                     商品
                     <small>
-                        一键购物商品（用户导航页的菜单项）
+                        预估分类（用户导航页的菜单项）
                     </small>
                 </h3>
             </div>
@@ -70,10 +70,10 @@
             <div class="col-md-6 col-sm-6 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>商品 <small>详情</small></h2>
+                  <h2><a href="/vendors/{{ vendor_id }}/recommend/categorys"><small>{{_category['title']}}</small></a> > <small>商品列表</small></h2>
 
                   <ul class="nav navbar-right panel_toolbox">
-                  	<li><a href="javascript:;" id="add-btn" class="btn btn-success btn-xs">
+                  	<li><a href="/vendors/{{ vendor_id }}/recommend-categorys/create?recommend_category_id={{ recommend_category_id }}" class="btn btn-success btn-xs">
                       <i class="fa fa-plus"></i> 添加 </a>
                   	</li>
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
@@ -88,21 +88,22 @@
                   <table class="table table-striped">
                     <thead>
                       <tr>
-                        <th>#</th>
+                        <th>序号</th>
                         <th>名称</th>
                         <th>规格</th>
+                        <th>价格(元)</th>
                         <th>个数</th>
                         <th>操作</th>
                       </tr>
                     </thead>
                     <tbody>
-                    <input type="hidden" value="{{ i=1 }}"></input>
                     {% for category in recommend_categorys %}
                       <tr>
-                        <th scope="row">{{ i }}</th>
-                        <td>{{ category["title"] }}</td>
-                        <td></td>
-                        <td></td>
+                        <td scope="row">{{ category['_seq'] }}</td>
+                        <td>{{ category["item_title"] }}</td>
+                        <td>{{ category['spec_title'] }}</td>
+                        <td> {{ float(category['amount'])/100 }}</td>
+                        <td>{{ category['quantity'] }}</td>
                         <td>
                           <a data_id = "{{ category['_id'] }}" class="btn btn-info btn-xs cate-edit">
                             <i class="fa fa-pencil"></i> 编辑 </a>
@@ -110,7 +111,6 @@
                             <i class="fa fa-trash-o"></i> 删除 </a>
                         </td>
                       </tr>
-                      <input type="hidden" value="{{ i=i+1 }}"></input>
                     {% end %}
                     </tbody>
                   </table>
@@ -144,57 +144,12 @@
   <script src="{{ static_url('weui/js/jquery-weui.min.js') }}"></script>
   <script type="text/javascript">
   $(function(){
-      var num = $('.table tbody').children("tr").length;
 
-      $(document).on('click','#add-btn',function(){
-        var html = '<tr>';
-            html += '<th scope="row">'+num+'</th>';
-            html +=  '<td><input type="text" /></td>';
-            html +=  '<td>';
-            html +=  '<a class="btn btn-info btn-xs cate-edit">';
-            html +=  '<i class="fa fa-pencil"></i> 保存 </a>';
-            html +=  '<a class="btn btn-danger btn-xs cate-dele">';
-            html +=  '<i class="fa fa-trash-o"></i> 删除 </a>';
-            html +=  '<a href="#" class="btn btn-success btn-xs">';
-            html +=  '<i class="fa fa-eye"></i> 推荐商品 </a>';
-            html +=  '</td></tr>';
-          $('.table tbody').append(html);
-          num +=1;
-      }).on('click','.cate-edit',function(){
-        var _this = $(this);
-        var title = $(this).parent().prev().children().val();
-        var data = {'title':title, 'league_id':"{{ LEAGUE_ID }}"}
-        var _json = JSON.stringify(data);
-            console.log(_json);
-          $.ajax({
-            type: "POST",
-            url: "{{ API_DOMAIN }}/api/item-recommend/categories",
-            dataType: "json",
-            data:_json,
-            headers: {"Authorization":"Bearer {{access_token}}"},
-            contentType: 'application/json',
-            success: function(data, status, xhr) {
-              if(data.err_code == 200){
-                _this.parent().prev().html(title);
-                _this.html('<i class="fa fa-pencil">编辑');
-              }
-
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-              console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
-              $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
-            },
-            complete: function(XMLHttpRequest, textStatus) {
-              this; // 调用本次AJAX请求时传递的options参数
-            }
-          });
-      })
-
-    // 分类删除
-      function dele(category_id){
+    // 商品删除
+      function dele(_id){
         $.ajax({
           type: "DELETE",
-          url: "{{ API_DOMAIN }}/api/item-recommend/categories/"+category_id,
+          url: "{{ API_DOMAIN }}/api/item-recommend/categories/{{ recommend_category_id }}/items/"+_id,
           dataType: "json",
           headers: {"Authorization":"Bearer {{access_token}}"},
           contentType: 'application/json',
@@ -210,13 +165,14 @@
           }
         });
       };
-      // 分类编辑
-      function cateEidt(category_id,title){
-        var data= {"title":title};
+      // 商品编辑
+      function cateEidt(quantity,_id,seq_num){
+        var data=  {"quantity":quantity, "_seq":seq_num};
         var _json = JSON.stringify(data);
+        console.log(_json);
         $.ajax({
           type: "PUT",
-          url: "{{ API_DOMAIN }}/api/item-recommend/categories/"+category_id,
+          url: "{{ API_DOMAIN }}/api/item-recommend/categories/{{ recommend_category_id }}/items/"+_id,
           dataType: "json",
           data:_json,
           headers: {"Authorization":"Bearer {{access_token}}"},
@@ -235,10 +191,10 @@
       };
 
       $(document).on('click','.cate-dele',function(){
-        category_id = $(this).attr('data_id');
+        var _id = $(this).attr('data_id');
         var _this = $(this);
         $.confirm('确定删除该分类吗？',function(){
-          dele(category_id);
+          dele(_id);
           _this.parent().parent().remove();
         },function(){
             // 取消操作
@@ -249,18 +205,23 @@
       $(document).on('click','.cate-edit',function(){
         $(this).html('<i class="fa fa-save"></i> 保存')
         var old_text = $(this).parent().prev().text();
+        var old_num = $(this).parent().parent().children('td:first-child').text();
         var input = $('<input type="text" class="c-edit" value="'+old_text+'" style="width:100px;" />');
+        var seq_input = $('<input type="number" class="seq-edit" value="'+old_num+'" style="width:100px;" />');
         $(this).parent().prev().html(input);
+        $(this).parent().parent().children('td:first-child').html(seq_input);
         $(this).removeClass('cate-edit').addClass('cate-save');
       }).on('click','.cate-save',function(){
-        var title = $(".c-edit").val();
-        if(title == ""){
-          $.alert('分类名不能为空！');
+        var quantity = $(".c-edit").val();
+        var seq_num = $(".seq-edit").val();
+        if(quantity == "" || seq_num == ""){
+          $.alert('序号分类名不能为空！');
           return false;
         }
         var _id = $(this).attr('data_id');
-        cateEidt(_id,title);
-        $(this).parent().prev().html(title);
+        cateEidt(quantity,_id,seq_num);
+        $(this).parent().prev().html(quantity);
+        $(this).parent().parent().children('td:first-child').html(seq_num);
         $(this).html('<i class="fa fa-pencil"></i> 编辑');
         $(this).removeClass('cate-save').addClass('cate-edit');
       });

@@ -248,8 +248,8 @@ class VendorOrderInfoHandler(AuthorizationHandler):
         applies = order['items']
         logging.info("get applies %r",applies)
         for applys in applies:
-            applys['total_fee'] = float(applys['fee'])*float(applys['quantity']) / 100
-            applys['fee'] = float(applys['fee']) / 100
+            applys['total_fee'] = float(applys['amount'])*float(applys['quantity']) / 100
+            applys['amount'] = float(applys['amount']) / 100
 
         #
         # for _apply in applies:

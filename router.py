@@ -65,6 +65,7 @@ def map():
         # recommend category
         (r'/vendors/([a-z0-9]*)/recommend/categorys', getattr(vendor_recommend, 'VendorRecommendCategoryListHandler')),
         (r'/vendors/([a-z0-9]*)/recommend/products', getattr(vendor_recommend, 'VendorRecommendProductsListHandler')),
+        (r'/vendors/([a-z0-9]*)/recommend-categorys/create', getattr(vendor_recommend, 'VendorRecommendCategoryCreateHandler')),  #添加预估商品
 
 
         # vendor activity

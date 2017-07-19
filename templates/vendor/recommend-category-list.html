@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>骑无止境 | 一键购物分类</title>
+  <title>骑无止境 | 预估分类</title>
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
@@ -57,9 +57,6 @@
             <div class="title_left">
               <h3>
                     商品
-                    <small>
-                        一键购物分类（用户导航页的菜单项）
-                    </small>
                 </h3>
             </div>
           </div>
@@ -70,7 +67,7 @@
             <div class="col-md-6 col-sm-6 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>分类 <small>详情</small></h2>
+                  <h2>预估分类<small>列表</small></h2>
 
                   <ul class="nav navbar-right panel_toolbox">
                   	<li><a href="javascript:;" id="add-btn" class="btn btn-success btn-xs">
@@ -88,7 +85,7 @@
                   <table class="table table-striped">
                     <thead>
                       <tr>
-                        <th>#</th>
+                        <th>序号</th>
                         <th>名称</th>
                         <th>操作</th>
                       </tr>
@@ -126,6 +123,8 @@
   <script type="text/javascript">
   $(function(){
     getJson();
+    // 初始化分类列表
+    var num = 0;
     function getJson(){
       $.ajax({
         type: "GET",
@@ -134,13 +133,13 @@
         headers: {"Authorization":"Bearer {{access_token}}"},
         contentType: 'application/json',
         success: function(data, status, xhr) {
-          console.log(typeof(data));
+          // console.log(typeof(data));
           var dataObj = data.rs;
           console.log(dataObj);
           if(data.err_code == 200){
             for (var i=0; i<dataObj.length;i++){
               var html = '<tr>';
-                  html += '<th scope="row">'+i+'</th>';
+                  html += '<th scope="row">'+dataObj[i]['_seq']+'</th>';
                   html +=  '<td>'+dataObj[i]['title']+'</td>';
                   html +=  '<td>';
                   html +=  '<a data_id = "'+ dataObj[i]['_id'] +'" class="btn btn-info btn-xs cate-edit">';
@@ -152,7 +151,7 @@
                   html +=  '</td></tr>';
                 $('.table tbody').append(html);
             }
-
+            num = $('.table tbody').children("tr").length;
           }
 
         },
@@ -165,29 +164,27 @@
         }
       });
     };
-
-      var num = $('.table tbody').children("tr").length;
-
+    // 添加分类操作
       $(document).on('click','#add-btn',function(){
         var html = '<tr>';
             html += '<th scope="row">'+num+'</th>';
             html +=  '<td><input type="text" /></td>';
             html +=  '<td>';
-            html +=  '<a class="btn btn-info btn-xs cate-edit">';
+            html +=  '<a class="btn btn-info btn-xs new-edit">';
             html +=  '<i class="fa fa-pencil"></i> 保存 </a>';
             html +=  '<a class="btn btn-danger btn-xs cate-dele">';
             html +=  '<i class="fa fa-trash-o"></i> 删除 </a>';
-            html +=  '<a href="/vendors/{{ vendor_id }}/recommend/products" class="btn btn-success btn-xs">';
+            html +=  '<a href="#" class="btn btn-success btn-xs">';
             html +=  '<i class="fa fa-eye"></i> 推荐商品 </a>';
             html +=  '</td></tr>';
           $('.table tbody').append(html);
           num +=1;
-      }).on('click','.cate-edit',function(){
+      }).on('click','.new-edit',function(){
         var _this = $(this);
         var title = $(this).parent().prev().children().val();
         var data = {'title':title, 'league_id':"{{ LEAGUE_ID }}"}
         var _json = JSON.stringify(data);
-            console.log(_json);
+            // console.log(_json);
           $.ajax({
             type: "POST",
             url: "{{ API_DOMAIN }}/api/item-recommend/categories",
@@ -196,8 +193,13 @@
             headers: {"Authorization":"Bearer {{access_token}}"},
             contentType: 'application/json',
             success: function(data, status, xhr) {
+              var data_id = data.rs._id;
               if(data.err_code == 200){
                 _this.parent().prev().html(title);
+                _this.attr('data_id',data_id);
+                _this.next().attr('data_id',data_id);
+                _this.removeClass('new-edit').addClass('cate-edit');
+                _this.parent().children("a:last-child").attr("href","/vendors/{{ vendor_id }}/recommend/products?recommend_category_id="+data_id);
                 _this.html('<i class="fa fa-pencil">编辑');
               }
 
@@ -233,9 +235,10 @@
         });
       };
       // 分类编辑
-      function cateEidt(category_id,title){
-        var data= {"title":title};
+      function cateEidt(category_id,title,seq_num){
+        var data= {"title":title, "_seq":seq_num};
         var _json = JSON.stringify(data);
+        console.log(_json);
         $.ajax({
           type: "PUT",
           url: "{{ API_DOMAIN }}/api/item-recommend/categories/"+category_id,
@@ -271,18 +274,23 @@
       $(document).on('click','.cate-edit',function(){
         $(this).html('<i class="fa fa-save"></i> 保存')
         var old_text = $(this).parent().prev().text();
+        var old_num = $(this).parent().prev().prev().text();
         var input = $('<input type="text" class="c-edit" value="'+old_text+'" style="width:100px;" />');
+        var seq_input = $('<input type="number" class="seq-edit" value="'+old_num+'" style="width:100px;" />');
         $(this).parent().prev().html(input);
+        $(this).parent().prev().prev().html(seq_input);
         $(this).removeClass('cate-edit').addClass('cate-save');
       }).on('click','.cate-save',function(){
         var title = $(".c-edit").val();
-        if(title == ""){
-          $.alert('分类名不能为空！');
+        var seq_num = $(".seq-edit").val();
+        if(title == "" || seq_num == ""){
+          $.alert('分类及序号不能为空！');
           return false;
         }
         var _id = $(this).attr('data_id');
-        cateEidt(_id,title);
+        cateEidt(_id,title,seq_num);
         $(this).parent().prev().html(title);
+        $(this).parent().prev().prev().html(seq_num);
         $(this).html('<i class="fa fa-pencil"></i> 编辑');
         $(this).removeClass('cate-save').addClass('cate-edit');
       });

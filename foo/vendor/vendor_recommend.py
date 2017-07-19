@@ -91,17 +91,27 @@ class VendorRecommendProductsListHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        recommend_category_id = self.get_argument('recommend_category_id','')
+        logging.info("got recommend_category_id %r", recommend_category_id)
 
         access_token = self.get_access_token()
         logging.info("GET access_token %r", access_token)
 
-        url = API_DOMAIN + "/api/item-recommend/leagues/"+ LEAGUE_ID +"/categories"
+        url = API_DOMAIN + "/api/item-recommend/categories/"+recommend_category_id
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
         response = http_client.fetch(url, method="GET", headers=headers)
         logging.info("got response.body %r", response.body)
         data = json_decode(response.body)
-        recommend_categorys = data['rs']
+        _category = data['rs']
+
+        url = API_DOMAIN + "/api/item-recommend/categories/"+recommend_category_id+"/items"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        recommend_categorys = data['rs']['data']
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/recommend-products-list.html',
@@ -111,7 +121,63 @@ class VendorRecommendProductsListHandler(AuthorizationHandler):
                 LEAGUE_ID=LEAGUE_ID,
                 ops=ops,
                 counter=counter,
-                recommend_categorys=recommend_categorys)
+                _category=_category,
+                recommend_categorys=recommend_categorys,
+                recommend_category_id=recommend_category_id)
+
+# 创建预估商品
+class VendorRecommendCategoryCreateHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        access_token = self.get_access_token()
+
+        ops = self.get_ops_info()
+        recommend_category_id = self.get_argument('recommend_category_id','')
+        logging.info('got recommend_category_id %r',recommend_category_id)
+
+        url = API_DOMAIN + "/api/def/leagues/"+ LEAGUE_ID +"/categories"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        categorys = data['rs']
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/recommend-product-create.html',
+                vendor_id=vendor_id,
+                API_DOMAIN=API_DOMAIN,
+                access_token=access_token,
+                categorys=categorys,
+                ops=ops,
+                counter=counter,
+                recommend_category_id=recommend_category_id)
+
+    # @tornado.web.authenticated  # if no session, redirect to login page
+    # def post(self,vendor_id):
+    #     logging.info("GET vendor_id %r", vendor_id)
+    #
+    #     access_token = self.get_access_token()
+    #     logging.info("GET access_token %r", access_token)
+    #
+    #     ops = self.get_ops_info()
+    #
+    #     title = self.get_argument("title", "")
+    #     logging.debug("got param title %r", title)
+    #
+    #     categroy = {"league_id":LEAGUE_ID, "parent_id":"00000000000000000000000000000000", "level":1,
+    #                 "title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png",}
+    #
+    #     url = API_DOMAIN+"/api/def/categories"
+    #     http_client = HTTPClient()
+    #     headers={"Authorization":"Bearer "+access_token}
+    #     _json = json_encode(categroy)
+    #     logging.info("request %r body %r", url, _json)
+    #     response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+    #     logging.info("got response %r", response.body)
+    #
+    #     self.redirect('/vendors/' + vendor_id + '/categorys')
 
 
 # /vendors/<string:vendor_id>/categorys/<string:category_id>/edit

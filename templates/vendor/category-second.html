@@ -88,16 +88,15 @@
                   <table class="table table-striped">
                     <thead>
                       <tr>
-                        <th>#</th>
+                        <th>序号</th>
                         <th>名称</th>
                         <th>操作</th>
                       </tr>
                     </thead>
                     <tbody>
-                    <input type="hidden" value="{{ i=1 }}"></input>
                     {% for category in second_categorys %}
                       <tr>
-                        <th scope="row">{{ i }}</th>
+                        <th scope="row">{{ category["_seq"] }}</th>
                         <td>{{ category["title"] }}</td>
                         <td>
                           <a data_id = "{{ category['_id'] }}" class="btn btn-info btn-xs s-cate-edit">
@@ -110,7 +109,6 @@
                               <i class="fa fa-eye"></i> 查看规格 </a>
                         </td>
                       </tr>
-                      <input type="hidden" value="{{ i=i+1 }}"></input>
                     {% end %}
                     </tbody>
                   </table>
@@ -165,8 +163,8 @@
     };
 
     // 分类编辑
-    function cateEidt(category_id,title){
-      var data= {"title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png"};
+    function cateEidt(category_id,title,seq_num){
+      var data= {"title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png", "_seq":seq_num};
       var _json = JSON.stringify(data);
       $.ajax({
         type: "PUT",
@@ -203,18 +201,23 @@
     $(document).on('click','.s-cate-edit',function(){
       $(this).html('<i class="fa fa-save"></i> 保存')
       var old_text = $(this).parent().prev().text();
+      var old_num = $(this).parent().prev().prev().text();
       var input = $('<input type="text" class="c-edit" value="'+old_text+'" style="width:100px;" />');
+      var seq_input = $('<input type="number" class="seq-edit" value="'+old_num+'" style="width:100px;" />');
       $(this).parent().prev().html(input);
+      $(this).parent().prev().prev().html(seq_input);
       $(this).removeClass('s-cate-edit').addClass('s-cate-save');
     }).on('click','.s-cate-save',function(){
       var title = $(".c-edit").val();
-      if(title == ""){
-        $.alert('分类名不能为空！');
+      var seq_num = $(".seq-edit").val();
+      if(title == "" || seq_num == ""){
+        $.alert('分类及序号不能为空！');
         return false;
       }
       var _id = $(this).attr('data_id');
-      cateEidt(_id,title);
+      cateEidt(_id,title,seq_num);
       $(this).parent().prev().html(title);
+      $(this).parent().prev().prev().html(seq_num);
       $(this).html('<i class="fa fa-pencil"></i> 编辑');
       $(this).removeClass('s-cate-save').addClass('s-cate-edit');
     });

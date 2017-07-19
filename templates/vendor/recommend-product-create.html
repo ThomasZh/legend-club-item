@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>骑无止境 - 添加预估商品</title>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
+  <link rel="stylesheet" href="{{ static_url('weui/css/jquery-weui.min.css') }}">
+  <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
+  <!-- Custom styling plus plugins -->
+  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
+</head>
+
+
+<body class="nav-md">
+
+  <div class="container body">
+
+
+    <div class="main_container">
+
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+
+          <!-- navigation title -->
+          {% module Template("vendor/nav-title-block.html", ops=ops) %}
+          <!-- /navigation title -->
+          <div class="clearfix"></div>
+
+          <!-- menu prile quick info -->
+          {% module Template("vendor/menu-prile-quick-info-block.html", ops=ops) %}
+          <!-- /menu prile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          {% module Template("vendor/sidebar-menu-block.html", vendor_id=vendor_id, counter=counter) %}
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      {% module Template("vendor/top-nav-block.html", ops=ops) %}
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+
+        <div class="">
+          <div class="page-title">
+            <div class="title_left">
+              <h3>预估分类 <small> 添加预估商品</small></h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>预估商品信息 <small>*为必填项</small></h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+                  <br />
+                  <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
+                    action="/vendors/{{ vendor_id }}/recommend-categorys/create" method="POST">
+  					        {% raw xsrf_form_html() %}
+
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-4">商品选择 <span class="required">*</span></label>
+                      <div class="col-md-1 col-sm-6 col-xs-12">
+                        <select class="form-control" id="category" name="category">
+                          <option value="one">一级分类</option>
+                        {% for category in categorys %}
+                          <option value="{{category['_id']}}">{{category['title']}}</option>
+                        {% end %}
+                        </select>
+                      </div>
+                      <div class="col-md-1 col-sm-6 col-xs-12">
+                        <select class="form-control" id="s-category" name="second-category" disabled="true">
+                          <option value="two">二级分类</option>
+                        </select>
+                      </div>
+                      <div class="col-md-2 col-sm-6 col-xs-12">
+                        <select class="form-control" id="prod" name="prod" disabled="true">
+                          <option value="prod">商品</option>
+                        </select>
+                      </div>
+                      <div class="col-md-2 col-sm-6 col-xs-12">
+                        <select class="form-control" id="spec" name="spec" disabled="true">
+                          <option value="spec">规格</option>
+                        </select>
+                      </div>
+
+                    </div>
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-4">商品数量 <span class="required">*</span></label>
+                      <div class="col-md-1 col-sm-6 col-xs-12">
+                        <input type="number" id="quantity" name="quantity" required="required" class="form-control col-md-7 col-xs-12">
+                      </div>
+                    </div>
+                    <div class="ln_solid"></div>
+                    <div class="form-group">
+                      <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                        <button type="button" class="btn btn-primary" onclick="reset();">重置</button>
+                        <button type="button" id="add-btn" class="btn btn-success">添加</button>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- footer content -->
+        {% module Template("vendor/footer-block.html") %}
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+    </div>
+
+  </div>
+  <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
+  <!-- bootstrap progress js -->
+  <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
+  <!-- icheck -->
+  <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
+  <script src="{{ static_url('admin/js/custom.js') }}"></script>
+  <!-- pace -->
+  <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
+  <!-- form validation -->
+  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+  <script src="{{ static_url('weui/js/jquery-weui.min.js') }}"></script>
+  <script type="text/javascript">
+
+      $(function(){
+        // 获取一级分类json
+        $("#category").on('change',function(){
+            getTwoJson();
+            $("#prod").html('<option value="prod">商品</option>');
+            $("#spec").html('<option value="spec">规格</option>');
+        });
+        $("#s-category").on('change',function(){
+            getProdJson();
+            $("#spec").html('<option value="spec">规格</option>');
+        });
+        $("#prod").on('change',function(){
+            getSpecJson();
+        });
+
+          // 获取二级数据的方法
+          function getTwoJson(){
+            var one_id = $("#category option:selected").val();
+            $.ajax({
+              type: "GET",
+              url: "{{ API_DOMAIN }}/api/def/categories/"+one_id+"/level2",
+              dataType: "json",
+              headers: {"Authorization":"Bearer {{access_token}}"},
+              contentType: 'application/json',
+              success: function(data, status, xhr) {
+                console.log(data);
+                $("#s-category").empty();
+                $("#s-category").attr('disabled',false);
+                var dataObj = data.rs;
+                var option = '';
+                for (var i=0;i<dataObj.length;i++){
+                    option += '<option value="'+dataObj[i]['_id']+'">'+dataObj[i]['title']+'</option>';
+                }
+                $("#s-category").html('<option value="prod">二级分类</option>');
+                $("#s-category").append(option);
+
+              },
+              error: function(XMLHttpRequest, textStatus, errorThrown) {
+                console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+                $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+              },
+              complete: function(XMLHttpRequest, textStatus) {
+                this; // 调用本次AJAX请求时传递的options参数
+              }
+            });
+          };
+          // 获取三级数据的方法
+          function getProdJson(){
+            var two_id = $("#s-category option:selected").val();
+            console.log(two_id);
+            var data =  {'page':1,'limit':1000}
+            var _json = JSON.stringify(data);
+            $.ajax({
+              type: "GET",
+              url: "{{ API_DOMAIN }}/api/def/categories/"+ two_id +"/items",
+              dataType: "json",
+              data:_json,
+              headers: {"Authorization":"Bearer {{access_token}}"},
+              contentType: 'application/json',
+              success: function(data, status, xhr) {
+                console.log(data);
+                $("#prod").empty();
+                $("#prod").attr('disabled',false);
+                var dataObj = data.rs.data;
+                var option = '';
+                for (var i=0;i<dataObj.length;i++){
+                    option += '<option value="'+dataObj[i]['_id']+'">'+dataObj[i]['title']+'</option>';
+                }
+                $("#prod").html('<option value="prod">商品</option>');
+                $("#prod").append(option);
+
+              },
+              error: function(XMLHttpRequest, textStatus, errorThrown) {
+                console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+                $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+              },
+              complete: function(XMLHttpRequest, textStatus) {
+                this; // 调用本次AJAX请求时传递的options参数
+              }
+            });
+          };
+          // 获取四级数据的方法
+          function getSpecJson(){
+            var three_id = $("#prod option:selected").val();
+            $.ajax({
+              type: "GET",
+              url: "{{ API_DOMAIN }}/api/items/"+ three_id +"/specs",
+              dataType: "json",
+              headers: {"Authorization":"Bearer {{access_token}}"},
+              contentType: 'application/json',
+              success: function(data, status, xhr) {
+                console.log(data);
+                $("#spec").empty();
+                $("#spec").attr('disabled',false);
+                var dataObj = data.rs;
+                var option = '';
+                for (var i=0;i<dataObj.length;i++){
+                    option += '<option value="'+dataObj[i]['spec_id']+'">'+dataObj[i]['title']+'</option>';
+                }
+                $("#spec").html('<option value="spec">规格</option>');
+                $("#spec").append(option);
+
+              },
+              error: function(XMLHttpRequest, textStatus, errorThrown) {
+                console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+                $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+              },
+              complete: function(XMLHttpRequest, textStatus) {
+                this; // 调用本次AJAX请求时传递的options参数
+              }
+            });
+          };
+
+          $('#add-btn').on('click',function(){
+            var prod_id = $("#prod option:selected").val();
+            var spec_id = $("#spec option:selected").val();
+            var quantity = $("#quantity").val();
+            if(prod_id == 'prod' || spec_id == 'spec' || quantity == ''){
+              $.alert('请选择商品数量及规格!');
+              return
+            }else{
+              var data =  {'item_id':prod_id, 'spec_id':spec_id, 'quantity':quantity, 'recommend_category_id':"{{ recommend_category_id }}"}
+              var _json = JSON.stringify(data);
+              $.ajax({
+                type: "POST",
+                url: "{{ API_DOMAIN }}/api/item-recommend/categories/{{ recommend_category_id }}/items",
+                dataType: "json",
+                data:_json,
+                headers: {"Authorization":"Bearer {{access_token}}"},
+                contentType: 'application/json',
+                success: function(data, status, xhr) {
+                  location.href="/vendors/{{ vendor_id }}/recommend/products?recommend_category_id={{ recommend_category_id }}"
+                },
+                error: function(XMLHttpRequest, textStatus, errorThrown) {
+                  console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+                  $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+                },
+                complete: function(XMLHttpRequest, textStatus) {
+                  this; // 调用本次AJAX请求时传递的options参数
+                }
+              });
+            }
+
+          })
+      });
+  </script>
+</body>
+
+</html>
