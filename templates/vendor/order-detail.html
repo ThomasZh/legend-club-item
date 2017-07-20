@@ -193,15 +193,15 @@
                         <tr class="headings">
                           <th>姓名</th>
                           <th>电话号码</th>
-                          <th>地址</th>
+                          <th>收货地址</th>
                         </tr>
                       </thead>
 
                       <tbody id="tbody">
                         <tr class="even pointer">
-                          <td>zhou</td>
-                          <td>99999999</td>
-                          <td>earth</td>
+                          <td>{{ order['shipping_addr']['name'] }}</td>
+                          <td>{{ order['shipping_addr']['phone'] }}</td>
+                          <td>{{ order['shipping_addr']['addr'] }}</td>
                         </tr>
                       </tbody>
                     </table>

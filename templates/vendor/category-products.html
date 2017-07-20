@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>骑无止境 | 二级分类</title>
+  <title>骑无止境 | 二级分类商品</title>
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
@@ -58,7 +58,7 @@
               <h3>
                     商品
                     <small>
-                        二级分类（用户导航页的菜单项）
+                        商品列表
                     </small>
                 </h3>
             </div>
@@ -67,14 +67,16 @@
 
           <div class="row">
 
-            <div class="col-md-8 col-sm-6 col-xs-12">
+            <div class="col-md-6 col-sm-6 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>分类 <small><a href="/vendors/{{ vendor_id }}/categorys">{{ second_category_info['title'] }}</a></small>&nbsp><small>二级分类</small></h2>
+                  <h2>分类 <small><a href="/vendors/{{ vendor_id }}/categorys">{{ second_category_info['parent_title'] }}</a></small>
+                    &nbsp><small><a href="/vendors/{{ vendor_id }}/categorys/secondary?category_id={{ second_category_info['parent_id'] }}">{{ second_category_info['title'] }}</a></small>
+                    &nbsp><small>商品列表</small></h2>
 
                   <ul class="nav navbar-right panel_toolbox">
-                  	<li><a href="/vendors/{{ vendor_id }}/categorys/create/second?category_id={{ category_id }}" class="btn btn-success btn-xs">
-                      <i class="fa fa-plus"></i> 添加二级分类 </a>
+                  	<li><a href="/vendors/{{ vendor_id }}/categorys/secondary/creat/product?second_categorys_id={{ second_categorys_id }}" class="btn btn-success btn-xs">
+                      <i class="fa fa-plus"></i> 添加商品 </a>
                   	</li>
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                     </li>
@@ -90,25 +92,30 @@
                       <tr>
                         <th>序号</th>
                         <th>名称</th>
+                        <th>状态</th>
                         <th>操作</th>
                       </tr>
                     </thead>
                     <tbody>
-                    {% for category in second_categorys %}
+                    {% for product in second_products %}
                       <tr>
-                        <th scope="row">{{ category["_seq"] }}</th>
-                        <td>{{ category["title"] }}</td>
+                        <th scope="row">{{ product['_seq'] }}</th>
+                        <td><a href="/vendors/{{ vendor_id }}/activitys/{{ product['_id'] }}/detail/step1">{{ product["title"] }}</a></td>
+                        <td>{% if product["_status"] > 10 %}
+                              销售中
+                          {% else %}
+                              草稿箱
+                          {% end %}
+                        </td>
                         <td>
-                          <a data_id = "{{ category['_id'] }}" class="btn btn-info btn-xs s-cate-edit">
+                          <a data_id = "{{ product['_id'] }}" class="btn btn-info btn-xs prod-edit">
                             <i class="fa fa-pencil"></i> 编辑 </a>
-                          <a data_id = "{{ category['_id'] }}" class="btn btn-danger btn-xs s-cate-dele">
+                          <a data_id = "{{ product['_id'] }}" class="btn btn-danger btn-xs prod-dele">
                             <i class="fa fa-trash-o"></i> 删除 </a>
-                          <a href="/vendors/{{ vendor_id }}/categorys/secondary/brand?second_categorys_id={{ category['_id'] }}" class="btn btn-success btn-xs">
-                            <i class="fa fa-eye"></i> 查看品牌 </a>
-                          <a href="/vendors/{{ vendor_id }}/categorys/secondary/spec?second_categorys_id={{ category['_id'] }}" class="btn btn-success btn-xs">
-                            <i class="fa fa-eye"></i> 查看规格 </a>
-                          <a href="/vendors/{{ vendor_id }}/categorys/secondary/products?second_categorys_id={{ category['_id'] }}" class="btn btn-success btn-xs">
-                            <i class="fa fa-eye"></i> 查看商品 </a>
+                            {% if product["_status"] == 10 %}
+                            <a data_id = "{{ product['_id'] }}" class="btn ap_del btn-success btn-xs prod-pub">
+                              <i class="fa fa-check-circle"></i> 发布 </a>
+                            {% end %}
                         </td>
                       </tr>
                     {% end %}
@@ -144,10 +151,43 @@
   <script src="{{ static_url('weui/js/jquery-weui.min.js') }}"></script>
   <script type="text/javascript">
   $(function(){
+    $(document).on('click','.prod-pub',function(){
+      var _id = $(this).attr('data_id');
+      var _this = $(this);
+      $.confirm('确定上架该商品吗？',function(){
+        publish(_id);
+        _this.parent().prev().html('销售中');
+        _this.remove();
+      },function(){
+          // 取消操作
+      })
+
+    })
+    // 上架操作
+    function publish(id){
+      console.log(id);
+      $.ajax({
+        type: "POST",
+        url: "{{ API_DOMAIN }}/api/items/"+id+"/publish",
+        dataType: "json",
+        headers: {"Authorization":"Bearer {{access_token}}"},
+        contentType: 'application/json',
+        success: function(data, status, xhr) {
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+          $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+        },
+        complete: function(XMLHttpRequest, textStatus) {
+          this; // 调用本次AJAX请求时传递的options参数
+        }
+      });
+    };
+    // 删除操作
     function dele(_id){
       $.ajax({
         type: "DELETE",
-        url: "{{ API_DOMAIN }}/api/def/categories/"+_id,
+        url: "{{ API_DOMAIN }}/api/items/"+_id,
         dataType: "json",
         headers: {"Authorization":"Bearer {{access_token}}"},
         contentType: 'application/json',
@@ -165,12 +205,13 @@
     };
 
     // 分类编辑
-    function cateEidt(category_id,title,seq_num){
-      var data= {"title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png", "_seq":seq_num};
+    function cateEidt(category_id,seq_num){
+      var data= {"_seq":seq_num};
       var _json = JSON.stringify(data);
+      console.log(_json);
       $.ajax({
         type: "PUT",
-        url: "{{ API_DOMAIN }}/api/def/categories/"+category_id,
+        url: "{{ API_DOMAIN }}/api/items/"+category_id,
         dataType: "json",
         data:_json,
         headers: {"Authorization":"Bearer {{access_token}}"},
@@ -188,11 +229,11 @@
       });
     };
 
-    $(document).on('click','.s-cate-dele',function(){
-      category_id = $(this).attr('data_id');
+    $(document).on('click','.prod-dele',function(){
+      spec_id = $(this).attr('data_id');
       var _this = $(this);
-      $.confirm('确定删除该分类吗？',function(){
-        dele(category_id);
+      $.confirm('确定删除该商品吗？',function(){
+        dele(spec_id);
         _this.parent().parent().remove();
       },function(){
           // 取消操作
@@ -200,28 +241,23 @@
     });
 
     // 修改操作
-    $(document).on('click','.s-cate-edit',function(){
+    $(document).on('click','.prod-edit',function(){
       $(this).html('<i class="fa fa-save"></i> 保存')
-      var old_text = $(this).parent().prev().text();
-      var old_num = $(this).parent().prev().prev().text();
-      var input = $('<input type="text" class="c-edit" value="'+old_text+'" style="width:100px;" />');
+      var old_num = $(this).parent().prev().prev().prev().text();
       var seq_input = $('<input type="number" class="seq-edit" value="'+old_num+'" style="width:100px;" />');
-      $(this).parent().prev().html(input);
-      $(this).parent().prev().prev().html(seq_input);
-      $(this).removeClass('s-cate-edit').addClass('s-cate-save');
-    }).on('click','.s-cate-save',function(){
-      var title = $(".c-edit").val();
+      $(this).parent().prev().prev().prev().html(seq_input);
+      $(this).removeClass('prod-edit').addClass('prod-save');
+    }).on('click','.prod-save',function(){
       var seq_num = $(".seq-edit").val();
-      if(title == "" || seq_num == ""){
-        $.alert('分类及序号不能为空！');
+      if(seq_num == ""){
+        $.alert('序号填写不完整！');
         return false;
       }
       var _id = $(this).attr('data_id');
-      cateEidt(_id,title,seq_num);
-      $(this).parent().prev().html(title);
-      $(this).parent().prev().prev().html(seq_num);
+      cateEidt(_id,seq_num);
+      $(this).parent().prev().prev().prev().html(seq_num);
       $(this).html('<i class="fa fa-pencil"></i> 编辑');
-      $(this).removeClass('s-cate-save').addClass('s-cate-edit');
+      $(this).removeClass('prod-save').addClass('prod-edit');
     });
 
   })

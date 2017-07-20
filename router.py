@@ -51,10 +51,14 @@ def map():
         (r'/vendors/([a-z0-9]*)/categorys/secondary/brand', getattr(vendor_category, 'VendorCategorySecondaryBrandHandler')),
         # 规格
         (r'/vendors/([a-z0-9]*)/categorys/secondary/spec', getattr(vendor_category, 'VendorCategorySecondarySpecHandler')),
+        # 二级分类下的商品列表
+        (r'/vendors/([a-z0-9]*)/categorys/secondary/products', getattr(vendor_category, 'VendorCategorySecondaryProductsHandler')),
         # 创建一级分类
         (r'/vendors/([a-z0-9]*)/categorys/create', getattr(vendor_category, 'VendorCategoryCreateHandler')),
         # 创建二级分类
         (r'/vendors/([a-z0-9]*)/categorys/create/second', getattr(vendor_category, 'VendorCategoryCreateSecondHandler')),
+        # 二级分类下添加商品
+        (r'/vendors/([a-z0-9]*)/categorys/secondary/creat/product', getattr(vendor_category, 'VendorCategoryCreateProductHandler')),
         # 创建品牌
         (r'/vendors/([a-z0-9]*)/categorys/secondary/creat/brand', getattr(vendor_category, 'VendorCategoryCreateBrandHandler')),
         # 创建规格

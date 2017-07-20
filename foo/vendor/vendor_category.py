@@ -26,6 +26,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../dao"))
 from comm import *
 from dao import budge_num_dao
 from dao import category_dao
+from dao import group_qrcode_dao
+from dao import vendor_wx_dao
 from global_const import *
 import uuid
 
@@ -388,6 +390,159 @@ class VendorCategoryCreateSpecHandler(AuthorizationHandler):
         logging.info("got response %r", response.body)
 
         self.redirect('/vendors/' + vendor_id + '/categorys/secondary/spec?second_categorys_id='+second_categorys_id)
+
+
+
+# 二级分类下添加商品
+class VendorCategoryCreateProductHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
+        second_categorys_id = self.get_argument('second_categorys_id','')
+        logging.info("GET second_categorys_id %r", second_categorys_id)
+
+        url = API_DOMAIN + "/api/def/leagues/"+ LEAGUE_ID +"/categories"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        categorys = data['rs']
+
+        url = API_DOMAIN + "/api/def/categories/"+second_categorys_id+"/brands"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        brands = data['rs']
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/category-products-create.html',
+                vendor_id=vendor_id,
+                access_token=access_token,
+                API_DOMAIN=API_DOMAIN,
+                ops=ops,
+                counter=counter,
+                categorys=categorys,
+                brands=brands,
+                second_categorys_id=second_categorys_id)
+
+    def post(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        access_token = self.get_secure_cookie("access_token")
+
+        ops = self.get_ops_info()
+        second_categorys_id = self.get_argument('second_categorys_id','')
+        logging.info("GET second_categorys_id %r", second_categorys_id)
+        _title = self.get_argument("title", "")
+        _bk_img_url = self.get_argument("bk_img_url", "")
+        brand = self.get_argument("brand", "")
+        logging.info ("get brand %r", brand)
+
+        # TODO: get second_category info
+        url = API_DOMAIN + "/api/def/categories/"+ second_categorys_id
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        second_category_info = data['rs']
+
+        _category = second_category_info['parent_id']
+
+        activity = {
+            "club_id":vendor_id,
+            "title":_title,
+            "img":_bk_img_url,
+            "category_id":_category,
+            "level2_category_id":second_categorys_id,
+            "brand_id":brand
+        }
+        logging.info("got activity %r",activity)
+        headers = {"Authorization":"Bearer "+access_token}
+        url = API_DOMAIN + "/api/items"
+        _json = json_encode(activity)
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("create activity response.body=[%r]", response.body)
+        data = json_decode(response.body)
+        rs = data['rs']
+        _activity_id = rs["_id"]
+
+        article = {'_id':_activity_id, 'title':_title, 'subtitle':_title, 'img':_bk_img_url, 'paragraphs':''}
+        self.create_article(article)
+
+        wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
+        wx_notify_domain = wx_app_info['wx_notify_domain']
+        # create wechat qrcode
+        activity_url = wx_notify_domain + "/bf/wx/vendors/" + vendor_id + "/activitys/" + _activity_id
+        logging.info("got activity_url %r", activity_url)
+        data = {"url": activity_url}
+        _json = json_encode(data)
+        logging.info("got ——json %r", _json)
+        http_client = HTTPClient()
+        response = http_client.fetch(QRCODE_CREATE_URL, method="POST", body=_json)
+        logging.info("got response %r", response.body)
+        qrcode_url = response.body
+        logging.info("got qrcode_url %r", qrcode_url)
+
+        _timestamp = time.time()
+        wx_qrcode_url = "http://bike-forever.b0.upaiyun.com/vendor/wx/2016/7/21/66a75009-e60e-44b1-80f7-bf4a9d95525a.jpg"
+        json = {"_id":_activity_id,
+                "create_time":_timestamp, "last_update_time":_timestamp,
+                "qrcode_url":qrcode_url, "wx_qrcode_url":wx_qrcode_url}
+        group_qrcode_dao.group_qrcode_dao().create(json)
+
+        counter = self.get_counter(vendor_id)
+        self.redirect('/vendors/'+ vendor_id +'/categorys/secondary/products?second_categorys_id='+second_categorys_id)
+
+
+# /二级分类下的商品
+class VendorCategorySecondaryProductsHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
+
+        second_categorys_id = self.get_argument('second_categorys_id','')
+        logging.info("get second_categorys_id",second_categorys_id)
+
+        # TODO: get second_category info
+        url = API_DOMAIN + "/api/def/categories/"+ second_categorys_id
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        second_category_info = data['rs']
+
+        params = {"_status":"all","page":1, "limit":200}
+        url = url_concat(API_DOMAIN + "/api/def/categories/"+ second_categorys_id +"/items", params)
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers,)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        second_products = data['rs']['data']
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/category-products.html',
+                vendor_id=vendor_id,
+                access_token=access_token,
+                API_DOMAIN=API_DOMAIN,
+                ops=ops,
+                counter=counter,
+                second_categorys_id=second_categorys_id,
+                second_category_info=second_category_info,
+                second_products=second_products)
 
 
 # /vendors/<string:vendor_id>/categorys/<string:category_id>/edit
