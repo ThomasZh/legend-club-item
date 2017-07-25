@@ -98,6 +98,7 @@
                         <th>下单金额</th>
                         <th>支付金额</th>
                         <th>下单时间</th>
+                        <th>是否开发票</th>
                         <th>状态</th>
                       </tr>
                     </thead>
@@ -141,6 +142,12 @@
                           {% end %}
                         </td>
                         <td class=" ">{{ order['create_time'] }}</td>
+                        <td class=" ">{% if order['billing_required'] == '1'%}
+                          是
+                          {% else %}
+                          否
+                          {% end %}
+                        </td>
                         {% if order['pay_status'] == 20 %}
                         <td>
                           <a href="#" class="btn btn-warning btn-xs"> 待付款 </a>
@@ -201,7 +208,7 @@
                         <tr class="even pointer">
                           <td>{{ order['shipping_addr']['name'] }}</td>
                           <td>{{ order['shipping_addr']['phone'] }}</td>
-                          <td>{{ order['shipping_addr']['addr'] }}</td>
+                          <td>{{ order['shipping_addr']['_addr'] }}</td>
                         </tr>
                       </tbody>
                     </table>
@@ -253,6 +260,40 @@
                     </div>
                     </div>
                   </div>
+                  <br />
+                  <br />
+                  <br />
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                  <div class="x_panel">
+                    <div class="x_title">
+                      <h2>发票信息 <small>客户</small></h2>
+                      <ul class="nav navbar-right panel_toolbox">
+                        <li><a href="#"><i class="fa fa-chevron-up"></i></a>
+                        </li>
+                        <li><a href="#"><i class="fa fa-close"></i></a>
+                        </li>
+                      </ul>
+                      <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+                      <table id="example" class="table table-striped responsive-utilities jambo_table">
+                        <thead>
+                          <tr class="headings">
+                            <th>公司抬头</th>
+                            <th>公司税号</th>
+                          </tr>
+                        </thead>
+
+                        <tbody id="tbody">
+                          <tr class="even pointer">
+                            <td>{{ order['billing_addr']['company_title'] }}</td>
+                            <td>{{ order['billing_addr']['tfn'] }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
             </div>
         </div>
 
