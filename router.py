@@ -12,6 +12,7 @@ from foo.auth import auth_email
 from foo.auth import auth_phone
 from vendor import vendor_category
 from vendor import vendor_recommend
+from vendor import vendor_expressfee
 from vendor import vendor_activity
 from vendor import vendor_order
 from vendor import vendor_customer
@@ -70,6 +71,8 @@ def map():
         (r'/vendors/([a-z0-9]*)/recommend/categorys', getattr(vendor_recommend, 'VendorRecommendCategoryListHandler')),
         (r'/vendors/([a-z0-9]*)/recommend/products', getattr(vendor_recommend, 'VendorRecommendProductsListHandler')),
         (r'/vendors/([a-z0-9]*)/recommend-categorys/create', getattr(vendor_recommend, 'VendorRecommendCategoryCreateHandler')),  #添加预估商品
+        # 运费
+        (r'/vendors/([a-z0-9]*)/activitys/expressfee', getattr(vendor_expressfee, 'VendorActivityExpressFeeHandler')),
 
 
         # vendor activity

@@ -248,7 +248,7 @@
       $(this).parent().prev().prev().prev().html(seq_input);
       $(this).removeClass('prod-edit').addClass('prod-save');
     }).on('click','.prod-save',function(){
-      var seq_num = $(".seq-edit").val();
+      var seq_num = $(this).parent().prev().prev().prev().children().val();
       if(seq_num == ""){
         $.alert('序号填写不完整！');
         return false;

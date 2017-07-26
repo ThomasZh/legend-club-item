@@ -204,8 +204,8 @@
       $(this).parent().prev().prev().html(seq_input);
       $(this).removeClass('brand-edit').addClass('brand-save');
     }).on('click','.brand-save',function(){
-      var title = $(".c-edit").val();
-      var seq_num = $(".seq-edit").val();
+      var title = $(this).parent().prev().children().val();
+      var seq_num = $(this).parent().prev().prev().children().val();
       if(title == "" || seq_num == ""){
         $.alert('品牌及序号不能为空！');
         return false;

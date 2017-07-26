@@ -133,7 +133,9 @@
                           <a href="/vendors/{{ vendor_id }}/customers/{{ order['account_id'] }}">{{ order['nickname'] }}</a>
                           <br />
                         </td>
-                        <td> {{ order['amount'] }}元<br /></td>
+                        <td> 商品价格:{{ order['amount'] }}元<br /><br />
+                             运费:{{ order['shipping_cost'] }}元
+                        </td>
                         <td>
                           {% if order['pay_status'] == 30 %}
                             <br />{{ order['actual_payment'] }}元

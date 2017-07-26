@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>骑无止境 | 预估分类</title>
+  <title>骑无止境 | 运费分类</title>
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
@@ -67,7 +67,7 @@
             <div class="col-md-6 col-sm-6 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>预估分类<small>列表</small></h2>
+                  <h2>运费分类<small>列表</small></h2>
 
                   <ul class="nav navbar-right panel_toolbox">
                   	<li><a href="javascript:;" id="add-btn" class="btn btn-success btn-xs">
@@ -86,7 +86,9 @@
                     <thead>
                       <tr>
                         <th>序号</th>
-                        <th>名称</th>
+                        <th>最小值</th>
+                        <th>最大值</th>
+                        <th>运费价格</th>
                         <th>操作</th>
                       </tr>
                     </thead>
@@ -128,30 +130,30 @@
     function getJson(){
       $.ajax({
         type: "GET",
-        url: "{{ API_DOMAIN }}/api/item-recommend/leagues/{{ LEAGUE_ID }}/categories",
+        url: "{{ API_DOMAIN }}/api/def/leagues/{{ LEAGUE_ID }}/shipping-costs",
         dataType: "json",
         headers: {"Authorization":"Bearer {{access_token}}"},
         contentType: 'application/json',
         success: function(data, status, xhr) {
-          // console.log(typeof(data));
+          console.log(data);
           var dataObj = data.rs;
           console.log(dataObj);
           if(data.err_code == 200){
             for (var i=0; i<dataObj.length;i++){
               var html = '<tr>';
                   html += '<th scope="row">'+dataObj[i]['_seq']+'</th>';
-                  html +=  '<td>'+dataObj[i]['title']+'</td>';
+                  html +=  '<td>'+dataObj[i]['_min']+'</td>';
+                  html +=  '<td>'+dataObj[i]['_max']+'</td>';
+                  html +=  '<td>'+dataObj[i]['cost']+'</td>';
                   html +=  '<td>';
                   html +=  '<a data_id = "'+ dataObj[i]['_id'] +'" class="btn btn-info btn-xs cate-edit">';
                   html +=  '<i class="fa fa-pencil"></i> 编辑 </a>';
                   html +=  '<a data_id = "'+ dataObj[i]['_id'] +'" class="btn btn-danger btn-xs cate-dele">';
                   html +=  '<i class="fa fa-trash-o"></i> 删除 </a>';
-                  html +=  '<a href="/vendors/{{ vendor_id }}/recommend/products?recommend_category_id='+dataObj[i]['_id']+'" class="btn btn-success btn-xs">';
-                  html +=  '<i class="fa fa-eye"></i> 推荐商品 </a>';
                   html +=  '</td></tr>';
                 $('.table tbody').append(html);
             }
-            num = $('.table tbody').children("tr").length;
+            num = $('.table tbody').children("tr").length+1;
           }
 
         },
@@ -164,61 +166,71 @@
         }
       });
     };
-    // 添加分类操作
+    // 添加运费操作
       $(document).on('click','#add-btn',function(){
         var html = '<tr>';
             html += '<th scope="row">'+num+'</th>';
+            html +=  '<td><input type="text" /></td>';
+            html +=  '<td><input type="text" /></td>';
             html +=  '<td><input type="text" /></td>';
             html +=  '<td>';
             html +=  '<a class="btn btn-info btn-xs new-edit">';
             html +=  '<i class="fa fa-pencil"></i> 保存 </a>';
             html +=  '<a class="btn btn-danger btn-xs cate-dele">';
             html +=  '<i class="fa fa-trash-o"></i> 删除 </a>';
-            html +=  '<a href="#" class="btn btn-success btn-xs">';
-            html +=  '<i class="fa fa-eye"></i> 推荐商品 </a>';
             html +=  '</td></tr>';
           $('.table tbody').append(html);
           num +=1;
       }).on('click','.new-edit',function(){
         var _this = $(this);
-        var title = $(this).parent().prev().children().val();
-        var data = {'title':title, 'league_id':"{{ LEAGUE_ID }}"}
-        var _json = JSON.stringify(data);
-            // console.log(_json);
-          $.ajax({
-            type: "POST",
-            url: "{{ API_DOMAIN }}/api/item-recommend/categories",
-            dataType: "json",
-            data:_json,
-            headers: {"Authorization":"Bearer {{access_token}}"},
-            contentType: 'application/json',
-            success: function(data, status, xhr) {
-              var data_id = data.rs._id;
-              if(data.err_code == 200){
-                _this.parent().prev().html(title);
-                _this.attr('data_id',data_id);
-                _this.next().attr('data_id',data_id);
-                _this.removeClass('new-edit').addClass('cate-edit');
-                _this.parent().children("a:last-child").attr("href","/vendors/{{ vendor_id }}/recommend/products?recommend_category_id="+data_id);
-                _this.html('<i class="fa fa-pencil">编辑');
-              }
+        var minNum = $(this).parent().prev().prev().prev().children().val();
+        var maxNum = $(this).parent().prev().prev().children().val();
+        var costNum = $(this).parent().prev().children().val();
+        if(minNum == '' || maxNum == '' || costNum == ''){
+          $.alert("填写不完整!");
+        }else{
+          var data = {'_min':minNum, '_max':maxNum, 'cost':costNum}
+          var _json = JSON.stringify(data);
+              console.log(_json);
+            $.ajax({
+              type: "POST",
+              url: "{{ API_DOMAIN }}/api/def/leagues/{{ LEAGUE_ID }}/shipping-costs",
+              dataType: "json",
+              data:_json,
+              headers: {"Authorization":"Bearer {{access_token}}"},
+              contentType: 'application/json',
+              success: function(data, status, xhr) {
+                console.log(data);
+                var data_id = data.rs._id;
+                if(data.err_code == 200){
+                  _this.parent().prev().prev().prev().html(minNum);
+                  _this.parent().prev().prev().html(maxNum);
+                  _this.parent().prev().html(costNum);
+                  _this.attr('data_id',data_id);
+                  _this.next().attr('data_id',data_id);
+                  _this.removeClass('new-edit').addClass('cate-edit');
+                  _this.parent().children("a:last-child").attr("href","/vendors/{{ vendor_id }}/recommend/products?recommend_category_id="+data_id);
+                  _this.html('<i class="fa fa-pencil">编辑');
+                }
 
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-              console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
-              $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
-            },
-            complete: function(XMLHttpRequest, textStatus) {
-              this; // 调用本次AJAX请求时传递的options参数
-            }
-          });
+              },
+              error: function(XMLHttpRequest, textStatus, errorThrown) {
+                console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+                $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+              },
+              complete: function(XMLHttpRequest, textStatus) {
+                this; // 调用本次AJAX请求时传递的options参数
+              }
+            });
+        }
+
       })
 
     // 分类删除
-      function dele(category_id){
+      function dele(cost_id){
         $.ajax({
           type: "DELETE",
-          url: "{{ API_DOMAIN }}/api/item-recommend/categories/"+category_id,
+          url: "{{ API_DOMAIN }}/api/def/shipping-costs/"+cost_id,
           dataType: "json",
           headers: {"Authorization":"Bearer {{access_token}}"},
           contentType: 'application/json',
@@ -235,19 +247,18 @@
         });
       };
       // 分类编辑
-      function cateEidt(category_id,title,seq_num){
-        var data= {"title":title, "_seq":seq_num};
+      function cateEidt(cost_id,_min,_max,cost,seq){
+        var data= {'_min':_min, '_max':_max, 'cost':cost, '_seq':seq};
         var _json = JSON.stringify(data);
         console.log(_json);
         $.ajax({
           type: "PUT",
-          url: "{{ API_DOMAIN }}/api/item-recommend/categories/"+category_id,
+          url: "{{ API_DOMAIN }}/api/def/shipping-costs/"+cost_id,
           dataType: "json",
           data:_json,
           headers: {"Authorization":"Bearer {{access_token}}"},
           contentType: 'application/json',
           success: function(data, status, xhr) {
-
           },
           error: function(XMLHttpRequest, textStatus, errorThrown) {
             console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
@@ -262,7 +273,7 @@
       $(document).on('click','.cate-dele',function(){
         category_id = $(this).attr('data_id');
         var _this = $(this);
-        $.confirm('确定删除该分类吗？',function(){
+        $.confirm('确定删除该运费配置吗？',function(){
           dele(category_id);
           _this.parent().parent().remove();
         },function(){
@@ -272,25 +283,35 @@
       });
       // 修改操作
       $(document).on('click','.cate-edit',function(){
-        $(this).html('<i class="fa fa-save"></i> 保存')
-        var old_text = $(this).parent().prev().text();
-        var old_num = $(this).parent().prev().prev().text();
-        var input = $('<input type="text" class="c-edit" value="'+old_text+'" style="width:100px;" />');
-        var seq_input = $('<input type="number" class="seq-edit" value="'+old_num+'" style="width:100px;" />');
-        $(this).parent().prev().html(input);
-        $(this).parent().prev().prev().html(seq_input);
+        $(this).html('<i class="fa fa-save"></i> 保存');
+        var old_min = $(this).parent().prev().prev().prev().text();
+        var old_max = $(this).parent().prev().prev().text();
+        var old_cost = $(this).parent().prev().text();
+        var old_seq = $(this).parent().prev().prev().prev().prev().text();
+        var _min = $('<input type="text" class="c-edit" value="'+old_min+'" style="width:100px;" />');
+        var _max = $('<input type="number" class="max-edit" value="'+old_max+'" style="width:100px;" />');
+        var _cost = $('<input type="number" class="cost-edit" value="'+old_cost+'" style="width:100px;" />');
+        var _seq = $('<input type="number" class="seq-edit" value="'+old_seq+'" style="width:100px;" />');
+        $(this).parent().prev().prev().prev().prev().html(_seq);
+        $(this).parent().prev().prev().prev().html(_min);
+        $(this).parent().prev().prev().html(_max);
+        $(this).parent().prev().html(_cost);
         $(this).removeClass('cate-edit').addClass('cate-save');
       }).on('click','.cate-save',function(){
-        var title = $(this).parent().prev().children().val();
-        var seq_num = $(this).parent().prev().prev().children().val();
-        if(title == "" || seq_num == ""){
-          $.alert('分类及序号不能为空！');
+        var min = $(this).parent().prev().prev().prev().children().val();
+        var max = $(this).parent().prev().prev().children().val();
+        var cost = $(this).parent().prev().children().val();
+        var seq = $(this).parent().prev().prev().prev().prev().children().val();
+        if(min == "" || max == "" || cost=="" || seq == ""){
+          $.alert('填写不完整！');
           return false;
         }
         var _id = $(this).attr('data_id');
-        cateEidt(_id,title,seq_num);
-        $(this).parent().prev().html(title);
-        $(this).parent().prev().prev().html(seq_num);
+        cateEidt(_id,min,max,cost,seq);
+        $(this).parent().prev().html(cost);
+        $(this).parent().prev().prev().html(max);
+        $(this).parent().prev().prev().prev().html(min);
+        $(this).parent().prev().prev().prev().prev().html(seq);
         $(this).html('<i class="fa fa-pencil"></i> 编辑');
         $(this).removeClass('cate-save').addClass('cate-edit');
       });

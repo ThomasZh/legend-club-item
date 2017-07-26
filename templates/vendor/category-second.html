@@ -210,8 +210,8 @@
       $(this).parent().prev().prev().html(seq_input);
       $(this).removeClass('s-cate-edit').addClass('s-cate-save');
     }).on('click','.s-cate-save',function(){
-      var title = $(".c-edit").val();
-      var seq_num = $(".seq-edit").val();
+      var title = $(this).parent().prev().children().val();
+      var seq_num = $(this).parent().prev().prev().children().val();
       if(title == "" || seq_num == ""){
         $.alert('分类及序号不能为空！');
         return false;

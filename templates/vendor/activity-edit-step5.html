@@ -98,20 +98,6 @@
               </a>
             </div>
           </div>
-          <div class="animated flipInY col-md-2 col-sm-4 col-xs-4 tile_stats_count">
-            <div class="left"></div>
-            <div class="right">
-              <a href="/vendors/{{ vendor_id }}/activitys/{{ activity['_id'] }}/detail/step5">
-              <span class="count_top"><i class="fa fa-money"></i> 订单</span>
-              {% if activity_counter and activity_counter.has_key('order') %}
-              <div class="count">{{ activity_counter['order'] }}<small>笔</small></div>
-              {% else %}
-              <div class="count">0 <small>笔</small></div>
-              {% end %}
-              <span class="count_bottom"><i class="red">Step5 </i> 付费信息</span>
-              </a>
-            </div>
-          </div>
         </div>
         <!-- /top tiles -->
 

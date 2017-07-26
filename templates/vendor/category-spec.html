@@ -212,9 +212,9 @@
       $(this).parent().prev().prev().prev().html(seq_input);
       $(this).removeClass('spec-edit').addClass('spec-save');
     }).on('click','.spec-save',function(){
-      var title = $(".c-edit").val();
-      var unit = $(".c-unit").val();
-      var seq_num = $(".seq-edit").val();
+      var unit = $(this).parent().prev().children().val();
+      var title = $(this).parent().prev().prev().children().val();
+      var seq_num = $(this).parent().prev().prev().prev().children().val();
       if(title == "" || unit == "" || seq_num == ""){
         $.alert('填写不完整！');
         return false;
