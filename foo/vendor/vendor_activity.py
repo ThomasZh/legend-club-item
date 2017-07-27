@@ -566,7 +566,7 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         wx_app_info = vendor_wx_dao.vendor_wx_dao().query(vendor_id)
         wx_notify_domain = wx_app_info['wx_notify_domain']
         # create wechat qrcode
-        activity_url = wx_notify_domain + "/bf/wx/vendors/" + vendor_id + "/activitys/" + _activity_id
+        activity_url = wx_notify_domain + "/bf/wx/vendors/" + vendor_id + "/items/" + _activity_id
         logging.info("got activity_url %r", activity_url)
         data = {"url": activity_url}
         _json = json_encode(data)
