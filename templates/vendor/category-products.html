@@ -17,8 +17,8 @@
   <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
   <!-- Custom styling plus plugins -->
-  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+  <link href="{{ static_url('css/custom.css') }}" rel="stylesheet">
   <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
 </head>
 <body class="nav-md">
@@ -67,7 +67,7 @@
 
           <div class="row">
 
-            <div class="col-md-6 col-sm-6 col-xs-12">
+            <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
                   <h2>分类 <small><a href="/vendors/{{ vendor_id }}/categorys">{{ second_category_info['parent_title'] }}</a></small>
@@ -96,32 +96,17 @@
                         <th>操作</th>
                       </tr>
                     </thead>
-                    <tbody>
-                    {% for product in second_products %}
-                      <tr>
-                        <th scope="row">{{ product['_seq'] }}</th>
-                        <td><a href="/vendors/{{ vendor_id }}/activitys/{{ product['_id'] }}/detail/step1">{{ product["title"] }}</a></td>
-                        <td>{% if product["_status"] > 10 %}
-                              销售中
-                          {% else %}
-                              草稿箱
-                          {% end %}
-                        </td>
-                        <td>
-                          <a data_id = "{{ product['_id'] }}" class="btn btn-info btn-xs prod-edit">
-                            <i class="fa fa-pencil"></i> 编辑 </a>
-                          <a data_id = "{{ product['_id'] }}" class="btn btn-danger btn-xs prod-dele">
-                            <i class="fa fa-trash-o"></i> 删除 </a>
-                            {% if product["_status"] == 10 %}
-                            <a data_id = "{{ product['_id'] }}" class="btn ap_del btn-success btn-xs prod-pub">
-                              <i class="fa fa-check-circle"></i> 上架商品 </a>
-                            {% end %}
-                        </td>
-                      </tr>
-                    {% end %}
-                    </tbody>
+                    <tbody id="prod-wrap"></tbody>
                   </table>
+                  <div class="clearfix"></div>
+                  <div class="col-md-5 col-sm-12 col-xs-12 center-margin">
+                    <button class="btn btn-success" type="button" id="prev">上一页</button>
+                    <span class="pageBox"></span>
 
+                    <button class="btn btn-success" type="button" id="next">下一页</button>
+                    共<span id="total_page" style="padding:0 5px;"></span>页
+
+                  </div>
                 </div> <!-- x_content -->
               </div> <!-- x_panel -->
             </div> <!-- column -->
@@ -151,6 +136,97 @@
   <script src="{{ static_url('weui/js/jquery-weui.min.js') }}"></script>
   <script type="text/javascript">
   $(function(){
+    // 商品分页显示
+
+    var limit = 8;//每页显示数
+    var currentPage = 0;//当前页
+    var total_page = 0;//总页数
+
+    function gotoPage(pageNum) {
+      $.get("{{ API_DOMAIN }}/api/def/categories/{{second_categorys_id}}/items?_status=all&page="+pageNum+"&limit="+limit+"",function(data,status){
+            console.log(data);
+            data_obj = JSON.parse(data);
+            data = data_obj.rs;
+            currentPage = pageNum;
+        var pageData = data.data;
+            total_page = data.total_page;//总页
+            $("#total_page").html(total_page);
+        $('#prod-wrap').html("");
+
+        for (var i in pageData) {
+
+          var inner_html = '<tr>';
+              inner_html += '<th scope="row">'+ pageData[i]._seq +'</th>';
+              inner_html += '<td><a href="/vendors/{{ vendor_id }}/activitys/'+ pageData[i]._id +'/detail/step1">'+ pageData[i].title +'</a></td>';
+              inner_html += '<td>';
+               if (pageData[i]._status > 10){
+                inner_html += '销售中';}
+               else{
+                 inner_html += '草稿箱'
+               }
+              inner_html += '</td>';
+              inner_html += '<td>';
+              inner_html += '<a data_id = "'+ pageData[i]._id +'" class="btn btn-info btn-xs prod-edit">';
+              inner_html += '<i class="fa fa-pencil"></i> 编辑 </a>';
+              inner_html += '<a data_id = "'+ pageData[i]._id +'" class="btn btn-danger btn-xs prod-dele">';
+              inner_html += '<i class="fa fa-trash-o"></i> 删除 </a>';
+              if (pageData[i]._status == 10){
+                inner_html += '<a data_id = "'+ pageData[i]._id +'" class="btn ap_del btn-success btn-xs prod-pub">';
+                inner_html += '<i class="fa fa-check-circle"></i> 上架商品 </a>';
+              }
+              inner_html += '</td></tr>';
+
+          $('#prod-wrap').append(inner_html);
+          // member_num += 1;
+        };
+
+        pageNext = parseInt((currentPage-1)/5) + 1;
+
+          start = (pageNext-1)*5+1;
+          end = pageNext*5;
+          if(end > total_page){
+            end = total_page;
+          }
+
+          $(".pageBox").html("");
+          for (var k=start;k<=end;k++){
+            var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+
+            $(".pageBox").append(inner_html);
+          };
+           $("#num"+currentPage).addClass("on").siblings().removeClass("on");
+
+
+      });
+
+    };
+
+      gotoPage("1");
+      $(document).on('click','.pageBox > button',function(){
+        var num = $(this).text();
+        gotoPage(num);
+        //  $(this).addClass("current").siblings().removeClass("current");
+      })
+
+      $("#prev").on("click",function(){
+          if(currentPage<=1){
+
+          }else{
+              gotoPage(--currentPage);
+              // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+          }
+      });
+
+      $("#next").on("click",function(){
+          if(currentPage>=total_page){
+
+          }else{
+              gotoPage(++currentPage);
+              // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+          }
+      });
+
+    // 上架商品操作
     $(document).on('click','.prod-pub',function(){
       var _id = $(this).attr('data_id');
       var _this = $(this);

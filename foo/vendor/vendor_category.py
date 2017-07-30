@@ -523,15 +523,16 @@ class VendorCategorySecondaryProductsHandler(AuthorizationHandler):
         logging.info("got response.body %r", response.body)
         data = json_decode(response.body)
         second_category_info = data['rs']
-
-        params = {"_status":"all","page":1, "limit":200}
-        url = url_concat(API_DOMAIN + "/api/def/categories/"+ second_categorys_id +"/items", params)
-        http_client = HTTPClient()
-        headers = {"Authorization":"Bearer " + access_token}
-        response = http_client.fetch(url, method="GET", headers=headers,)
-        logging.info("got response.body %r", response.body)
-        data = json_decode(response.body)
-        second_products = data['rs']['data']
+        
+        # 获取商品列表
+        # params = {"_status":"all","page":1, "limit":200}
+        # url = url_concat(API_DOMAIN + "/api/def/categories/"+ second_categorys_id +"/items", params)
+        # http_client = HTTPClient()
+        # headers = {"Authorization":"Bearer " + access_token}
+        # response = http_client.fetch(url, method="GET", headers=headers,)
+        # logging.info("got response.body %r", response.body)
+        # data = json_decode(response.body)
+        # second_products = data['rs']['data']
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/category-products.html',
@@ -541,8 +542,7 @@ class VendorCategorySecondaryProductsHandler(AuthorizationHandler):
                 ops=ops,
                 counter=counter,
                 second_categorys_id=second_categorys_id,
-                second_category_info=second_category_info,
-                second_products=second_products)
+                second_category_info=second_category_info)
 
 
 # /vendors/<string:vendor_id>/categorys/<string:category_id>/edit
