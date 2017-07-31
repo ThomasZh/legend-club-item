@@ -12,17 +12,13 @@
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="{{ static_url('weui/lib/weui.css') }}">
-
   <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
-
   <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
-
   <!-- Custom styling plus plugins -->
   <link href="{{ static_url('css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
   <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
-
   <!-- Custom styling plus plugins -->
   <link href="{{ static_url('admin/css/datatables/tools/css/dataTables.tableTools.css') }}" rel="stylesheet">
 
@@ -72,6 +68,16 @@
                         注意用户下单后续工作：准备按时发货
                     </small>
                 </h3>
+            </div>
+            <div class="title_right">
+                <div class="col-md-5 col-sm-5 col-xs-12 form-group pull-right top_search">
+                   <div class="input-group">
+                     <input type="text" id="order-value" class="form-control" placeholder="订单号...">
+                     <span class="input-group-btn">
+                       <button class="btn btn-default" type="button" id="s-btn" style="background-color: #e4e2e2;">查询</button>
+                     </span>
+                   </div>
+                </div>
             </div>
           </div>
           <div class="clearfix"></div>
@@ -168,15 +174,11 @@
   <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
   <!-- icheck -->
   <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
-
   <script src="{{ static_url('admin/js/custom.js') }}"></script>
   <!-- pace -->
   <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
-
   <!-- daterangepicker -->
   <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
-  <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
-
 
   <script type="text/javascript">
     function OnReviewOrder(e) {
@@ -184,142 +186,247 @@
       $.get("/bf/api/vendors/{{ vendor_id }}/orders/" + orderId + "/review", function(data, status) {
         e.disabled = "true";
       });
-    }
-  </script>
+    };
 
-  <script>
+    $(function(){
 
-          var limit = 8;//每页显示数
-          var currentPage = 0;//当前页
-          var total_page = 0;//总页数
+      var limit = 8;//每页显示数
+      var currentPage = 0;//当前页
+      var total_page = 0;//总页数
+      function gotoPage(pageNum) {
+        $.ajax({
+          type: "GET",
+          url: "/bf/api/vendors/{{ vendor_id }}/orders?distributor_id=all&page="+pageNum+"&limit="+limit,
+          headers: {"Authorization": "Bearer {{ access_token }}"},
+          dataType: "json",
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+              // console.log(data);
+              currentPage = pageNum;
+          var pageData = data.data;
+              total_page = data.total_page;//总页
+              $("#total_page").html(total_page);
+          $('#tbody').html("");
 
-          function gotoPage(pageNum) {
-            $.ajax({
-              type: "GET",
-              url: "/bf/api/vendors/{{ vendor_id }}/orders?distributor_id=all&page="+pageNum+"&limit="+limit,
-              headers: {"Authorization": "Bearer {{ access_token }}"},
-              dataType: "json",
-              contentType: 'application/json',
-              success: function(data, status, xhr) {
-                  console.log(data);
-                  currentPage = pageNum;
-              var pageData = data.data;
-                  total_page = data.total_page;//总页
-                  $("#total_page").html(total_page);
-              $('#tbody').html("");
+          for (var i in pageData) {
+            var inner_html = '<tr class="even pointer">';
+                inner_html += '<td class="a-center">';
+                if (pageData[i].check_status == '0')
+                  inner_html += '<input type="checkbox" class="tableflat" value="'+pageData[i]._id+'" onclick="javascript:OnReviewOrder(this);">';
+                else
+                  inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
+                inner_html += '</td>';
 
-              for (var i in pageData) {
-                var inner_html = '<tr class="even pointer">';
-                    inner_html += '<td class="a-center">';
-                    if (pageData[i].check_status == '0')
-                      inner_html += '<input type="checkbox" class="tableflat" value="'+pageData[i]._id+'" onclick="javascript:OnReviewOrder(this);">';
-                    else
-                      inner_html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
-                    inner_html += '</td>';
-
-                    inner_html += '<td class=" ">';
-                    inner_html += pageData[i]._id;
-                    if (pageData[i].pay_status == 20)
-                      inner_html += '<br />' + pageData[i].prepay_id;
-                    else if (pageData[i].pay_status > 20) {
-                      inner_html += '<br />' + pageData[i].prepay_id;
-                      inner_html += '<br />' + pageData[i].transaction_id;
-                    }
-                    inner_html += '</td>';
-                    inner_html += '<td class=" ">';
-                    inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + pageData[i].item_id + '/detail/step1">'+pageData[i].item_name+'</a>';
-                    inner_html += '</td>';
-                    inner_html += '<td class=" ">';
-                    inner_html += '<ul class="list-inline">';
-                    inner_html += '<li>';
-                    inner_html += '<img src="'+pageData[i].avatar+'" class="avatar" alt="Avatar">';
-                    inner_html += '</li>';
-                    inner_html += '</ul>';
-                    inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+pageData[i].account_id+'">'+pageData[i].nickname+'</a>';
-                    inner_html += '<br />';
-                    inner_html += '</td>';
-                    inner_html += '<td class=" ">';
-                    inner_html += (pageData[i].actual_payment).toFixed(2)+'元<br />';
-                    inner_html += '</td>';
-                    if (pageData[i].pay_status == 30){
-                      inner_html += '<td>'+(pageData[i].actual_payment).toFixed(2)+'元</td>';
-                    }else{
-                      inner_html += '<td>--</td>';
-                    }
-                    inner_html += '<td class=" ">'+pageData[i].create_time+'</td>';
-                    inner_html += '<td class=" ">'
-                        if(pageData[i].billing_required == '1'){
-                          inner_html += '是'
-                        }else{
-                          inner_html += '否'
-                        }
-                    '</td>';
-                    inner_html += '<td class=" ">';
-                    if (pageData[i].pay_status <= 20)
-                      inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
-                    else if(pageData[i].pay_status == 21)
-                      inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>';
-                    else if (pageData[i].pay_status == 31)
-                      inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
-                    else if (pageData[i].pay_status == 30)
-                      inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
-                    inner_html += '</td>';
-                    inner_html += '<td class=" ">';
-                      inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+pageData[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a>';
-                    inner_html += '</td>';
-                    inner_html += '</tr>';
-
-                $('#tbody').append(inner_html);
-                // member_num += 1;
-              };
-
-              pageNext = parseInt((currentPage-1)/5) + 1;
-
-                start = (pageNext-1)*5+1;
-                end = pageNext*5;
-                if(end > total_page){
-                  end = total_page;
+                inner_html += '<td class=" ">';
+                inner_html += pageData[i].trade_no;
+                if (pageData[i].pay_status == 20)
+                  inner_html += '<br />' + pageData[i].prepay_id;
+                else if (pageData[i].pay_status > 20) {
+                  inner_html += '<br />' + pageData[i].prepay_id;
+                  inner_html += '<br />' + pageData[i].transaction_id;
                 }
+                inner_html += '</td>';
+                inner_html += '<td class=" ">';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/activitys/' + pageData[i].item_id + '/detail/step1">'+pageData[i].item_name+'</a>';
+                inner_html += '</td>';
+                inner_html += '<td class=" ">';
+                inner_html += '<ul class="list-inline">';
+                inner_html += '<li>';
+                inner_html += '<img src="'+pageData[i].avatar+'" class="avatar" alt="Avatar">';
+                inner_html += '</li>';
+                inner_html += '</ul>';
+                inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+pageData[i].account_id+'">'+pageData[i].nickname+'</a>';
+                inner_html += '<br />';
+                inner_html += '</td>';
+                inner_html += '<td class=" ">';
+                inner_html += (pageData[i].actual_payment).toFixed(2)+'元<br />';
+                inner_html += '</td>';
+                if (pageData[i].pay_status == 30){
+                  inner_html += '<td>'+(pageData[i].actual_payment).toFixed(2)+'元</td>';
+                }else{
+                  inner_html += '<td>--</td>';
+                }
+                inner_html += '<td class=" ">'+pageData[i].create_time+'</td>';
+                inner_html += '<td class=" ">'
+                    if(pageData[i].billing_required == '1'){
+                      inner_html += '是'
+                    }else{
+                      inner_html += '否'
+                    }
+                '</td>';
+                inner_html += '<td class=" ">';
+                if (pageData[i].pay_status <= 20)
+                  inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
+                else if(pageData[i].pay_status == 21)
+                  inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>';
+                else if (pageData[i].pay_status == 31)
+                  inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
+                else if (pageData[i].pay_status == 30)
+                  inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+                inner_html += '</td>';
+                inner_html += '<td class=" ">';
+                  inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+pageData[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a>';
+                inner_html += '</td>';
+                inner_html += '</tr>';
 
-                $(".pageBox").html("");
-                for (var k=start;k<=end;k++){
-                  var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
-
-                  $(".pageBox").append(inner_html);
-                };
-                 $("#num"+currentPage).addClass("on").siblings().removeClass("on");
-
-              }
-            });
-
+            $('#tbody').append(inner_html);
+            // member_num += 1;
           };
 
-          $(function(){
-            gotoPage("1");
-            $(document).on('click','.pageBox > button',function(){
-              var num = $(this).text();
-              gotoPage(num);
-              //  $(this).addClass("current").siblings().removeClass("current");
-            })
+          pageNext = parseInt((currentPage-1)/5) + 1;
 
-            $("#prev").on("click",function(){
-                if(currentPage<=1){
+            start = (pageNext-1)*5+1;
+            end = pageNext*5;
+            if(end > total_page){
+              end = total_page;
+            }
 
-                }else{
-                    gotoPage(--currentPage);
-                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+            $(".pageBox").html("");
+            for (var k=start;k<=end;k++){
+              var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+
+              $(".pageBox").append(inner_html);
+            };
+             $("#num"+currentPage).addClass("on").siblings().removeClass("on");
+
+          }
+        });
+
+      };
+      gotoPage("1");
+      $(document).on('click','.pageBox > button',function(){
+        var num = $(this).text();
+        gotoPage(num);
+        //  $(this).addClass("current").siblings().removeClass("current");
+      })
+
+      $("#prev").on("click",function(){
+          if(currentPage<=1){
+
+          }else{
+              gotoPage(--currentPage);
+              // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+          }
+      });
+
+      $("#next").on("click",function(){
+          if(currentPage>=total_page){
+
+          }else{
+              gotoPage(++currentPage);
+              // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+          }
+      });
+
+      // 订单查询
+      $("#s-btn").on('click',function(){
+        var order_id = $("#order-value").val();
+          searchOrder('1',order_id);
+      });
+      function searchOrder(pageNum,_id){
+        var limit = 8;//每页显示数
+        var currentPage = 0;//当前页
+        var total_page = 0;//总页数
+        $.ajax({
+          type: "GET",
+          url: "{{ API_DOMAIN }}/api/orders/trades/"+ _id +"?page="+pageNum+"&limit="+limit,
+          headers: {"Authorization": "Bearer {{ access_token }}"},
+          dataType: "json",
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+              console.log(data);
+              currentPage = pageNum;
+          var pageData = data.rs.data;
+              total_page = data.rs.total_page;//总页
+              $("#total_page").html(total_page);
+          $('#tbody').html("");
+          // $('#pageBox').html('');
+          for (var i in pageData) {
+            var _html = '<tr class="even pointer">';
+                _html += '<td class="a-center">';
+                if (pageData[i].check_status == '0')
+                  _html += '<input type="checkbox" class="tableflat" value="'+pageData[i]._id+'" onclick="javascript:OnReviewOrder(this);">';
+                else
+                  _html += '<input type="checkbox" class="tableflat" checked="checked" disabled="true">';
+                _html += '</td>';
+
+                _html += '<td class=" ">';
+                _html += pageData[i].trade_no;
+                if (pageData[i].pay_status == 20)
+                  _html += '<br />' + pageData[i].prepay_id;
+                else if (pageData[i].pay_status > 20) {
+                  _html += '<br />' + pageData[i].prepay_id;
+                  _html += '<br />' + pageData[i].transaction_id;
                 }
-            });
-
-            $("#next").on("click",function(){
-                if(currentPage>=total_page){
-
+                _html += '</td>';
+                _html += '<td class=" ">';
+                _html += '<a href="/vendors/{{ vendor_id }}/activitys/' + pageData[i].item_id + '/detail/step1">'+pageData[i].item_name+'</a>';
+                _html += '</td>';
+                _html += '<td class=" ">';
+                _html += '<ul class="list-inline">';
+                _html += '<li>';
+                _html += '<img src="'+pageData[i].avatar+'" class="avatar" alt="Avatar">';
+                _html += '</li>';
+                _html += '</ul>';
+                _html += '<a href="/vendors/{{ vendor_id }}/customers/'+pageData[i].account_id+'">'+pageData[i].nickname+'</a>';
+                _html += '<br />';
+                _html += '</td>';
+                _html += '<td class=" ">';
+                _html += (pageData[i].actual_payment).toFixed(2)+'元<br />';
+                _html += '</td>';
+                if (pageData[i].pay_status == 30){
+                  _html += '<td>'+(pageData[i].actual_payment).toFixed(2)+'元</td>';
                 }else{
-                    gotoPage(++currentPage);
-                    // $("#num"+currentPage).addClass("current").siblings().removeClass("current");
+                  _html += '<td>--</td>';
                 }
-            })
-          });
+                _html += '<td class=" ">'+pageData[i].create_time+'</td>';
+                _html += '<td class=" ">'
+                    if(pageData[i].billing_required == '1'){
+                      _html += '是'
+                    }else{
+                      _html += '否'
+                    }
+                '</td>';
+                _html += '<td class=" ">';
+                if (pageData[i].pay_status <= 20)
+                  _html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a>';
+                else if(pageData[i].pay_status == 21)
+                  _html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>';
+                else if (pageData[i].pay_status == 31)
+                  _html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>';
+                else if (pageData[i].pay_status == 30)
+                  _html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a>';
+                _html += '</td>';
+                _html += '<td class=" ">';
+                  _html += '<a href="/vendors/{{ vendor_id }}/orders/'+pageData[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a>';
+                _html += '</td>';
+                _html += '</tr>';
+
+            $('#tbody').append(_html);
+            // member_num += 1;
+          };
+
+          pageNext = parseInt((currentPage-1)/5) + 1;
+
+            start = (pageNext-1)*5+1;
+            end = pageNext*5;
+            if(end > total_page){
+              end = total_page;
+            }
+
+            $(".pageBox").html("");
+            for (var k=start;k<=end;k++){
+              var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+
+              $(".pageBox").append(inner_html);
+            };
+             $("#num"+currentPage).addClass("on").siblings().removeClass("on");
+
+          }
+        })
+      };
+
+    });
   </script>
 </body>
 </html>

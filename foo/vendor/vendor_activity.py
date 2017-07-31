@@ -596,9 +596,22 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
 
         ops = self.get_ops_info()
         activity = self.get_activity(activity_id)
+        logging.info("got activity %r",activity)
 
         access_token = self.get_access_token()
         logging.info("GET access_token %r", access_token)
+
+        # second_categorys_id = self.get_argument('second_categorys_id','')
+        # logging.info("get second_categorys_id",second_categorys_id)
+        #
+        # # TODO: get second_category info
+        # url = API_DOMAIN + "/api/def/categories/"+ second_categorys_id
+        # http_client = HTTPClient()
+        # headers = {"Authorization":"Bearer " + access_token}
+        # response = http_client.fetch(url, method="GET", headers=headers)
+        # logging.info("got response.body %r", response.body)
+        # data = json_decode(response.body)
+        # second_category_info = data['rs']
 
         url = API_DOMAIN + "/api/def/leagues/"+ LEAGUE_ID +"/categories"
         http_client = HTTPClient()

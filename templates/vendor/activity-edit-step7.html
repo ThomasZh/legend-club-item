@@ -115,7 +115,11 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>详细描述 <small>可以直接编辑</small></h2>
+                  <h2>详细描述 <small><a href="/vendors/{{ vendor_id }}/categorys">{{ activity['category_title'] }}</a></small>
+                    &nbsp><small><a href="/vendors/{{ vendor_id }}/categorys/secondary?category_id={{ activity['category_id'] }}">{{ activity['level2_category_title'] }}</a></small>
+                    &nbsp><a href="/vendors/{{ vendor_id }}/categorys/secondary/products?second_categorys_id={{ activity['level2_category_id'] }}"><small>商品列表</small></a>
+                    &nbsp><small>商品描述</small>
+                  </h2>
 
                   <div class="clearfix"></div>
                 </div>

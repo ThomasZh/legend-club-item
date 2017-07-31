@@ -371,12 +371,12 @@ class VendorCategoryCreateSpecHandler(AuthorizationHandler):
         ops = self.get_ops_info()
 
         title = self.get_argument("title", "")
-        logging.debug("got param title %r", title)
+        logging.info("got param title %r", title)
 
         second_categorys_id = self.get_argument('second_categorys_id','')
         logging.info("get second_categorys_id",second_categorys_id)
 
-        unit = self.get_argument('unit','')
+        unit = self.get_argument('unit',"")
         logging.info("get unit",unit)
 
         categroy = {"category_id":second_categorys_id, "title":title, 'amount':0, 'unit':unit, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png",}
@@ -524,15 +524,14 @@ class VendorCategorySecondaryProductsHandler(AuthorizationHandler):
         data = json_decode(response.body)
         second_category_info = data['rs']
 
-        # 获取商品列表
-        # params = {"_status":"all","page":1, "limit":200}
-        # url = url_concat(API_DOMAIN + "/api/def/categories/"+ second_categorys_id +"/items", params)
-        # http_client = HTTPClient()
-        # headers = {"Authorization":"Bearer " + access_token}
-        # response = http_client.fetch(url, method="GET", headers=headers,)
-        # logging.info("got response.body %r", response.body)
-        # data = json_decode(response.body)
-        # second_products = data['rs']['data']
+        params = {"_status":"all","page":1, "limit":200}
+        url = url_concat(API_DOMAIN + "/api/def/categories/"+ second_categorys_id +"/items", params)
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers,)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        second_products = data['rs']['data']
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/category-products.html',
@@ -542,7 +541,8 @@ class VendorCategorySecondaryProductsHandler(AuthorizationHandler):
                 ops=ops,
                 counter=counter,
                 second_categorys_id=second_categorys_id,
-                second_category_info=second_category_info)
+                second_category_info=second_category_info,
+                second_products=second_products)
 
 
 # /vendors/<string:vendor_id>/categorys/<string:category_id>/edit

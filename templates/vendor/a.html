@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>骑无止境 | 二级分类商品</title>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
+  <link rel="stylesheet" href="{{ static_url('weui/css/jquery-weui.min.css') }}">
+  <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
+  <!-- Custom styling plus plugins -->
+  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
+</head>
+<body class="nav-md">
+  <div class="container body">
+    <div class="main_container">
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+
+          <!-- navigation title -->
+          {% module Template("vendor/nav-title-block.html", ops=ops) %}
+          <!-- /navigation title -->
+          <div class="clearfix"></div>
+
+          <!-- menu prile quick info -->
+          {% module Template("vendor/menu-prile-quick-info-block.html", ops=ops) %}
+          <!-- /menu prile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          {% module Template("vendor/sidebar-menu-block.html", vendor_id=vendor_id, counter=counter) %}
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      {% module Template("vendor/top-nav-block.html", ops=ops) %}
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+        <div class="">
+
+          <div class="page-title">
+            <div class="title_left">
+              <h3>
+                    商品
+                    <small>
+                        商品列表
+                    </small>
+                </h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+
+            <div class="col-md-6 col-sm-6 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>分类 <small><a href="/vendors/{{ vendor_id }}/categorys">{{ second_category_info['parent_title'] }}</a></small>
+                    &nbsp><small><a href="/vendors/{{ vendor_id }}/categorys/secondary?category_id={{ second_category_info['parent_id'] }}">{{ second_category_info['title'] }}</a></small>
+                    &nbsp><small>商品列表</small></h2>
+
+                  <ul class="nav navbar-right panel_toolbox">
+                  	<li><a href="/vendors/{{ vendor_id }}/categorys/secondary/creat/product?second_categorys_id={{ second_categorys_id }}" class="btn btn-success btn-xs">
+                      <i class="fa fa-plus"></i> 添加商品 </a>
+                  	</li>
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>序号</th>
+                        <th>名称</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for product in second_products %}
+                      <tr>
+                        <th scope="row">{{ product['_seq'] }}</th>
+                        <td><a href="/vendors/{{ vendor_id }}/activitys/{{ product['_id'] }}/detail/step1?second_categorys_id={{ second_categorys_id }}">{{ product["title"] }}</a></td>
+                        <td>{% if product["_status"] > 10 %}
+                              销售中
+                          {% else %}
+                              草稿箱
+                          {% end %}
+                        </td>
+                        <td>
+                          <a data_id = "{{ product['_id'] }}" class="btn btn-info btn-xs prod-edit">
+                            <i class="fa fa-pencil"></i> 编辑 </a>
+                          <a data_id = "{{ product['_id'] }}" class="btn btn-danger btn-xs prod-dele">
+                            <i class="fa fa-trash-o"></i> 删除 </a>
+                            {% if product["_status"] == 10 %}
+                            <a data_id = "{{ product['_id'] }}" class="btn ap_del btn-success btn-xs prod-pub">
+                              <i class="fa fa-check-circle"></i> 上架商品 </a>
+                            {% end %}
+                        </td>
+                      </tr>
+                    {% end %}
+                    </tbody>
+                  </table>
+
+                </div> <!-- x_content -->
+              </div> <!-- x_panel -->
+            </div> <!-- column -->
+
+          </div> <!-- row -->
+        </div>
+
+        <!-- footer content -->
+        {% module Template("vendor/footer-block.html") %}
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+    </div>
+
+  </div>
+  <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
+  <!-- bootstrap progress js -->
+  <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
+  <!-- icheck -->
+  <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
+  <script src="{{ static_url('admin/js/custom.js') }}"></script>
+  <!-- pace -->
+  <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
+  <!-- form validation -->
+  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+  <script src="{{ static_url('weui/js/jquery-weui.min.js') }}"></script>
+  <script type="text/javascript">
+  $(function(){
+    $(document).on('click','.prod-pub',function(){
+      var _id = $(this).attr('data_id');
+      var _this = $(this);
+      $.confirm('确定上架该商品吗？',function(){
+        publish(_id);
+        _this.parent().prev().html('销售中');
+        _this.remove();
+      },function(){
+          // 取消操作
+      })
+
+    })
+    // 上架操作
+    function publish(id){
+      console.log(id);
+      $.ajax({
+        type: "POST",
+        url: "{{ API_DOMAIN }}/api/items/"+id+"/publish",
+        dataType: "json",
+        headers: {"Authorization":"Bearer {{access_token}}"},
+        contentType: 'application/json',
+        success: function(data, status, xhr) {
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+          $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+        },
+        complete: function(XMLHttpRequest, textStatus) {
+          this; // 调用本次AJAX请求时传递的options参数
+        }
+      });
+    };
+    // 删除操作
+    function dele(_id){
+      $.ajax({
+        type: "DELETE",
+        url: "{{ API_DOMAIN }}/api/items/"+_id,
+        dataType: "json",
+        headers: {"Authorization":"Bearer {{access_token}}"},
+        contentType: 'application/json',
+        success: function(data, status, xhr) {
+
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+          $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+        },
+        complete: function(XMLHttpRequest, textStatus) {
+          this; // 调用本次AJAX请求时传递的options参数
+        }
+      });
+    };
+
+    // 分类编辑
+    function cateEidt(category_id,seq_num){
+      var data= {"_seq":seq_num};
+      var _json = JSON.stringify(data);
+      console.log(_json);
+      $.ajax({
+        type: "PUT",
+        url: "{{ API_DOMAIN }}/api/items/"+category_id,
+        dataType: "json",
+        data:_json,
+        headers: {"Authorization":"Bearer {{access_token}}"},
+        contentType: 'application/json',
+        success: function(data, status, xhr) {
+
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+          $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+        },
+        complete: function(XMLHttpRequest, textStatus) {
+          this; // 调用本次AJAX请求时传递的options参数
+        }
+      });
+    };
+
+    $(document).on('click','.prod-dele',function(){
+      spec_id = $(this).attr('data_id');
+      var _this = $(this);
+      $.confirm('确定删除该商品吗？',function(){
+        dele(spec_id);
+        _this.parent().parent().remove();
+      },function(){
+          // 取消操作
+      })
+    });
+
+    // 修改操作
+    $(document).on('click','.prod-edit',function(){
+      $(this).html('<i class="fa fa-save"></i> 保存')
+      var old_num = $(this).parent().prev().prev().prev().text();
+      var seq_input = $('<input type="number" class="seq-edit" value="'+old_num+'" style="width:100px;" />');
+      $(this).parent().prev().prev().prev().html(seq_input);
+      $(this).removeClass('prod-edit').addClass('prod-save');
+    }).on('click','.prod-save',function(){
+      var seq_num = $(this).parent().prev().prev().prev().children().val();
+      if(seq_num == ""){
+        $.alert('序号填写不完整！');
+        return false;
+      }
+      var _id = $(this).attr('data_id');
+      cateEidt(_id,seq_num);
+      $(this).parent().prev().prev().prev().html(seq_num);
+      $(this).html('<i class="fa fa-pencil"></i> 编辑');
+      $(this).removeClass('prod-save').addClass('prod-edit');
+    });
+
+  })
+  </script>
+</body>
+
+</html>
