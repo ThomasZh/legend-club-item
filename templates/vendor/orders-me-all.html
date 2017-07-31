@@ -111,10 +111,7 @@
                 <div class="x_title">
                   <h2>订单（所有订单）</h2>
                   <ul class="nav navbar-right panel_toolbox">
-                    <li><a href="#"><i class="fa fa-chevron-up"></i></a>
-                    </li>
-                    <li><a href="#"><i class="fa fa-close"></i></a>
-                    </li>
+                    <button type="button" name="button">导出报表</button>
                   </ul>
                   <div class="clearfix"></div>
                 </div>
@@ -239,10 +236,10 @@
                 inner_html += '<br />';
                 inner_html += '</td>';
                 inner_html += '<td class=" ">';
-                inner_html += (pageData[i].actual_payment).toFixed(2)+'元<br />';
+                inner_html += pageData[i].actual_payment.toFixed(2)+'元<br />';
                 inner_html += '</td>';
                 if (pageData[i].pay_status == 30){
-                  inner_html += '<td>'+(pageData[i].actual_payment).toFixed(2)+'元</td>';
+                  inner_html += '<td>'+pageData[i].actual_payment.toFixed(2)+'元</td>';
                 }else{
                   inner_html += '<td>--</td>';
                 }
@@ -372,10 +369,10 @@
                 _html += '<br />';
                 _html += '</td>';
                 _html += '<td class=" ">';
-                _html += (pageData[i].actual_payment).toFixed(2)+'元<br />';
+                _html += (parseFloat(pageData[i].actual_payment)/100).toFixed(2)+'元<br />';
                 _html += '</td>';
                 if (pageData[i].pay_status == 30){
-                  _html += '<td>'+(pageData[i].actual_payment).toFixed(2)+'元</td>';
+                  _html += '<td>'+(parseFloat(pageData[i].actual_payment)/100).toFixed(2)+'元</td>';
                 }else{
                   _html += '<td>--</td>';
                 }

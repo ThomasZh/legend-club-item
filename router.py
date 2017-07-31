@@ -155,6 +155,7 @@ def map():
         (r"/vendors/([a-z0-9]*)/setup/insurances/([a-z0-9]*)/edit", getattr(vendor_setup, 'VendorSetupInsuranceEditHandler')),
         (r"/vendors/([a-z0-9]*)/setup/insurances/([a-z0-9]*)/delete", getattr(vendor_setup, 'VendorSetupInsuranceDeleteHandler')),
         (r"/vendors/([a-z0-9]*)/setup/wx", getattr(vendor_setup, 'VendorSetupWxHandler')),
+        (r'/vendors/([a-z0-9]*)/setup/binding-wx', getattr(vendor_setup, 'VendorBindingWxHandler')),#绑定微信操作
         (r"/vendors/([a-z0-9]*)/setup/hha", getattr(vendor_setup, 'VendorSetupHhaHandler')),
         (r"/vendors/([a-z0-9]*)/setup/club", getattr(vendor_setup, 'VendorSetupClubHandler')),
 

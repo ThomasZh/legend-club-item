@@ -346,6 +346,36 @@ class VendorSetupTaskDeleteHandler(AuthorizationHandler):
         self.redirect('/vendors/' + vendor_id + '/setup/task')
 
 
+# 绑定微信 通知消息
+class VendorBindingWxHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, club_id):
+        logging.info(self.request)
+        ops = self.get_ops_info()
+
+        wx_app_info = vendor_wx_dao.vendor_wx_dao().query(club_id)
+        wx_notify_domain = wx_app_info['wx_notify_domain']
+
+        # create wechat qrcode
+        binding_wx_url = wx_notify_domain + "/bf/wx/vendors/" + club_id + "/ops/" + ops['account_id'] +"/binding"
+        logging.info("got binding_wx_url %r", binding_wx_url)
+        data = {"url": binding_wx_url}
+        _json = json_encode(data)
+        http_client = HTTPClient()
+        response = http_client.fetch(QRCODE_CREATE_URL, method="POST", body=_json)
+        logging.info("got response %r", response.body)
+        qrcode_url = response.body
+        logging.info("got qrcode_url %r", qrcode_url)
+
+        counter = self.get_counter(club_id)
+        self.render('vendor/binding-wx.html',
+                ops=ops,
+                counter=counter,
+                vendor_id=club_id,
+                qrcode_url=qrcode_url,
+                api_domain=API_DOMAIN)
+
+
 # VendorSetupTaskCreateHandler
 class VendorSetupTaskCreateHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
