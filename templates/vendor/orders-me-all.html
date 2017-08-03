@@ -388,11 +388,13 @@
            }
         $.get("/bf/api/vendors/{{ vendor_id }}/items/applys/export?begin_time="+begin_time+"&end_time="+end_time,function(data,status){
           var ajaxobj = JSON.parse(data);
-          $("#downloadExcel").attr("data-href", ajaxobj).attr("disabled",false);
+          $("#downloadExcel").attr("href", ajaxobj).attr("disabled",false);
         });
 
-      }).on('click','#downloadExcel',function(){
-        location.href = $(this).attr('data-href');
+      }).on('click','#downloadExcel',function(event){
+        // location.href = $(this).attr('href');
+        $(this).attr('disabled',true).prop("href","");
+        event.preventDefault();
       });
 
       // 订单查询

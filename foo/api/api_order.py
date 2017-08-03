@@ -277,7 +277,7 @@ class ApiActivityExportXHR(AuthorizationHandler):
         _table.write(rownum, 8, unicode(u'是否付款').encode(_unicode))
 
         # table
-        params = {"club_id":vendor_id, "distributor_id":'all', "page":1,  "limit":10, "order_type":"buy_item","product_type": "all","begin_time":begin_time, "end_time":end_time}
+        params = {"club_id":vendor_id, "distributor_id":'all', "page":1,  "limit":2000, "order_type":"buy_item","product_type": "all","begin_time":begin_time, "end_time":end_time}
         url = url_concat(API_DOMAIN + "/api/orders", params)
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
