@@ -10,7 +10,7 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Cache-Control" content="no-cache">
 
-  <title>璟天俱乐部</title>
+  <title>{{ ops['club_name'] }}</title>
 
   <!-- Bootstrap core CSS -->
 
@@ -174,7 +174,7 @@
         </div>
 
         <!-- footer content -->
-        {% module Template("vendor/footer-block.html") %}
+        {% module Template("vendor/footer-block.html",ops=ops) %}
         <!-- /footer content -->
 
       </div>

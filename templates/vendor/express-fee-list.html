@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>骑无止境 | 运费分类</title>
+  <title>{{ ops['club_name'] }} | 运费分类</title>
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
@@ -103,7 +103,7 @@
         </div>
 
         <!-- footer content -->
-        {% module Template("vendor/footer-block.html") %}
+        {% module Template("vendor/footer-block.html",ops=ops) %}
         <!-- /footer content -->
 
       </div>

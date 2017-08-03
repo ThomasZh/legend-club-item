@@ -63,6 +63,7 @@ class VendorCategoryListHandler(AuthorizationHandler):
         logging.info("got vendor_id %r in uri", vendor_id)
 
         ops = self.get_ops_info()
+        logging.info("got ops %r", ops)
 
         access_token = self.get_access_token()
         logging.info("GET access_token %r", access_token)
