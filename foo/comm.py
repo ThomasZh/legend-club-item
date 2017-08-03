@@ -28,6 +28,7 @@ from tornado.httputil import url_concat
 import html2text
 import markdown
 import re
+import uuid
 
 
 class singleton(object):
@@ -108,6 +109,8 @@ def datetime_timestamp(dt):
      _timestamp = time.mktime(time.strptime(dt, '%Y-%m-%d %H:%M'))
      return int(_timestamp)
 
+def generate_uuid_str():
+    return str(uuid.uuid1()).replace('-', '')
 
 def time_span(ts):
     delta = datetime.now() - ts

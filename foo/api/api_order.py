@@ -241,65 +241,87 @@ class ApiApplyReviewXHR(AuthorizationHandler):
 # 使用时必须先生成文件，然后再下载
 class ApiActivityExportXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
-    def get(self, vendor_id, activity_id):
+    def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
-        logging.info("got activity_id %r in uri", activity_id)
 
         access_token = self.get_access_token()
+
+        begin_time = self.get_argument("begin_time","")
+        logging.info("got begin_time %r",begin_time)
+
+        end_time = self.get_argument("end_time","")
+        logging.info("got end_time %r",end_time)
 
         # utf8,gbk,gb2312
         _unicode = 'utf8'
         _file = xlwt.Workbook(encoding=_unicode) # Workbook
+        rownum = None
 
         # activity = activity_dao.activity_dao().query(activity_id)
-        activity = self.get_activity(activity_id)
-        logging.info("got activity %r in uri", activity)
+        # activity = self.get_activity(activity_id)
+        # logging.info("got activity %r in uri", activity)
+        #
+        # for base_fee in activity['base_fee_template']:
+        #     _table = _file.add_sheet(base_fee['name'])        # new sheet
+        _table = _file.add_sheet('test')
+        # column names
+        rownum = 0
+        _table.write(rownum, 0, unicode(u'分配').encode(_unicode))
+        _table.write(rownum, 1, unicode(u'订单号').encode(_unicode))
+        _table.write(rownum, 2, unicode(u'商品名').encode(_unicode))
+        _table.write(rownum, 3, unicode(u'客户名').encode(_unicode))
+        _table.write(rownum, 4, unicode(u'下单金额').encode(_unicode))
+        _table.write(rownum, 5, unicode(u'支付金额').encode(_unicode))
+        _table.write(rownum, 6, unicode(u'下单时间').encode(_unicode))
+        _table.write(rownum, 7, unicode(u'是否开发票').encode(_unicode))
+        _table.write(rownum, 8, unicode(u'是否付款').encode(_unicode))
 
-        for base_fee in activity['base_fee_template']:
-            _table = _file.add_sheet(base_fee['name'])        # new sheet
+        # table
+        params = {"club_id":vendor_id, "distributor_id":'all', "page":1,  "limit":10, "order_type":"buy_item","product_type": "all","begin_time":begin_time, "end_time":end_time}
+        url = url_concat(API_DOMAIN + "/api/orders", params)
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        rs = data['rs']
+        orders = rs['data']
 
-            # column names
-            rownum = 0
-            _table.write(rownum, 0, unicode(u'姓名').encode(_unicode))
-            _table.write(rownum, 1, unicode(u'性别').encode(_unicode))
-            _table.write(rownum, 2, unicode(u'身份证号码').encode(_unicode))
-            _table.write(rownum, 3, unicode(u'电话号码').encode(_unicode))
-            _table.write(rownum, 4, unicode(u'身高cm').encode(_unicode))
-            _table.write(rownum, 5, unicode(u'备注').encode(_unicode))
-            _table.write(rownum, 6, unicode(u'报名时间').encode(_unicode))
+        rownum = 1
+        for order in orders:
+            # 下单时间，timestamp -> %m月%d 星期%w
+            if order['check_status'] == 0:
+                order['check_status'] = u'否'
+            elif order['check_status'] == 1:
+                order['check_status'] = u'是'
 
-            # table
-            rownum = 1
-            params = {"filter":"item", "item_id":activity_id, "page":1, "limit":200}
-            url = url_concat(API_DOMAIN + "/api/applies", params)
-            http_client = HTTPClient()
-            headers = {"Authorization":"Bearer " + access_token}
-            response = http_client.fetch(url, method="GET", headers=headers)
-            logging.info("got response.body %r", response.body)
-            data = json_decode(response.body)
-            rs = data['rs']
-            applies = rs['data']
+            if order['billing_required'] == 0:
+                order['billing_required'] = u'否'
+            elif order['billing_required'] == 1:
+                order['billing_required'] = 'u是'
 
-            for _apply in applies:
-                if base_fee['name'] == _apply['group_name']:
-                    # 下单时间，timestamp -> %m月%d 星期%w
-                    _apply['create_time'] = timestamp_datetime(float(_apply['create_time']))
-                    if _apply['gender'] == 'male':
-                        _apply['gender'] = u'男'
-                    else:
-                        _apply['gender'] = u'女'
+            if order['pay_status'] == 30:
+                order['pay_status'] = u'是'
+            else:
+                order['pay_status'] = u'否'
 
-                    _table.write(rownum, 0, _apply['real_name'])
-                    _table.write(rownum, 1, _apply['gender'])
-                    _table.write(rownum, 2, _apply['id_code'])
-                    _table.write(rownum, 3, _apply['phone'])
-                    _table.write(rownum, 4, _apply['height'])
-                    _table.write(rownum, 5, _apply['note'])
-                    _table.write(rownum, 6, _apply['create_time'])
-                    rownum = rownum + 1
+            order['create_time'] = timestamp_datetime(float(order['create_time']))
+            order['amount'] = float(order['amount'])/100
+            order['actual_payment'] = float(order['actual_payment'])/100
 
-        _file.save('static/report/'+activity_id+'.xls')     # Save file
-        self.finish(JSON.dumps("http://riding.time2box.com/static/report/"+activity_id+".xls"))
+            _table.write(rownum, 0, order['check_status'])
+            _table.write(rownum, 1, order['trade_no'])
+            _table.write(rownum, 2, order['item_name'])
+            _table.write(rownum, 3, order['nickname'])
+            _table.write(rownum, 4, order['amount'])
+            _table.write(rownum, 5, order['actual_payment'])
+            _table.write(rownum, 6, order['create_time'])
+            _table.write(rownum, 7, order['billing_required'])
+            _table.write(rownum, 8, order['pay_status'])
+            rownum = rownum + 1
+        _id = generate_uuid_str()
+        _file.save('static/report/'+ _id +'.xls')     # Save file
+        self.finish(JSON.dumps(ITEM_DOMAIN+"/static/report/"+ _id +".xls"))
 
 
 class ApiVoucherOrderReviewXHR(AuthorizationHandler):

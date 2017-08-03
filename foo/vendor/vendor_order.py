@@ -58,6 +58,7 @@ class VendorOrdersMeAllHandler(AuthorizationHandler):
 
         access_token = self.get_access_token()
         ops = self.get_ops_info()
+        logging.info("get ops %r",ops)
 
         counter = self.get_counter(vendor_id)
         self.render('vendor/orders-me-all.html',

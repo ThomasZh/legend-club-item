@@ -46,6 +46,7 @@ WX_MCH_KEY = "b9f1ffe612aa11e6a4f6a45e60efbf2d"
 # WX_NOTIFY_DOMAIN = "http://planc2c.com"
 WX_NOTIFY_DOMAIN="http://7x24hs.com"
 
+
 # A计划服务号（绿）
 # WX_APP_ID = "wx445c952b09d519ec"
 # WX_APP_SECRET = "35b6fcfd5af1d13440b39fe4ab1b327f"
@@ -100,3 +101,4 @@ GUEST_CLUB_ID = '00000000000000000000000000000000'
 
 
 API_DOMAIN="http://7x24hs.com"
+ITEM_DOMAIN="http://item.7x24hs.com"

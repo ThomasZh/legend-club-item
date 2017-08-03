@@ -171,8 +171,11 @@
               inner_html += '<a data_id = "'+ pageData[i]._id +'" class="btn btn-danger btn-xs prod-dele">';
               inner_html += '<i class="fa fa-trash-o"></i> 删除 </a>';
               if (pageData[i]._status == 10){
-                inner_html += '<a data_id = "'+ pageData[i]._id +'" class="btn ap_del btn-success btn-xs prod-pub">';
-                inner_html += '<i class="fa fa-check-circle"></i> 上架商品 </a>';
+                inner_html += '<a data_id = "'+ pageData[i]._id +'" class="btn btn-success btn-xs prod-pub">';
+                inner_html += '<i class="fa fa-play"></i> 上架商品 </a>';
+              }else{
+                inner_html += '<a data_id = "'+ pageData[i]._id +'" class="btn btn-primary btn-xs prod-unpub">';
+                inner_html += '<i class="fa fa-pause"></i> 下架商品 </a>';
               }
               inner_html += '</td></tr>';
 
@@ -233,12 +236,23 @@
       $.confirm('确定上架该商品吗？',function(){
         publish(_id);
         _this.parent().prev().html('销售中');
-        _this.remove();
+        _this.removeClass('btn-success prod-pub').addClass('btn-primary prod-unpub').html('<i class="fa fa-pause"></i> 下架商品');
       },function(){
           // 取消操作
       })
+    });
 
-    })
+    $(document).on('click','.prod-unpub',function(){
+      var _id = $(this).attr('data_id');
+      var _this = $(this);
+      $.confirm('确定下架该商品吗？',function(){
+        unpublish(_id);
+        _this.parent().prev().html('草稿箱');
+        _this.removeClass('btn-primary prod-unpub').addClass('btn-success prod-pub').html('<i class="fa fa-play"></i> 上架商品');
+      },function(){
+          // 取消操作
+      })
+    });
     // 上架操作
     function publish(id){
       console.log(id);
@@ -259,6 +273,28 @@
         }
       });
     };
+
+    // 下架操作
+    function unpublish(id){
+      console.log(id);
+      $.ajax({
+        type: "POST",
+        url: "{{ API_DOMAIN }}/api/items/"+id+"/unpublish",
+        dataType: "json",
+        headers: {"Authorization":"Bearer {{access_token}}"},
+        contentType: 'application/json',
+        success: function(data, status, xhr) {
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+          $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+        },
+        complete: function(XMLHttpRequest, textStatus) {
+          this; // 调用本次AJAX请求时传递的options参数
+        }
+      });
+    };
+
     // 删除操作
     function dele(_id){
       $.ajax({
