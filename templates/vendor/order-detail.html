@@ -241,6 +241,7 @@
                         <thead>
                           <tr class="headings">
                             <th>商品</th>
+                            <th>品牌</th>
                             <th>规格</th>
                             <th>数量</th>
                             <th>单价</th>
@@ -251,7 +252,8 @@
                         <tbody id="tbody">
                         {% for apply in applies %}
                           <tr class="even pointer">
-                            <td class=" "><a href="/vendors/{{ vendor_id }}/activitys/{{ apply['item_id'] }}/detail/step1">{{ apply['title'] }}</a></td>
+                            <td class=" ">{{ apply['title'] }}</td>
+                            <td class=" ">{{ apply['brand_title'] }}</td>
                             <td class=" ">{{ apply['spec_title'] }}</td>
                             <td>{{ apply['quantity'] }}</td>
                             <td>{{ apply['amount'] }}元/{{ apply['unit'] }}</td>
