@@ -268,16 +268,18 @@ class ApiActivityExportXHR(AuthorizationHandler):
         rownum = 0
         _table.write(rownum, 0, unicode(u'分配').encode(_unicode))
         _table.write(rownum, 1, unicode(u'订单号').encode(_unicode))
-        _table.write(rownum, 2, unicode(u'商品名').encode(_unicode))
+        _table.write(rownum, 2, unicode(u'商品详情').encode(_unicode))
         _table.write(rownum, 3, unicode(u'客户名').encode(_unicode))
-        _table.write(rownum, 4, unicode(u'下单金额').encode(_unicode))
-        _table.write(rownum, 5, unicode(u'支付金额').encode(_unicode))
-        _table.write(rownum, 6, unicode(u'下单时间').encode(_unicode))
-        _table.write(rownum, 7, unicode(u'是否开发票').encode(_unicode))
-        _table.write(rownum, 8, unicode(u'是否付款').encode(_unicode))
+        _table.write(rownum, 4, unicode(u'收货地址').encode(_unicode))
+        _table.write(rownum, 5, unicode(u'下单金额').encode(_unicode))
+        _table.write(rownum, 6, unicode(u'支付金额').encode(_unicode))
+        _table.write(rownum, 7, unicode(u'下单时间').encode(_unicode))
+        _table.write(rownum, 8, unicode(u'是否开发票').encode(_unicode))
+        _table.write(rownum, 9, unicode(u'发票信息').encode(_unicode))
+        _table.write(rownum, 10, unicode(u'是否付款').encode(_unicode))
 
         # table
-        params = {"club_id":vendor_id, "distributor_id":'all', "page":1,  "limit":2000, "order_type":"buy_item","product_type": "all","begin_time":begin_time, "end_time":end_time}
+        params = {"club_id":vendor_id, "distributor_id":'all', "page":1,  "limit":20, "order_type":"buy_item","product_type": "all","begin_time":begin_time, "end_time":end_time}
         url = url_concat(API_DOMAIN + "/api/orders", params)
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
@@ -298,7 +300,7 @@ class ApiActivityExportXHR(AuthorizationHandler):
             if order['billing_required'] == 0:
                 order['billing_required'] = u'否'
             elif order['billing_required'] == 1:
-                order['billing_required'] = 'u是'
+                order['billing_required'] = u'是'
 
             if order['pay_status'] == 30:
                 order['pay_status'] = u'是'
@@ -309,15 +311,66 @@ class ApiActivityExportXHR(AuthorizationHandler):
             order['amount'] = float(order['amount'])/100
             order['actual_payment'] = float(order['actual_payment'])/100
 
+            order_detail = {}
+            # order_detail
+            url = API_DOMAIN + "/api/orders/"+order['_id']
+            http_client = HTTPClient()
+            headers = {"Authorization":"Bearer " + access_token}
+            response = http_client.fetch(url, method="GET", headers=headers)
+            logging.info("got order_detail.body %r", response.body)
+            data = json_decode(response.body)
+            if data.has_key('rs'):
+                order_detail = data['rs']
+
+            shipping_addr = ''
+            if order_detail.has_key('shipping_addr'):
+                shipping_addr = order_detail['shipping_addr']
+                name = ''
+                if shipping_addr.has_key('name'):
+                    name = shipping_addr['name']
+                phone = ''
+                if shipping_addr.has_key('phone'):
+                    phone = shipping_addr['phone']
+                _addr = ''
+                if shipping_addr.has_key('_addr'):
+                    _addr = shipping_addr['_addr']
+                shipping_addr = u"姓名："+name+u"\n电话："+phone+u"\n地址："+_addr
+            billing_addr = ''
+            if order_detail.has_key('billing_addr'):
+                billing_addr = order_detail['billing_addr']
+                tfn = ''
+                if billing_addr.has_key('tfn'):
+                    tfn = billing_addr['tfn']
+                company_title = ''
+                if billing_addr.has_key('company_title'):
+                    company_title = billing_addr['company_title']
+                billing_addr = u"税号："+tfn+u"\n公司抬头："+company_title
+            items_detail = ''
+            if order_detail.has_key('items'):
+                items = order_detail['items']
+                for item in items:
+                    brand_title = ''
+                    if item.has_key('brand_title'):
+                        brand_title = item['brand_title']
+                    spec_title = ''
+                    if item.has_key('spec_title'):
+                        spec_title = item['spec_title']
+                    items_detail += item['title'] +\
+                        u" 品牌：(" + brand_title +\
+                        u") 规格：(" + spec_title + ") " +\
+                        item['quantity'] + item['unit'] + u" 小计：" + str(float(item['amount'])/100*int(item['quantity'])) + u"元\n"
+
             _table.write(rownum, 0, order['check_status'])
             _table.write(rownum, 1, order['trade_no'])
-            _table.write(rownum, 2, order['item_name'])
+            _table.write(rownum, 2, items_detail)
             _table.write(rownum, 3, order['nickname'])
-            _table.write(rownum, 4, order['amount'])
-            _table.write(rownum, 5, order['actual_payment'])
-            _table.write(rownum, 6, order['create_time'])
-            _table.write(rownum, 7, order['billing_required'])
-            _table.write(rownum, 8, order['pay_status'])
+            _table.write(rownum, 4, shipping_addr)
+            _table.write(rownum, 5, order['amount'])
+            _table.write(rownum, 6, order['actual_payment'])
+            _table.write(rownum, 7, order['create_time'])
+            _table.write(rownum, 8, order['billing_required'])
+            _table.write(rownum, 9, billing_addr)
+            _table.write(rownum, 10, order['pay_status'])
             rownum = rownum + 1
         _id = generate_uuid_str()
         _file.save('static/report/'+ _id +'.xls')     # Save file
