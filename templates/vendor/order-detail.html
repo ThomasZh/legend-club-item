@@ -11,16 +11,15 @@
   <title>{{ ops['club_name'] }}--订单详情</title>
 
   <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
+  <link rel="stylesheet" href="{{ static_url('weui/css/jquery-weui.min.css') }}">
   <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
-
   <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
-
   <!-- Custom styling plus plugins -->
   <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
   <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
-
   <!-- Custom styling plus plugins -->
   <link href="{{ static_url('admin/css/datatables/tools/css/dataTables.tableTools.css') }}" rel="stylesheet">
 </head>
@@ -91,33 +90,30 @@
                   <table id="example" class="table table-striped responsive-utilities jambo_table">
                     <thead>
                       <tr class="headings">
-                        <th>分配</th>
                         <th>订单号</th>
                         <th>客户</th>
-                        <th>下单金额</th>
-                        <th>支付金额</th>
+                        <th>总计金额</th>
+                        <th>已付金额</th>
+                        <th>退款金额</th>
                         <th>下单时间</th>
                         <th>是否开发票</th>
                         <th>状态</th>
+                        <th class=" no-link last">
+                          <span class="nobr">操作</span>
+                        </th>
+                        <th>仓库</th>
                       </tr>
                     </thead>
 
                     <tbody id="tbody">
                       <tr class="even pointer">
-                        <td class="a-center ">
-                          {% if order['check_status'] == 0 %}
-                            <input type="checkbox" class="tableflat" value="{{ order['_id'] }}" onclick="OnReviewOrder(this);">
-                          {% else %}
-                            <input type="checkbox" class="tableflat" checked="checked" disabled="true">
-                          {% end %}
-                        </td>
                         <td class=" ">
-                          {{ order['trade_no'] }}
+                          订单号:{{ order['trade_no'] }}
                           {% if order['pay_status'] == 20 %}
-                            <br />{{ order['prepay_id'] }}
+                            <br />微信订单号:{{ order['prepay_id'] }}
                           {% elif order['pay_status'] > 20 %}
-                            <br />{{ order['prepay_id'] }}
-                            <br />{{ order['transaction_id'] }}
+                            <br />微信订单号:{{ order['prepay_id'] }}
+                            <br />微信交易号:{{ order['transaction_id'] }}
                           {% end %}
                         </td>
                         <td>
@@ -134,11 +130,18 @@
                         </td>
                         <td>
                           {% if order['pay_status'] == 30 %}
-                            <br />{{ float(order['actual_payment']) / 100 }}元
+                            {{ float(order['actual_payment']) / 100 }}元
                           {% else %}
-
+                              --
                           {% end %}
                         </td>
+                        <td>
+                          {% if order.has_key('refund_amount') %}
+                              {{ order['refund_amount'] }}元
+                          {% else %}
+                              --
+                          {% end %}
+                          </td>
                         <td class=" ">{{ order['create_time'] }}</td>
                         <td class=" ">{% if order['billing_required'] == '1'%}
                           是
@@ -146,27 +149,47 @@
                           否
                           {% end %}
                         </td>
-                        {% if order['pay_status'] == 20 %}
                         <td>
-                          <a href="#" class="btn btn-warning btn-xs"> 待付款 </a>
-                        </td>
-                        {% elif order['pay_status'] == 21 %}
-                        <td>
-                          <a href="#" class="btn btn-danger btn-xs"> 下单失败 </a>
-                        </td>
-                        {% elif order['pay_status'] == 31 %}
-                        <td>
-                          <a href="#" class="btn btn-danger btn-xs"> 支付失败 </a>
-                        </td>
-                        {% elif order['pay_status'] == 30 %}
-                        <td>
-                          <a href="#" class="btn btn-success btn-xs"> 支付成功 </a>
-                        </td>
-                        {% else %}
-                        <td>
-                          <a href="#" class="btn btn-success btn-xs"> {{ order['pay_status'] }} </a>
-                        </td>
+                          {% if order['pay_status'] == 20 %}
+                            <a href="#" class="btn btn-warning btn-xs"> 待付款 </a><br/>
+                          {% elif order['pay_status'] == 21 %}
+                            <a href="#" class="btn btn-danger btn-xs"> 下单失败 </a><br/>
+                          {% elif order['pay_status'] == 31 %}
+                            <a href="#" class="btn btn-danger btn-xs"> 支付失败 </a><br/>
+                          {% elif order['pay_status'] == 30 %}
+                            <a href="#" class="btn btn-success btn-xs"> 支付成功 </a><br/>
+                          {% else %}
+                            <a href="#" class="btn btn-success btn-xs"> {{ order['pay_status'] }} </a><br/>
+                          {% end %}
+
+                          {% if order['check_status'] == 0 %}
+                          <a href="#" class="btn btn-danger btn-xs dis-status"> 未分配 </a><br/>
+                          {% else %}
+                          <a href="#" class="btn btn-success btn-xs dis-status"> 已分配 </a><br/>
+                          {% end %}
+
+                      {% if order.has_key('delivered_status') %}
+                          {% if order['delivered_status'] == 0 %}
+                          <a href="#" class="btn btn-danger btn-xs dis-status"> 未发货 </a><br/>
+                          {% else %}
+                          <a href="#" class="btn btn-success btn-xs dis-status"> 已发货 </a><br/>
+                          {% end %}
+                      {% end %}
+
+                        {% if order.has_key('refund_amount') %}
+                          {% if order['refund_amount'] > 0 %}
+                          <a href="#" class="btn btn-success btn-xs dis-status"> 已退款 </a><br/>
+                          {% end %}
                         {% end %}
+                        </td>
+                        <td>
+                          <a href="#" class="btn btn-primary btn-xs" data-id="{{ order['_id'] }}" data-toggle="modal" data-target=".bs-example-modal-sm" id="dis-btn"><i class="fa fa-pencil"></i> 分配 </a><br/>
+                          <a href="#" class="btn btn-primary btn-xs" data-id="{{ order['_id'] }}" id="delivery-btn"><i class="fa fa-pencil"></i> 发货 </a><br/>
+                          {% if order['pay_status'] == 30 %}
+                          <a href="#" class="btn btn-primary btn-xs" data-id="{{ order['_id'] }}" id="refund-btn"><i class="fa fa-pencil"></i> 退款 </a>
+                          {% end %}
+                        </td>
+                        <td> {{ order['distributor_name'] }}</td>
                       </tr>
                     </tbody>
                   </table>
@@ -181,7 +204,6 @@
               </div>
             </div>
 
-            <br />
             <br />
             <br />
 
@@ -302,7 +324,28 @@
                 </div>
             </div>
         </div>
-
+        <!-- 仓库列表 -->
+        <div class="modal fade bs-example-modal-sm" tabindex="-1" role="dialog" aria-hidden="true" style="display: none;">
+          <div class="modal-dialog modal-sm" style="margin:14rem auto;">
+            <div class="modal-content">
+              <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span>
+              </button>
+              <h4 class="modal-title">仓库选择</h4>
+              </div>
+              <div class="modal-body col-md-9 col-sm-9 col-xs-12">
+                  <select class="select2_single form-control" id="dis-list" tabindex="-1">
+                    {% for distributor in distributors %}
+                      <option value="{{ distributor['club_id'] }}">{{ distributor['name'] }}</option>
+                    {% end %}
+                  </select>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="dis-save-btn">保存</button>
+              </div>
+            </div>
+          </div>
+        </div>
         <!-- footer content -->
         {% module Template("vendor/footer-block.html",ops=ops) %}
         <!-- /footer content -->
@@ -316,15 +359,13 @@
   <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
   <!-- icheck -->
   <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
-
   <script src="{{ static_url('admin/js/custom.js') }}"></script>
   <!-- pace -->
   <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
-
   <!-- daterangepicker -->
   <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
   <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
-
+  <script src="{{ static_url('weui/js/jquery-weui.min.js') }}"></script>
   <script type="text/javascript">
     function OnReviewOrder(e){
   	  orderId = e.value;
@@ -338,7 +379,7 @@
 			  e.disabled="true";
 		  });
     };
-
+    // 备注信息
     $('#note-btn').on('click',function(){
       var _id = $(this).attr("data_id");
       var note = $("#message").val();
@@ -355,6 +396,86 @@
         success: function(data, status, xhr) {
             console.log(data);
         }
+      })
+    });
+
+    // 发货 分配 退款操作
+    $('#dis-btn').on('click',function(){
+      var _id = $(this).attr('data-id');
+      console.log(or_id);
+      $('#dis-save-btn').on('click',function(){
+        var distributor_id = $('#dis-list option:checked').val();
+        var distributor_name = $('#dis-list option:checked').text();
+        var data = {'distributor_id':distributor_id}
+        var _json = JSON.stringify(data);
+        // console.log(_json);
+        $.ajax({
+          type: "POST",
+          url: "{{ API_DOMAIN }}/api/orders/"+_id+"/distributor",
+          headers: {"Authorization": "Bearer {{ access_token }}"},
+          dataType: "json",
+          data:_json,
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+            console.log(data);
+              if(data.err_code == 200){
+                self.parent().prev().children(".dis-status").removeClass('btn-danger').addClass('btn-success').text('已分配');
+                self.parent().next().text(distributor_name);
+              }
+          }
+        })
+      });
+
+    });
+
+    $('#delivery-btn').on('click',function(){
+      var _id = $(this).attr('data-id');
+      var _this = $(this);
+      $.confirm("确定已经发货?",function(){
+        var data = {'delivered_status':1}
+        var _json = JSON.stringify(data);
+        $.ajax({
+          type: "POST",
+          url: "{{ API_DOMAIN }}/api/orders/"+_id+"/delivered",
+          headers: {"Authorization": "Bearer {{ access_token }}"},
+          dataType: "json",
+          data:_json,
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+            console.log(data);
+              if(data.err_code == 200){
+                _this.parent().prev().children(".delive-status").removeClass('btn-danger').addClass('btn-success').text('已发货');
+              }
+          }
+        })
+      },function(){
+        //cancle
+      })
+    });
+
+    $('#refund-btn').on('click',function(){
+      var _id = $(this).attr('data-id');
+      var _this = $(this);
+      $.prompt("请输入退款金额?",function(text){
+        console.log(text);
+        var data = {'refund_amount':text}
+        var _json = JSON.stringify(data);
+        $.ajax({
+          type: "POST",
+          url: "{{ API_DOMAIN }}/api/orders/"+_id+"/refund",
+          headers: {"Authorization": "Bearer {{ access_token }}"},
+          dataType: "json",
+          data:_json,
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+            console.log(data);
+              if(data.err_code == 200){
+                _this.parent().prev().prev().prev().prev().text(text);
+              }
+          }
+        })
+      },function(){
+        //cancle
       })
     });
   </script>

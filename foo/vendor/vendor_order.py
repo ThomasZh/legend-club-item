@@ -60,13 +60,23 @@ class VendorOrdersMeAllHandler(AuthorizationHandler):
         ops = self.get_ops_info()
         logging.info("get ops %r",ops)
 
+        params = {"filter":"league","franchise_type":"供应商","page":1,"limit":20}
+        url = url_concat(API_DOMAIN +"/api/leagues/"+ LEAGUE_ID +"/clubs",params)
+        http_client = HTTPClient()
+        headers={"Authorization":"Bearer "+access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body=[%r]", response.body)
+        data = json_decode(response.body)
+        distributors = data['rs']['data']
+
         counter = self.get_counter(vendor_id)
         self.render('vendor/orders-me-all.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 API_DOMAIN=API_DOMAIN,
                 access_token=access_token,
-                counter=counter)
+                counter=counter,
+                distributors=distributors)
 
 
 class VendorOrdersMeNoneHandler(AuthorizationHandler):
@@ -253,6 +263,15 @@ class VendorOrderInfoHandler(AuthorizationHandler):
             applys['total_fee'] = float(applys['amount'])*float(applys['quantity']) / 100
             applys['amount'] = float(applys['amount']) / 100
 
+        params = {"filter":"league","franchise_type":"供应商","page":1,"limit":20}
+        url = url_concat(API_DOMAIN +"/api/leagues/"+ LEAGUE_ID +"/clubs",params)
+        http_client = HTTPClient()
+        headers={"Authorization":"Bearer "+access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body=[%r]", response.body)
+        data = json_decode(response.body)
+        distributors = data['rs']['data']
+
         #
         # for _apply in applies:
         #     # 下单时间，timestamp -> %m月%d 星期%w
@@ -270,4 +289,5 @@ class VendorOrderInfoHandler(AuthorizationHandler):
                 access_token=access_token,
                 counter=counter,
                 order=order,
-                applies=applies)
+                applies=applies,
+                distributors=distributors)
