@@ -77,12 +77,10 @@
             <div class="col-md-12 col-sm-12 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>订单 <small>概要信息</small></h2>
+                  <h2>订单详情</h2>
                   <ul class="nav navbar-right panel_toolbox">
-                    <li><a href="#"><i class="fa fa-chevron-up"></i></a>
-                    </li>
-                    <li><a href="#"><i class="fa fa-close"></i></a>
-                    </li>
+                    <button class="btn btn-info" id="createExcel" name="button"><i class="fa fa-recycle"></i>生成报表</button>
+                    <a class="btn btn-success" disabled="true" id="downloadExcel" name="button"><i class="fa fa-download"></i>下载报表</a>
                   </ul>
                   <div class="clearfix"></div>
                 </div>
@@ -137,7 +135,7 @@
                         </td>
                         <td>
                           {% if order.has_key('refund_amount') %}
-                              {{ order['refund_amount'] }}元
+                              {{ float(order['refund_amount'])/100 }}元
                           {% else %}
                               --
                           {% end %}
@@ -170,15 +168,15 @@
 
                       {% if order.has_key('delivered_status') %}
                           {% if order['delivered_status'] == 0 %}
-                          <a href="#" class="btn btn-danger btn-xs dis-status"> 未发货 </a><br/>
+                          <a href="#" class="btn btn-danger btn-xs delive-status"> 未发货 </a><br/>
                           {% else %}
-                          <a href="#" class="btn btn-success btn-xs dis-status"> 已发货 </a><br/>
+                          <a href="#" class="btn btn-success btn-xs delive-status"> 已发货 </a><br/>
                           {% end %}
                       {% end %}
 
                         {% if order.has_key('refund_amount') %}
                           {% if order['refund_amount'] > 0 %}
-                          <a href="#" class="btn btn-success btn-xs dis-status"> 已退款 </a><br/>
+                          <a href="#" class="btn btn-success btn-xs refund-status"> 已退款 </a><br/>
                           {% end %}
                         {% end %}
                         </td>
@@ -362,9 +360,6 @@
   <script src="{{ static_url('admin/js/custom.js') }}"></script>
   <!-- pace -->
   <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
-  <!-- daterangepicker -->
-  <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
-  <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
   <script src="{{ static_url('weui/js/jquery-weui.min.js') }}"></script>
   <script type="text/javascript">
     function OnReviewOrder(e){
@@ -402,13 +397,14 @@
     // 发货 分配 退款操作
     $('#dis-btn').on('click',function(){
       var _id = $(this).attr('data-id');
-      console.log(or_id);
+      var self = $(this);
+      console.log(_id);
       $('#dis-save-btn').on('click',function(){
         var distributor_id = $('#dis-list option:checked').val();
         var distributor_name = $('#dis-list option:checked').text();
         var data = {'distributor_id':distributor_id}
         var _json = JSON.stringify(data);
-        // console.log(_json);
+        console.log(_json);
         $.ajax({
           type: "POST",
           url: "{{ API_DOMAIN }}/api/orders/"+_id+"/distributor",
@@ -457,8 +453,9 @@
       var _id = $(this).attr('data-id');
       var _this = $(this);
       $.prompt("请输入退款金额?",function(text){
-        console.log(text);
-        var data = {'refund_amount':text}
+        // console.log(text);
+        var num = parseFloat(text)*100;
+        var data = {'refund_amount':num}
         var _json = JSON.stringify(data);
         $.ajax({
           type: "POST",
@@ -477,6 +474,20 @@
       },function(){
         //cancle
       })
+    });
+
+    // 导出报表
+    $(document).on('click','#createExcel',function(){ // This event fires when a button is clicked
+         var _this = $(this);
+      $.get("/bf/api/vendors/{{ vendor_id }}/items/applys/export/detail/{{order_id}}",function(data,status){
+        var ajaxobj = JSON.parse(data);
+        $("#downloadExcel").attr("href", ajaxobj).attr("disabled",false);
+      });
+
+    }).on('click','#downloadExcel',function(event){
+      location.href = $(this).attr('href');
+      $(this).attr('disabled',true).prop("href","");
+      event.preventDefault();
     });
   </script>
 </body>

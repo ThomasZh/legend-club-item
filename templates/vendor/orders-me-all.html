@@ -111,16 +111,16 @@
               <div class="x_panel">
                 <div class="x_title">
                   <h2>订单（所有订单）</h2>
-                    <div class="col-md-12 col-sm-12 col-xs-12 center-margin">
-                      <div class="col-md-2 xdisplay_inputx form-group has-feedback">
-                        <input type="text" name="begin_time" class="form-control has-feedback-left" id="single_cal1" placeholder="开始时间">
-                        <span class="fa fa-calendar-o form-control-feedback left" aria-hidden="true"></span>
-                      </div>
-                      <div class="col-md-2 xdisplay_inputx form-group has-feedback">
-                        <input type="text" name="end_time" class="form-control has-feedback-left" id="single_cal2" placeholder="结束时间">
-                        <span class="fa fa-calendar-o form-control-feedback left" aria-hidden="true"></span>
-                      </div>
+                  <div class="col-md-12 col-sm-12 col-xs-12 center-margin">
+                    <div class="col-md-2 xdisplay_inputx form-group has-feedback">
+                      <input type="text" name="begin_time" class="form-control has-feedback-left" id="single_cal1" placeholder="开始时间">
+                      <span class="fa fa-calendar-o form-control-feedback left" aria-hidden="true"></span>
                     </div>
+                    <div class="col-md-2 xdisplay_inputx form-group has-feedback">
+                      <input type="text" name="end_time" class="form-control has-feedback-left" id="single_cal2" placeholder="结束时间">
+                      <span class="fa fa-calendar-o form-control-feedback left" aria-hidden="true"></span>
+                    </div>
+                  </div>
                   <ul class="nav navbar-right panel_toolbox">
                     <button class="btn btn-info" id="createExcel" name="button"><i class="fa fa-recycle"></i>生成报表</button>
                     <a class="btn btn-success" disabled="true" id="downloadExcel" name="button"><i class="fa fa-download"></i>下载报表</a>
@@ -307,7 +307,7 @@
                 }
                 inner_html += '<td class="refund-amount-td">';
                 if (pageData[i].refund_amount > 0){
-                  inner_html += pageData[i].refund_amount.toFixed(2)+'元';
+                  inner_html += (parseFloat(pageData[i].refund_amount)/100).toFixed(2)+'元';
                 }else{
                   inner_html += '--';
                 }
@@ -438,8 +438,9 @@
         var _id = $(this).attr('data-id');
         var _this = $(this);
         $.prompt("请输入退款金额?",function(text){
-          console.log(text);
-          var data = {'refund_amount':text}
+          var num = parseFloat(text)*100;
+          console.log(num);
+          var data = {'refund_amount':num}
           var _json = JSON.stringify(data);
           $.ajax({
             type: "POST",

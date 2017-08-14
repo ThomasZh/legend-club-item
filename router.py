@@ -204,6 +204,7 @@ def map():
         (r"/bf/api/vendors/([a-z0-9]*)/applys", getattr(api_order, 'ApiApplyListXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/applys/([a-z0-9]*)/review", getattr(api_order, 'ApiApplyReviewXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/items/applys/export", getattr(api_order, 'ApiActivityExportXHR')),
+        (r"/bf/api/vendors/([a-z0-9]*)/items/applys/export/detail/([a-z0-9]*)", getattr(api_order, 'ApiActivityDetailExportXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/insurance-templates", getattr(api_setup, 'ApiSetupInsuranceTemplateListXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/customer-profile/vouchers", getattr(api_customer_profile, 'ApiCustomerProfileVoucherListXHR')),
         (r"/bf/api/vendors/([a-z0-9]*)/customer-profile/my", getattr(api_customer_profile, 'ApiCustomerProfileMyInfoXHR')),

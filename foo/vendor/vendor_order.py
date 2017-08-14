@@ -284,6 +284,7 @@ class VendorOrderInfoHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/order-detail.html',
                 vendor_id=vendor_id,
+                order_id = order_id,
                 API_DOMAIN=API_DOMAIN,
                 ops=ops,
                 access_token=access_token,

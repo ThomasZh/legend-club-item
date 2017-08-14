@@ -377,6 +377,161 @@ class ApiActivityExportXHR(AuthorizationHandler):
         self.finish(JSON.dumps(ITEM_DOMAIN+"/static/report/"+ _id +".xls"))
 
 
+# 订单详情页报表导出
+class ApiActivityDetailExportXHR(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id, order_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        logging.info("got order_id %r in uri", order_id)
+
+        access_token = self.get_access_token()
+
+        # utf8,gbk,gb2312
+        _unicode = 'utf8'
+        _file = xlwt.Workbook(encoding=_unicode) # Workbook
+        rownum = None
+
+        sheet_1 = _file.add_sheet('sheet1')
+        sheet_2 = _file.add_sheet('sheet2')
+        sheet_3 = _file.add_sheet('sheet3')
+        sheet_4 = _file.add_sheet('sheet4')
+        # column names
+        rownum = 0
+        # 订单详情
+        sheet_1.write(rownum, 0, unicode(u'订单号').encode(_unicode))
+        sheet_1.write(rownum, 1, unicode(u'客户').encode(_unicode))
+        sheet_1.write(rownum, 2, unicode(u'总计金额').encode(_unicode))
+        sheet_1.write(rownum, 3, unicode(u'已付金额').encode(_unicode))
+        sheet_1.write(rownum, 4, unicode(u'退款金额').encode(_unicode))
+        sheet_1.write(rownum, 5, unicode(u'下单时间').encode(_unicode))
+        sheet_1.write(rownum, 6, unicode(u'是否开发票').encode(_unicode))
+        sheet_1.write(rownum, 7, unicode(u'状态').encode(_unicode))
+        sheet_1.write(rownum, 8, unicode(u'仓库').encode(_unicode))
+        sheet_1.write(rownum, 9, unicode(u'备注').encode(_unicode))
+
+        # 商品详情
+        sheet_2.write(rownum, 0, unicode(u'商品名').encode(_unicode))
+        sheet_2.write(rownum, 1, unicode(u'品牌').encode(_unicode))
+        sheet_2.write(rownum, 2, unicode(u'规格').encode(_unicode))
+        sheet_2.write(rownum, 3, unicode(u'数量').encode(_unicode))
+        sheet_2.write(rownum, 4, unicode(u'单价').encode(_unicode))
+        sheet_2.write(rownum, 5, unicode(u'小计').encode(_unicode))
+
+        # 收货信息
+        sheet_3.write(rownum, 0, unicode(u'姓名').encode(_unicode))
+        sheet_3.write(rownum, 1, unicode(u'联系方式').encode(_unicode))
+        sheet_3.write(rownum, 2, unicode(u'地址').encode(_unicode))
+
+        # 发票信息
+        sheet_4.write(rownum, 0, unicode(u'公司抬头').encode(_unicode))
+        sheet_4.write(rownum, 1, unicode(u'公司税号').encode(_unicode))
+
+        rownum = 1
+        # 获取订单详情
+        order = self.get_symbol_object(order_id)
+        logging.info("got order %r in uri", order)
+
+        order['create_time'] = timestamp_datetime(order['create_time'])
+        order['amount'] = float(order['amount']) / 100
+        order['actual_payment'] = float(order['actual_payment']) / 100
+        order['shipping_cost'] = float(order['shipping_cost']) / 100
+
+        if order['billing_required'] == '0':
+            order['billing_required'] = u'否'
+        elif order['billing_required'] == '1':
+            order['billing_required'] = u'是'
+        logging.info("got billing_required %r", order['billing_required'])
+
+        if order.has_key('refund_amount'):
+            order['refund_amount'] = float(order['refund_amount']) / 100
+        else:
+            order['refund_amount'] = '--'
+
+        # 各种状态
+        _status = ''
+        check_status = ''
+        if order.has_key('check_status'):
+            check_status = order['check_status']
+            if check_status == 1:
+                check_status = u'是'
+            elif check_status == 0:
+                check_status = u'否'
+
+        pay_status = ''
+        if order.has_key('pay_status'):
+            pay_status = order['pay_status']
+            if pay_status == 30:
+                pay_status = u'是'
+            else:
+                pay_status = u'否'
+                order['actual_payment'] = '--'
+
+        delivered = ''
+        if order.has_key('delivered_status'):
+            delivered = order['delivered_status']
+            if pay_status == 1:
+                pay_status = u'是'
+            else:
+                pay_status = u'否'
+
+        refund = ''
+        if order.has_key('refund_amount'):
+            refund = order['refund_amount']
+            if refund > 0:
+                refund = u'是'
+            else:
+                refund = u'否'
+        _status = u"是否付款："+pay_status+u"\n是否分配："+check_status+u"\n是否发货："+delivered+u"\n是否退款："+ refund
+
+        logging.info("got billing_required %r in order", order['billing_required'])
+
+        sheet_1.write(rownum, 0, order['_id'])
+        sheet_1.write(rownum, 1, order['nickname'])
+        sheet_1.write(rownum, 2, order['amount'])
+        sheet_1.write(rownum, 3, order['actual_payment'])
+        sheet_1.write(rownum, 4, order['refund_amount'])
+        sheet_1.write(rownum, 5, order['create_time'])
+        sheet_1.write(rownum, 6, order['billing_required'])
+        sheet_1.write(rownum, 7, _status)
+        sheet_1.write(rownum, 8, order['club_name'])
+        sheet_1.write(rownum, 9, order['note'])
+
+        # 商品详情
+        _rownum = 1
+        if order.has_key('items'):
+            items = order['items']
+            for item in items:
+                sheet_2.write(_rownum, 0, item['title'])
+                sheet_2.write(_rownum, 1, item['brand_title'])
+                sheet_2.write(_rownum, 2, item['spec_title'])
+                sheet_2.write(_rownum, 3, item['quantity'])
+                sheet_2.write(_rownum, 4, float(item['amount'])/100)
+                sheet_2.write(_rownum, 5, str(float(item['amount'])/100*int(item['quantity'])))
+
+                _rownum = _rownum +1
+
+        # 收货地址
+        shipping_addr = ''
+        if order.has_key('shipping_addr'):
+            shipping_addr = order['shipping_addr']
+
+            sheet_3.write(rownum, 0, shipping_addr['name'])
+            sheet_3.write(rownum, 1, shipping_addr['phone'])
+            sheet_3.write(rownum, 2, shipping_addr['_addr'])
+
+        # 发票
+        billing_addr = ''
+        if order.has_key('billing_addr'):
+            billing_addr = order['billing_addr']
+
+            sheet_4.write(rownum, 0, billing_addr['company_title'])
+            sheet_4.write(rownum, 1, billing_addr['tfn'])
+
+        _id = generate_uuid_str()
+        _file.save('static/report/'+ _id +'.xls')     # Save file
+        self.finish(JSON.dumps(ITEM_DOMAIN+"/static/report/"+ _id +".xls"))
+
+
 class ApiVoucherOrderReviewXHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, voucher_order_id):
