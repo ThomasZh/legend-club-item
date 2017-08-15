@@ -158,8 +158,8 @@
 
 
                   <ul class="nav navbar-right panel_toolbox">
-                    <!-- <button class="btn btn-info" id="createExcel" name="button"><i class="fa fa-recycle"></i>生成报表</button>
-                    <a class="btn btn-success" disabled="true" id="downloadExcel" name="button"><i class="fa fa-download"></i>下载报表</a> -->
+                    <button class="btn btn-info" id="createExcel" name="button"><i class="fa fa-recycle"></i>生成报表</button>
+                    <a class="btn btn-success" disabled="true" id="downloadExcel" name="button"><i class="fa fa-download"></i>下载报表</a>
                   </ul>
                   <div class="clearfix"></div>
                 </div>
@@ -306,7 +306,7 @@
           dataType: "json",
           contentType: 'application/json',
           success: function(data, status, xhr) {
-              console.log(data);
+              // console.log(data);
               currentPage = pageNum;
           var pageData = data.rs.data;
               total_page = data.rs.total_page;//总页
@@ -412,58 +412,61 @@
           }
         });
       };
-      $(document).on('click','.pageBox > button',function(){
-        var num = $(this).text();
-        gotoPage(num);
-      })
-      $("#prev").on("click",function(){
-          if(currentPage<=1){}
-          else{
-            gotoPage(--currentPage);
-          }
-      });
-
-      $("#next").on("click",function(){
-          if(currentPage>=total_page){}
-          else{
-            gotoPage(++currentPage);
-          }
-      });
 
       gotoPage("1","all","all","all","0","0");
 
+      var distributor_id="all",check_status="all",pay_status="all",begin_time="0",end_time="0";
+
       $('#order-search').on('click',function(){
-          var begin_time = $('#single_cal1').val();
+           begin_time = $('#single_cal1').val();
           if (begin_time != ""){
             var b = new Date(begin_time);
-            console.log(b.getTime());
+            // console.log(b.getTime());
                 begin_time = b.getTime()/1000;
           }else{
             begin_time = 0;
           }
-          var end_time = $('#single_cal2').val();
+           end_time = $('#single_cal2').val();
           if(end_time != ""){
             var e = new Date(end_time);
                 end_time = e.getTime()/1000;
           }else{
             end_time = 0;
           }
-          var distributor_id = $('#distributor_id option:checked').val();
-          var check_status = $('#check_status input:radio[name="check-status"]:checked').val();
-          console.log(check_status);
-
-          var pay_status = $('#pay_status input:radio[name="pay-status"]:checked').val();
-          console.log(pay_status);
+          distributor_id = $('#distributor_id option:checked').val();
+          check_status = $('#check_status input:radio[name="check-status"]:checked').val();
+          pay_status = $('#pay_status input:radio[name="pay-status"]:checked').val();
 
           gotoPage("1",distributor_id,check_status,pay_status,begin_time,end_time);
+
       });
+
+      $(document).on('click','.pageBox > button',function(){
+        var num = $(this).text();
+        gotoPage(num,distributor_id,check_status,pay_status,begin_time,end_time);
+      })
+      $("#prev").on("click",function(){
+          if(currentPage<=1){}
+          else{
+            gotoPage(--currentPage,distributor_id,check_status,pay_status,begin_time,end_time);
+          }
+      });
+
+      $("#next").on("click",function(){
+          if(currentPage>=total_page){}
+          else{
+            gotoPage(++currentPage,distributor_id,check_status,pay_status,begin_time,end_time);
+          }
+      });
+
+
 
       // 分配仓库  发货  退款操作
       var or_id;
       var self;
       $(document).on('click','.dis-btn',function(){
           or_id = $(this).attr('data-id');
-          console.log(or_id);
+          // console.log(or_id);
           self = $(this);
       }).on('click','.delivery-btn',function(){
         var _id = $(this).attr('data-id');
@@ -479,7 +482,7 @@
             data:_json,
             contentType: 'application/json',
             success: function(data, status, xhr) {
-              console.log(data);
+              // console.log(data);
                 if(data.err_code == 200){
                   _this.parent().prev().children(".delive-status").removeClass('btn-danger').addClass('btn-success').text('已发货');
                 }
@@ -493,7 +496,7 @@
         var _this = $(this);
         $.prompt("请输入退款金额?",function(text){
           var num = parseFloat(text)*100;
-          console.log(num);
+          // console.log(num);
           var data = {'refund_amount':num}
           var _json = JSON.stringify(data);
           $.ajax({
@@ -504,7 +507,7 @@
             data:_json,
             contentType: 'application/json',
             success: function(data, status, xhr) {
-              console.log(data);
+              // console.log(data);
                 if(data.err_code == 200){
                   _this.parent().prev().prev().prev().prev().text(text);
                 }
@@ -530,7 +533,7 @@
           data:_json,
           contentType: 'application/json',
           success: function(data, status, xhr) {
-            console.log(data);
+            // console.log(data);
               if(data.err_code == 200){
                 self.parent().prev().children(".dis-status").removeClass('btn-danger').addClass('btn-success').text('已分配');
                 self.parent().next().text(distributor_name);
@@ -542,23 +545,23 @@
       // 导出报表
       $(document).on('click','#createExcel',function(){ // This event fires when a button is clicked
            var _this = $(this);
-           var begin_time = $('#single_cal1').val();
-           if (begin_time != ""){
-             var b = new Date(begin_time);
-             console.log(b.getTime());
-                 begin_time = b.getTime()/1000;
-           }else{
-             begin_time = 0;
-           }
-
-           var end_time = $('#single_cal2').val();
-           if(end_time != ""){
-             var e = new Date(end_time);
-                 end_time = e.getTime()/1000;
-           }else{
-             end_time = 0;
-           }
-        $.get("/bf/api/vendors/{{ vendor_id }}/items/applys/export?begin_time="+begin_time+"&end_time="+end_time,function(data,status){
+          //  var begin_time = $('#single_cal1').val();
+          //  if (begin_time != ""){
+          //    var b = new Date(begin_time);
+          //   //  console.log(b.getTime());
+          //        begin_time = b.getTime()/1000;
+          //  }else{
+          //    begin_time = 0;
+          //  }
+           //
+          //  var end_time = $('#single_cal2').val();
+          //  if(end_time != ""){
+          //    var e = new Date(end_time);
+          //        end_time = e.getTime()/1000;
+          //  }else{
+          //    end_time = 0;
+          //  }
+        $.get("/bf/api/vendors/{{ vendor_id }}/items/applys/export?check_status="+check_status+"&pay_status="+pay_status+"&distributor_id="+distributor_id+"&pagenum="+currentPage+"&limit="+limit+"&begin_time="+begin_time+"&end_time="+end_time,function(data,status){
           var ajaxobj = JSON.parse(data);
           $("#downloadExcel").attr("href", ajaxobj).attr("disabled",false);
         });
