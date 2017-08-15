@@ -535,6 +535,17 @@
           success: function(data, status, xhr) {
             // console.log(data);
               if(data.err_code == 200){
+                $.ajax({
+                  type: "PUT",
+                  url: "{{ API_DOMAIN }}/api/counters/{{ vendor_id }}/parameters/item_order/decrease",
+                  headers: {"Authorization": "Bearer {{ access_token }}"},
+                  dataType: "json",
+                  contentType: 'application/json',
+                  success: function(data, status, xhr) {
+                    // console.log(data);
+                  }
+                })
+
                 self.parent().prev().children(".dis-status").removeClass('btn-danger').addClass('btn-success').text('已分配');
                 self.parent().next().text(distributor_name);
               }

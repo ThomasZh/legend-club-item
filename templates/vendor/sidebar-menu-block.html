@@ -15,15 +15,15 @@
           <li><a href="/vendors/{{ vendor_id }}/activitys/recruit">销售中</a></li>
         </ul>
       </li>
-    {% if counter and counter.has_key('activity_order') and counter['activity_order'] != "0" %}
-      <li><a><i class="fa fa-rmb"></i> 订单 <span class="badge bg-green">{{ counter['activity_order'] }}</span>
+    {% if counter and counter.has_key('item_order') and counter['item_order'] != "0" %}
+      <li><a><i class="fa fa-rmb"></i> 订单 <span class="badge bg-green">{{ counter['item_order'] }}</span>
     {% else %}
       <li><a><i class="fa fa-rmb"></i> 订单
     {% end %}
         <span class="fa fa-chevron-down"></span></a>
         <ul class="nav child_menu" style="display: none">
-          {% if counter and counter.has_key('activity_order') and counter['activity_order'] != "0" %}
-          <li><a href="/vendors/{{ vendor_id }}/orders-me-all"> 我的订单  <span class="badge bg-green">{{ counter['activity_order'] }}</span></a></li>
+          {% if counter and counter.has_key('item_order') and counter['item_order'] != "0" %}
+          <li><a href="/vendors/{{ vendor_id }}/orders-me-all"> 我的订单  <span class="badge bg-green">{{ counter['item_order'] }}</span></a></li>
           {% else %}
           <li><a href="/vendors/{{ vendor_id }}/orders-me-all"> 我的订单  </a></li>
           {% end %}
