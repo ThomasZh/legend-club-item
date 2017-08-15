@@ -391,10 +391,10 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
         _file = xlwt.Workbook(encoding=_unicode) # Workbook
         rownum = None
 
-        sheet_1 = _file.add_sheet('sheet1')
-        sheet_2 = _file.add_sheet('sheet2')
-        sheet_3 = _file.add_sheet('sheet3')
-        sheet_4 = _file.add_sheet('sheet4')
+        sheet_1 = _file.add_sheet('概要信息')
+        sheet_2 = _file.add_sheet('详情')
+        sheet_3 = _file.add_sheet('送货地址')
+        sheet_4 = _file.add_sheet('发票')
         # column names
         rownum = 0
         # 订单详情
@@ -485,7 +485,7 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
 
         logging.info("got billing_required %r in order", order['billing_required'])
 
-        sheet_1.write(rownum, 0, order['_id'])
+        sheet_1.write(rownum, 0, order['trade_no'])
         sheet_1.write(rownum, 1, order['nickname'])
         sheet_1.write(rownum, 2, order['amount'])
         sheet_1.write(rownum, 3, order['actual_payment'])
@@ -493,8 +493,11 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
         sheet_1.write(rownum, 5, order['create_time'])
         sheet_1.write(rownum, 6, order['billing_required'])
         sheet_1.write(rownum, 7, _status)
-        sheet_1.write(rownum, 8, order['club_name'])
-        sheet_1.write(rownum, 9, order['note'])
+        sheet_1.write(rownum, 8, order['distributor_name'])
+        note = ""
+        if order.has_key('note'):
+            note = order['note']
+        sheet_1.write(rownum, 9, note)
 
         # 商品详情
         _rownum = 1
