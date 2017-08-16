@@ -150,9 +150,21 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
         data = json_decode(response.body)
         _customer_profile = data['rs']
 
-        _contacts = contact_dao.contact_dao().query_by_account(vendor_id, account_id)
+        url = API_DOMAIN + "/api/addr/accounts/"+account_id+"/shippings"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        _contacts = data['rs']
 
-        access_token = self.get_access_token()
+        url = API_DOMAIN + "/api/addr/accounts/"+account_id+"/billings"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        billings = data['rs']
 
         params = {"filter":"account", "account_id":account_id, "page":1, "limit":20,}
         url = url_concat(API_DOMAIN + "/api/orders", params)
@@ -200,7 +212,7 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
                 account_id=account_id,
                 counter=counter,
                 profile=_customer_profile,
-                contacts=_contacts, orders=orders, tasks =personal_tasks)
+                contacts=_contacts,billings=billings, orders=orders, tasks =personal_tasks)
 
 
     @tornado.web.authenticated  # if no session, redirect to login page
