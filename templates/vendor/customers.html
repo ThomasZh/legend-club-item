@@ -71,15 +71,6 @@
             <div class="col-md-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <form id="form1" method="post" action="/vendors/{{ vendor_id }}/customer/search">
-                      {% raw xsrf_form_html() %}
-                    <ul class="nav navbar-right panel_toolbox">
-                      <li class="next">
-                        <input type="text" id="search_keys" name="search_keys" value="{{ keys_value }}" >
-                        <button type="submit" class="btn btn-search">搜索</button>
-                      </li>
-                    </ul>
-                  </from>
                   <div class="clearfix"></div>
                 </div>
 
@@ -164,11 +155,7 @@
                 inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
                 inner_html += '<p class="">L'+ajaxobj[i].star+'</p></div>';
                 inner_html += '<div class="col-xs-12 col-sm-6 emphasis">';
-                if(ajaxobj[i]._rank == "100"){
-                  inner_html += '<button type="button" class="btn btn-danger btn-xs"><i class="fa fa-tags"> 领队 </i> </button>';
-                }else{
-                  inner_html += '<button type="button" class="btn btn-success btn-xs"><i class="fa fa-tags"> 会员 </i> </button>';
-                }
+                inner_html += '<button type="button" class="btn btn-success btn-xs"><i class="fa fa-tags"> 会员 </i> </button>';
                 inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+ajaxobj[i].account_id+'" type="button" class="btn btn-primary btn-xs" >';
                 inner_html += '<i class="fa fa-user"></i> 查看详情 </a>';
                 inner_html += '</div></div></div></div>';
