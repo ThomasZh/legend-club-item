@@ -599,7 +599,7 @@
           dataType: "json",
           contentType: 'application/json',
           success: function(data, status, xhr) {
-              // console.log(data);
+              console.log(data);
               currentPage = pageNum;
           var pageData = data.rs.data;
               total_page = data.rs.total_page;//总页
@@ -626,15 +626,15 @@
                 _html += '<a href="/vendors/{{ vendor_id }}/customers/'+pageData[i].account_id+'">'+pageData[i].nickname+'</a>';
                 _html += '<br />';
                 _html += '</td>';
-                _html += '<td class=" ">'+pageData[i].actual_payment.toFixed(2)+'元<br /></td>';
+                _html += '<td class=" ">'+parseFloat(pageData[i].actual_payment).toFixed(2)+'元<br /></td>';
                 if (pageData[i].pay_status == 30){
-                  _html += '<td>'+pageData[i].actual_payment.toFixed(2)+'元</td>';
+                  _html += '<td>'+parseFloat(pageData[i].actual_payment).toFixed(2)+'元</td>';
                 }else{
                   _html += '<td>--</td>';
                 }
                 _html += '<td class="refund-amount-td">';
                 if (pageData[i].refund_amount > 0){
-                  _html += (parseFloat(pageData[i].refund_amount)/100).toFixed(2)+'元';
+                  _html += parseFloat(pageData[i].refund_amount/100).toFixed(2)+'元';
                 }else{
                   _html += '--';
                 }
