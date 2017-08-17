@@ -437,9 +437,15 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
             sheet_1.write(rownum, 1, shipping_addr['name'])
             sheet_1.write(rownum, 2, unicode(u'收货电话').encode(_unicode))
             sheet_1.write(rownum, 3, shipping_addr['phone'])
+            sheet_1.write(rownum, 4, "")
+            sheet_1.write(rownum, 5, "")
             rownum = rownum + 1
             sheet_1.write(rownum, 0, unicode(u'收货地址').encode(_unicode))
             sheet_1.write(rownum, 1, shipping_addr['_addr'])
+            sheet_1.write(rownum, 2, "")
+            sheet_1.write(rownum, 3, "")
+            sheet_1.write(rownum, 4, "")
+            sheet_1.write(rownum, 5, "")
 
         # 发票
         billing_addr = ''
@@ -450,8 +456,12 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
             sheet_1.write(rownum, 1, billing_addr['company_title'])
             sheet_1.write(rownum, 2, unicode(u'税号').encode(_unicode))
             sheet_1.write(rownum, 3, billing_addr['tfn'])
+            sheet_1.write(rownum, 4, "")
+            sheet_1.write(rownum, 5, "")
 
         rownum = rownum + 1
+        sheet_1.write_merge(rownum,rownum,0,5,"",set_style('Times New Roman',220,False,False))
+
         rownum = rownum + 1
         # 商品详情
         sheet_1.write(rownum, 0, unicode(u'行号').encode(_unicode),set_style('Times New Roman',220,False,True))
