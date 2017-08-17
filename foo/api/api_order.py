@@ -501,8 +501,9 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
 
         rownum = rownum + 1
         sheet_1.write(rownum, 0, unicode(u'应收款合计').encode(_unicode),set_style('Times New Roman',220,False,True))
-        sheet_1.write_merge(rownum,rownum,1,3,unicode(u'金额大写: ').encode(_unicode),set_style('Times New Roman',220,False,True))
         actual_payment = float(order['actual_payment']) / 100
+        rmb = num2chn(actual_payment)
+        sheet_1.write_merge(rownum,rownum,1,3,unicode(u'金额大写: ').encode(_unicode)+rmb,set_style('Times New Roman',220,False,True))
         sheet_1.write_merge(rownum,rownum,4,5, actual_payment,set_style('Times New Roman',220,False,True))
 
         _id = generate_uuid_str()
