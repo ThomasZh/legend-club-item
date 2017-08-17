@@ -366,8 +366,151 @@ class ApiActivityExportXHR(AuthorizationHandler):
         self.finish(JSON.dumps(ITEM_DOMAIN+"/static/report/"+ _id +".xls"))
 
 
+'''
+设置单元格样式
+'''
+def set_style(name,height,bold=False,border=False):
+    style = xlwt.XFStyle() # 初始化样式
+
+    font = xlwt.Font() # 为样式创建字体
+    font.name = name # 'Times New Roman'
+    font.bold = bold
+    font.color_index = 4
+    font.height = height
+    style.font = font
+
+    if border:
+        borders = xlwt.Borders()
+        borders.left = 1
+        borders.right = 1
+        borders.top = 1
+        borders.bottom = 1
+        style.borders = borders
+
+    return style
+
+
 # 订单详情页报表导出
 class ApiActivityDetailExportXHR(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id, order_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+        logging.info("got order_id %r in uri", order_id)
+
+        access_token = self.get_access_token()
+
+        # 获取订单详情
+        order = self.get_symbol_object(order_id)
+        logging.info("got order %r in uri", order)
+
+        # utf8,gbk,gb2312
+        _unicode = 'utf8'
+        _file = xlwt.Workbook(encoding=_unicode) # Workbook
+
+        sheet_1 = _file.add_sheet('sheet_1')
+        sheet_1.col(0).width = 256*10
+        sheet_1.col(1).width = 256*30
+        sheet_1.col(2).width = 256*10
+        sheet_1.col(3).width = 256*30
+        sheet_1.col(4).width = 256*10
+        sheet_1.col(5).width = 256*30
+
+        # column names
+        rownum = 0
+        sheet_1.write_merge(rownum,rownum,0,5,"空空配送装修建材配送单",set_style('Times New Roman',450,False))
+
+        rownum = rownum + 1
+        sheet_1.write(rownum, 0, unicode(u'送货日期').encode(_unicode))
+        create_time = timestamp_datetime(order['create_time'])
+        sheet_1.write(rownum, 1, create_time)
+        sheet_1.write(rownum, 2, unicode(u'单据编号').encode(_unicode))
+        sheet_1.write(rownum, 3, order['trade_no'])
+        sheet_1.write(rownum, 4, unicode(u'发货仓库').encode(_unicode))
+        sheet_1.write(rownum, 5, order['distributor_name'])
+
+        # 收货地址
+        shipping_addr = ''
+        if order.has_key('shipping_addr'):
+            shipping_addr = order['shipping_addr']
+            rownum = rownum + 1
+            sheet_1.write(rownum, 0, unicode(u'收货人').encode(_unicode))
+            sheet_1.write(rownum, 1, shipping_addr['name'])
+            sheet_1.write(rownum, 2, unicode(u'收货电话').encode(_unicode))
+            sheet_1.write(rownum, 3, shipping_addr['phone'])
+            rownum = rownum + 1
+            sheet_1.write(rownum, 0, unicode(u'收货地址').encode(_unicode))
+            sheet_1.write(rownum, 1, shipping_addr['_addr'])
+
+        # 发票
+        billing_addr = ''
+        if order.has_key('billing_addr'):
+            billing_addr = order['billing_addr']
+            rownum = rownum + 1
+            sheet_1.write(rownum, 0, unicode(u'发票抬头').encode(_unicode))
+            sheet_1.write(rownum, 1, billing_addr['company_title'])
+            sheet_1.write(rownum, 2, unicode(u'税号').encode(_unicode))
+            sheet_1.write(rownum, 3, billing_addr['tfn'])
+
+        rownum = rownum + 1
+        rownum = rownum + 1
+        # 商品详情
+        sheet_1.write(rownum, 0, unicode(u'行号').encode(_unicode),set_style('Times New Roman',220,False,True))
+        sheet_1.write(rownum, 1, unicode(u'商品全称').encode(_unicode),set_style('Times New Roman',220,False,True))
+        sheet_1.write(rownum, 2, unicode(u'数量').encode(_unicode),set_style('Times New Roman',220,False,True))
+        sheet_1.write(rownum, 3, unicode(u'单价').encode(_unicode),set_style('Times New Roman',220,False,True))
+        sheet_1.write(rownum, 4, unicode(u'小计').encode(_unicode),set_style('Times New Roman',220,False,True))
+        sheet_1.write(rownum, 5, unicode(u'备注').encode(_unicode),set_style('Times New Roman',220,False,True))
+
+        # 商品详情
+        rownum = rownum + 1
+        line = 1
+        if order.has_key('items'):
+            items = order['items']
+            for item in items:
+                sheet_1.write(rownum, 0, line,set_style('Times New Roman',220,False,True))
+                sheet_1.write(rownum, 1, item['title'] + "(" + item['brand_title'] + ")" + item['spec_title'],set_style('Times New Roman',220,False,True))
+                sheet_1.write(rownum, 2, int(item['quantity']),set_style('Times New Roman',220,False,True))
+                sheet_1.write(rownum, 3, float(item['amount'])/100,set_style('Times New Roman',220,False,True))
+                sheet_1.write(rownum, 4, float(item['amount'])/100*int(item['quantity']),set_style('Times New Roman',220,False,True))
+                sheet_1.write(rownum, 5, "",set_style('Times New Roman',220,False,True))
+                rownum = rownum + 1
+                line = line + 1
+
+        sheet_1.write_merge(rownum,rownum,0,5,"",set_style('Times New Roman',220,False,True))
+
+        rownum = rownum + 1
+        sheet_1.write(rownum, 0, line, set_style('Times New Roman',220,False,True))
+        sheet_1.write_merge(rownum,rownum,1,3,unicode(u'搬运费').encode(_unicode),set_style('Times New Roman',220,False,True))
+        shipping_cost = float(order['shipping_cost']) / 100
+        sheet_1.write(rownum, 4, shipping_cost,set_style('Times New Roman',220,False,True))
+        sheet_1.write(rownum, 5, "",set_style('Times New Roman',220,False,True))
+
+        line = line + 1
+        rownum = rownum + 1
+        sheet_1.write(rownum, 0, line,set_style('Times New Roman',220,False,True))
+        sheet_1.write_merge(rownum,rownum,1,3,unicode(u'原价合计').encode(_unicode),set_style('Times New Roman',220,False,True))
+        amount = float(order['amount']) / 100
+        sheet_1.write(rownum, 4, amount,set_style('Times New Roman',220,False,True))
+        sheet_1.write(rownum, 5, "",set_style('Times New Roman',220,False,True))
+
+        line = line + 1
+        rownum = rownum + 1
+        sheet_1.write(rownum, 0, line,set_style('Times New Roman',220,False,True))
+        sheet_1.write_merge(rownum,rownum,1,3,unicode(u'优惠').encode(_unicode),set_style('Times New Roman',220,False,True))
+        sheet_1.write(rownum, 5, "",set_style('Times New Roman',220,False,True))
+
+        rownum = rownum + 1
+        sheet_1.write(rownum, 0, unicode(u'应收款合计').encode(_unicode),set_style('Times New Roman',220,False,True))
+        sheet_1.write_merge(rownum,rownum,1,3,unicode(u'金额大写: ').encode(_unicode),set_style('Times New Roman',220,False,True))
+        actual_payment = float(order['actual_payment']) / 100
+        sheet_1.write_merge(rownum,rownum,4,5, actual_payment,set_style('Times New Roman',220,False,True))
+
+        _id = generate_uuid_str()
+        _file.save('static/report/'+ _id +'.xls')     # Save file
+        self.finish(JSON.dumps(ITEM_DOMAIN+"/static/report/"+ _id +".xls"))
+
+
+class ApiActivityDetailExport2XHR(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id, order_id):
         logging.info("got vendor_id %r in uri", vendor_id)
