@@ -391,12 +391,16 @@ def set_style(name,height,bold=False,border=False,number=False,align_horz=xlwt.A
     style.alignment = alignment # Add Alignment to Style
 
     if border:
-        borders = xlwt.Borders()
-        borders.left = 1
-        borders.right = 1
-        borders.top = 1
-        borders.bottom = 1
-        style.borders = borders
+        borders = xlwt.Borders() # Create Borders
+        borders.left = xlwt.Borders.THIN # May be: NO_LINE, THIN, MEDIUM, DASHED, DOTTED, THICK, DOUBLE, HAIR, MEDIUM_DASHED, THIN_DASH_DOTTED, MEDIUM_DASH_DOTTED, THIN_DASH_DOT_DOTTED, MEDIUM_DASH_DOT_DOTTED, SLANTED_MEDIUM_DASH_DOTTED, or 0x00 through 0x0D.
+        borders.right = xlwt.Borders.THIN
+        borders.top = xlwt.Borders.THIN
+        borders.bottom = xlwt.Borders.THIN
+        borders.left_colour = 0x40
+        borders.right_colour = 0x40
+        borders.top_colour = 0x40
+        borders.bottom_colour = 0x40
+        style.borders = borders # Add Borders to Style
 
     return style
 
@@ -419,25 +423,27 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
         _file = xlwt.Workbook(encoding=_unicode) # Workbook
 
         sheet_1 = _file.add_sheet('sheet_1')
-        sheet_1.col(0).width = 256*10
-        sheet_1.col(1).width = 256*30
-        sheet_1.col(2).width = 256*10
-        sheet_1.col(3).width = 256*30
+        sheet_1.col(0).width = 256*8
+        sheet_1.col(1).width = 256*45
+        sheet_1.col(2).width = 256*8
+        sheet_1.col(3).width = 256*9
         sheet_1.col(4).width = 256*10
-        sheet_1.col(5).width = 256*30
+        sheet_1.col(5).width = 256*10
 
         # column names
         rownum = 0
+        sheet_1.write_merge(rownum,rownum,0,5,"")
+        rownum = rownum + 1
         sheet_1.write_merge(rownum,rownum,0,5,"空空配送装修建材配送单",set_style('Times New Roman',450,False,False,False,xlwt.Alignment.HORZ_CENTER))
+        rownum = rownum + 1
+        sheet_1.write_merge(rownum,rownum,0,5,"")
 
         rownum = rownum + 1
-        sheet_1.write(rownum, 0, unicode(u'送货日期').encode(_unicode))
+        sheet_1.write(rownum, 0, unicode(u'下单时间').encode(_unicode))
         create_time = timestamp_datetime(order['create_time'])
         sheet_1.write(rownum, 1, create_time)
         sheet_1.write(rownum, 2, unicode(u'单据编号').encode(_unicode))
-        sheet_1.write(rownum, 3, order['trade_no'])
-        sheet_1.write(rownum, 4, unicode(u'发货仓库').encode(_unicode))
-        sheet_1.write(rownum, 5, order['distributor_name'])
+        sheet_1.write_merge(rownum,rownum,3,5,order['trade_no'])
 
         # 收货地址
         shipping_addr = ''
@@ -447,16 +453,11 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
             sheet_1.write(rownum, 0, unicode(u'收货人').encode(_unicode))
             sheet_1.write(rownum, 1, shipping_addr['name'])
             sheet_1.write(rownum, 2, unicode(u'收货电话').encode(_unicode))
-            sheet_1.write(rownum, 3, shipping_addr['phone'])
-            sheet_1.write(rownum, 4, "")
-            sheet_1.write(rownum, 5, "")
+            sheet_1.write_merge(rownum,rownum,3,5,shipping_addr['phone'])
+
             rownum = rownum + 1
             sheet_1.write(rownum, 0, unicode(u'收货地址').encode(_unicode))
-            sheet_1.write(rownum, 1, shipping_addr['_addr'])
-            sheet_1.write(rownum, 2, "")
-            sheet_1.write(rownum, 3, "")
-            sheet_1.write(rownum, 4, "")
-            sheet_1.write(rownum, 5, "")
+            sheet_1.write_merge(rownum,rownum,1,5,shipping_addr['_addr'])
 
         # 发票
         billing_addr = ''
@@ -466,9 +467,7 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
             sheet_1.write(rownum, 0, unicode(u'发票抬头').encode(_unicode))
             sheet_1.write(rownum, 1, billing_addr['company_title'])
             sheet_1.write(rownum, 2, unicode(u'税号').encode(_unicode))
-            sheet_1.write(rownum, 3, billing_addr['tfn'])
-            sheet_1.write(rownum, 4, "")
-            sheet_1.write(rownum, 5, "")
+            sheet_1.write_merge(rownum,rownum,3,5,billing_addr['tfn'])
 
         rownum = rownum + 1
         sheet_1.write_merge(rownum,rownum,0,5,"",set_style('Times New Roman',220,False,False))
@@ -478,8 +477,8 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
         sheet_1.write(rownum, 0, unicode(u'行号').encode(_unicode),set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
         sheet_1.write(rownum, 1, unicode(u'商品全称').encode(_unicode),set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
         sheet_1.write(rownum, 2, unicode(u'数量').encode(_unicode),set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
-        sheet_1.write(rownum, 3, unicode(u'单价(元)').encode(_unicode),set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
-        sheet_1.write(rownum, 4, unicode(u'小计(元)').encode(_unicode),set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
+        sheet_1.write(rownum, 3, unicode(u'单价').encode(_unicode),set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
+        sheet_1.write(rownum, 4, unicode(u'小计').encode(_unicode),set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
         sheet_1.write(rownum, 5, unicode(u'备注').encode(_unicode),set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
 
         # 商品详情
@@ -521,14 +520,15 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
         sheet_1.write(rownum, 5, "",set_style('Times New Roman',220,False,True))
 
         rownum = rownum + 1
-        sheet_1.write(rownum, 0, unicode(u'应收款合计').encode(_unicode),set_style('Times New Roman',220,False,True,xlwt.Alignment.HORZ_LEFT))
+        sheet_1.write(rownum, 0, unicode(u'合计').encode(_unicode),set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
         actual_payment = float(order['actual_payment']) / 100
         rmb = num2chn(actual_payment)
         sheet_1.write_merge(rownum,rownum,1,3,unicode(u'金额大写: ').encode(_unicode)+rmb,set_style('Times New Roman',220,False,True))
         sheet_1.write(rownum, 4, actual_payment,set_style('Times New Roman',220,False,True,True,xlwt.Alignment.HORZ_RIGHT))
         sheet_1.write(rownum, 5, '', set_style('Times New Roman',220,False,True))
 
-        _id = generate_uuid_str()
+        timestamp = int(time.time())
+        _id = order['trade_no']+"_"+timestamp_short_datetime(timestamp)
         _file.save('static/report/'+ _id +'.xls')     # Save file
         self.finish(JSON.dumps(ITEM_DOMAIN+"/static/report/"+ _id +".xls"))
 
