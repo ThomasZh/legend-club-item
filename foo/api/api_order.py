@@ -371,6 +371,7 @@ class ApiActivityExportXHR(AuthorizationHandler):
 '''
 def set_style(name,height,bold=False,border=False,number=False,align_horz=xlwt.Alignment.HORZ_LEFT):
     style = xlwt.XFStyle() # 初始化样式
+    #style = xlwt.easyxf('align: wrap on') # 自动换行
 
     font = xlwt.Font() # 为样式创建字体
     font.name = name # 'Times New Roman'
@@ -458,6 +459,10 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
             rownum = rownum + 1
             sheet_1.write(rownum, 0, unicode(u'收货地址').encode(_unicode))
             sheet_1.write_merge(rownum,rownum,1,5,shipping_addr['_addr'])
+
+        rownum = rownum + 1
+        sheet_1.write(rownum, 0, unicode(u'配送仓库').encode(_unicode))
+        sheet_1.write_merge(rownum,rownum,1,5,order['distributor_name'])
 
         # 发票
         billing_addr = ''
