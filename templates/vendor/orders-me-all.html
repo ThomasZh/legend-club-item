@@ -137,27 +137,32 @@
                       </select>
                     </div>
                   </div>
-                  <div class="col-md-12 col-sm-12 col-xs-12" style="margin-top: 1rem;">
+                  <!-- <div class="col-md-12 col-sm-12 col-xs-12" style="margin-top: 1rem;">
                     <label class="control-label col-md-1 col-sm-3 col-xs-12">是否付款:</label>
                     <div class="col-md-6 xdisplay_inputx form-group has-feedback" id="pay_status">
                       <label class="z-right"><input type="radio" class="flat" checked="checked" name="pay-status" value="all"> 全部</label>
                       <label class="z-right"><input type="radio" class="flat" name="pay-status" value="30"> 是</label>
                       <label class="z-right"><input type="radio" class="flat" name="pay-status" value="20"> 否</label>
                     </div>
-                  </div>
+                  </div> -->
                   <div class="col-md-12 col-sm-12 col-xs-12" style="margin-top: 1rem;">
                     <label class="control-label col-md-1 col-sm-3 col-xs-12">订单状态:</label>
-                    <div class="col-md-6 xdisplay_inputx form-group has-feedback" id="check_status">
+                    <div class="col-md-7 xdisplay_inputx form-group has-feedback" id="check_status">
                       <label class="z-right"><input type="radio" class="flat" checked="checked" name="check-status" value="all"> 全部</label>
+                      <label class="z-right"><input type="radio" class="flat" name="check-status" value="0"> 未付款</label>
                       <label class="z-right"><input type="radio" class="flat" name="check-status" value="200"> 未分配</label>
                       <label class="z-right"><input type="radio" class="flat" name="check-status" value="300"> 未发货</label>
                       <label class="z-right"><input type="radio" class="flat" name="check-status" value="400"> 未签收</label>
                       <label class="z-right"><input type="radio" class="flat" name="check-status" value="500"> 已签收</label>
-                      <button type="button" class="btn btn-info" id="order-search" style="padding:3px 10px; margin-bottom:0;">查询</button>
                     </div>
-
                   </div>
 
+                  <div class="col-md-12 col-sm-12 col-xs-12" style="margin-top: 1rem;">
+                    <label class="control-label col-md-1 col-sm-3 col-xs-12"></label>
+                    <div class="col-md-6 xdisplay_inputx form-group has-feedback">
+                      <button type="button" class="btn btn-info" id="order-search" style="padding:3px 10px; margin-bottom:0;">查询</button>
+                    </div>
+                  </div>
 
                   <ul class="nav navbar-right panel_toolbox">
                     <button class="btn btn-info" id="createExcel" name="button"><i class="fa fa-recycle"></i>生成报表</button>
@@ -300,10 +305,10 @@
       var limit = 8;//每页显示数
       var currentPage = 0;//当前页
       var total_page = 0;//总页数
-      function gotoPage(pageNum,distributor_id,check_status,pay_status,begin_time,end_time) {
+      function gotoPage(pageNum,distributor_id,check_status,begin_time,end_time) {
         $.ajax({
           type: "GET",
-          url: "{{API_DOMAIN}}/api/orders?club_id={{vendor_id}}&order_type=buy_item&distributor_id="+distributor_id+"&_status="+check_status+"&pay_status="+pay_status+"&begin_time="+begin_time+"&end_time="+end_time+"&page="+pageNum+"&limit="+limit,
+          url: "{{API_DOMAIN}}/api/orders?club_id={{vendor_id}}&order_type=buy_item&distributor_id="+distributor_id+"&_status="+check_status+"&begin_time="+begin_time+"&end_time="+end_time+"&page="+pageNum+"&limit="+limit,
           headers: {"Authorization": "Bearer {{ access_token }}"},
           dataType: "json",
           contentType: 'application/json',
@@ -430,9 +435,9 @@
         });
       };
 
-      gotoPage("1","all","all","all","0","0");
+      gotoPage("1","all","all","0","0");
 
-      var distributor_id="all",check_status="all",pay_status="all",begin_time="0",end_time="0";
+      var distributor_id="all",check_status="all",begin_time="0",end_time="0";
 
       $('#order-search').on('click',function(){
            begin_time = $('#single_cal1').val();
@@ -452,27 +457,27 @@
           }
           distributor_id = $('#distributor_id option:checked').val();
           check_status = $('#check_status input:radio[name="check-status"]:checked').val();
-          pay_status = $('#pay_status input:radio[name="pay-status"]:checked').val();
+          // pay_status = $('#pay_status input:radio[name="pay-status"]:checked').val();
 
-          gotoPage("1",distributor_id,check_status,pay_status,begin_time,end_time);
+          gotoPage("1",distributor_id,check_status,begin_time,end_time);
 
       });
 
       $(document).on('click','.pageBox > button',function(){
         var num = $(this).text();
-        gotoPage(num,distributor_id,check_status,pay_status,begin_time,end_time);
+        gotoPage(num,distributor_id,check_status,begin_time,end_time);
       })
       $("#prev").on("click",function(){
           if(currentPage<=1){}
           else{
-            gotoPage(--currentPage,distributor_id,check_status,pay_status,begin_time,end_time);
+            gotoPage(--currentPage,distributor_id,check_status,begin_time,end_time);
           }
       });
 
       $("#next").on("click",function(){
           if(currentPage>=total_page){}
           else{
-            gotoPage(++currentPage,distributor_id,check_status,pay_status,begin_time,end_time);
+            gotoPage(++currentPage,distributor_id,check_status,begin_time,end_time);
           }
       });
 
