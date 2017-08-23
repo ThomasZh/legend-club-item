@@ -11,7 +11,7 @@
   <link href="{{ static_url('css/font-awesome.min.css') }}" rel="stylesheet" type="text/css">
   <link href="{{ static_url('css/login.css') }}" rel="stylesheet" type="text/css">
 
-  <title>login</title>
+  <title>登录</title>
 </head>
 
 <body>
@@ -19,7 +19,7 @@
   <!-- Where all the magic happens -->
   <!-- LOGIN FORM -->
   <div class="text-center" style="padding:50px 0">
-    <div class="logo">login</div>
+    <div class="logo">登录</div>
     <!-- Main Form -->
     <div class="login-form-1">
       <form id="login-form" class="text-left" method="POST" action="/ops/auth/phone/login">
@@ -35,15 +35,15 @@
             <div class="login-group">
               <div class="form-group">
                 <label for="lg_phone" class="sr-only">Phone</label>
-                <input type="text" class="form-control" id="lg_phone" name="lg_phone" placeholder="phone number">
+                <input type="text" class="form-control" id="lg_phone" name="lg_phone" placeholder="电话号码">
               </div>
               <div class="form-group">
                 <label for="lg_pwd" class="sr-only">Password</label>
-                <input type="password" class="form-control" id="lg_pwd" name="lg_pwd" placeholder="password">
+                <input type="password" class="form-control" id="lg_pwd" name="lg_pwd" placeholder="密码">
               </div>
               <div class="form-group login-group-checkbox">
                 <input type="checkbox" id="lg_remember" name="lg_remember">
-                <label for="lg_remember">remember</label>
+                <label for="lg_remember">记住我</label>
               </div>
             </div>
             {% if err_msg %}

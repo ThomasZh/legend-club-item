@@ -71,7 +71,13 @@ class AuthPhoneLoginHandler(BaseHandler):
             response = http_client.fetch(url, method="POST", headers=headers, body=_json)
             logging.info("got response %r", response.body)
             data = json_decode(response.body)
-            session_ticket = data['rs']
+            session_ticket = None
+            if data['err_code'] == 404:
+                err_msg = "手机号码或密码不正确!"
+                self.render('auth/phone-login.html', err_msg=err_msg)
+                return
+            else:
+                session_ticket = data['rs']
 
             # is ops
             try:
@@ -90,12 +96,20 @@ class AuthPhoneLoginHandler(BaseHandler):
                 headers={"Authorization":"Bearer "+session_ticket['access_token']}
                 response = http_client.fetch(url, method="GET", headers=headers)
                 logging.info("got response %r", response.body)
+                data = json_decode(response.body)
+                ops = None
+                if data['err_code'] == 404:
+                    err_msg = "您不是加盟商管理员!"
+                    self.render('auth/phone-login.html', err_msg=err_msg)
+                    return
+                else:
+                    ops = data['rs']
             except:
                 err_title = str( sys.exc_info()[0] );
                 err_detail = str( sys.exc_info()[1] );
                 logging.error("error: %r info: %r", err_title, err_detail)
                 if err_detail == 'HTTP 404: Not Found':
-                    err_msg = "您不是俱乐部的管理员!"
+                    err_msg = "您不是加盟商管理员!"
                     self.render('auth/phone-login.html', err_msg=err_msg)
                     return
                 else:

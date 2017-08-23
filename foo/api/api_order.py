@@ -316,13 +316,18 @@ class ApiActivityExportXHR(AuthorizationHandler):
 
             # 各种状态
             _status = ''
-            check_status = ''
-            if order.has_key('check_status'):
-                check_status = order['check_status']
-                if check_status == 1:
-                    check_status = u'是'
-                elif check_status == 0:
-                    check_status = u'否'
+            if order.has_key('_status'):
+                _status = order['_status']
+                if _status == 0:
+                    _status = u'未分配'
+                elif _status == 200:
+                    _status = u'未分配'
+                elif _status == 300:
+                    _status = u'未发货'
+                elif _status == 400:
+                    _status = u'未签收'
+                elif _status == 500:
+                    _status = u'已签收'
 
             pay_status = ''
             if order.has_key('pay_status'):
@@ -333,14 +338,6 @@ class ApiActivityExportXHR(AuthorizationHandler):
                     pay_status = u'否'
                     order['actual_payment'] = '--'
 
-            delivered = ''
-            if order.has_key('delivered_status'):
-                delivered = order['delivered_status']
-                if delivered == 1:
-                    delivered = u'是'
-                else:
-                    delivered = u'否'
-
             refund = ''
             if order.has_key('refund_amount'):
                 refund = order['refund_amount']
@@ -348,7 +345,7 @@ class ApiActivityExportXHR(AuthorizationHandler):
                     refund = u'是'
                 else:
                     refund = u'否'
-            _status = u"是否付款："+pay_status+u"\n是否分配："+check_status+u"\n是否发货："+delivered+u"\n是否退款："+ refund
+            _status = u"是否付款："+pay_status+u"\n订单状态："+_status+u"\n是否退款："+ refund
 
             _table.write(rownum, 0, order['trade_no'])
             _table.write(rownum, 1, order['nickname'])

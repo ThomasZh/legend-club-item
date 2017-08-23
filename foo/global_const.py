@@ -69,6 +69,12 @@ ACTIVITY_STATUS_RECRUIT = 20          # 招募中
 ACTIVITY_STATUS_DOING = 30            # 活动中
 ACTIVITY_STATUS_COMPLETED = 40        # 已完成
 
+# 商品发货状态
+ORDER_STATUS_PLACED = 0  #初始值（未分配）
+ORDER_STATUS_DISTRIBUTED = 300   #已分配
+ORDER_STATUS_SHIPPING = 400   #已发货
+ORDER_STATUS_SIGNED_RECEIPT = 500  #已签收
+ORDER_STATUS_APPRAISAL = 600  #已评价
 
 # order status
 ORDER_STATUS_BF_INIT = 10             # 在bike-forever系统中初始化创建成功

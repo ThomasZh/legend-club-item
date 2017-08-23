@@ -149,30 +149,31 @@
                         </td>
                         <td>
                           {% if order['pay_status'] == 20 %}
-                            <a href="#" class="btn btn-warning btn-xs"> 待付款 </a><br/>
-                          {% elif order['pay_status'] == 21 %}
-                            <a href="#" class="btn btn-danger btn-xs"> 下单失败 </a><br/>
-                          {% elif order['pay_status'] == 31 %}
-                            <a href="#" class="btn btn-danger btn-xs"> 支付失败 </a><br/>
-                          {% elif order['pay_status'] == 30 %}
-                            <a href="#" class="btn btn-success btn-xs"> 支付成功 </a><br/>
-                          {% else %}
-                            <a href="#" class="btn btn-success btn-xs"> {{ order['pay_status'] }} </a><br/>
-                          {% end %}
+                              <a href="#" class="btn btn-warning btn-xs"> 待付款 </a><br/>
+                            {% elif order['pay_status'] == 21 %}
+                              <a href="#" class="btn btn-danger btn-xs"> 下单失败 </a><br/>
+                            {% elif order['pay_status'] == 31 %}
+                              <a href="#" class="btn btn-danger btn-xs"> 支付失败 </a><br/>
+                            {% elif order['pay_status'] == 30 %}
+                              <a href="#" class="btn btn-success btn-xs"> 支付成功 </a><br/>
 
-                          {% if order['check_status'] == 0 %}
-                          <a href="#" class="btn btn-danger btn-xs dis-status"> 未分配 </a><br/>
-                          {% else %}
-                          <a href="#" class="btn btn-success btn-xs dis-status"> 已分配 </a><br/>
-                          {% end %}
+                              {% if order.has_key('_status') %}
+                                  {% if order['_status'] == 0 or order['_status'] == 200 %}
+                                  <a href="#" class="btn btn-danger btn-xs delive-status"> 未分配 </a><br/>
+                                  {% elif order['_status'] == 300 %}
+                                  <a href="#" class="btn btn-warning btn-xs delive-status"> 未发货 </a><br/>
+                                  {% elif order['_status'] == 400 %}
+                                  <a href="#" class="btn btn-info btn-xs delive-status"> 未签收 </a><br/>
+                                  {% elif order['_status'] == 500 %}
+                                  <a href="#" class="btn btn-primary btn-xs delive-status"> 已签收 </a><br/>
+                                  {% end %}
+                                {% else %}
+                                <a href="#" class="btn btn-danger btn-xs delive-status"> 未分配 </a><br/>
+                              {% end %}
 
-                      {% if order.has_key('delivered_status') %}
-                          {% if order['delivered_status'] == 0 %}
-                          <a href="#" class="btn btn-danger btn-xs delive-status"> 未发货 </a><br/>
-                          {% else %}
-                          <a href="#" class="btn btn-success btn-xs delive-status"> 已发货 </a><br/>
+                            {% else %}
+                              <a href="#" class="btn btn-success btn-xs"> {{ order['pay_status'] }} </a><br/>
                           {% end %}
-                      {% end %}
 
                         {% if order.has_key('refund_amount') %}
                           {% if order['refund_amount'] > 0 %}
@@ -182,8 +183,18 @@
                         </td>
                         <td>
                           {% if order['pay_status'] == 30 %}
-                          <a href="#" class="btn btn-primary btn-xs" data-id="{{ order['_id'] }}" data-toggle="modal" data-target=".bs-example-modal-sm" id="dis-btn"><i class="fa fa-pencil"></i> 分配 </a><br/>
-                          <a href="#" class="btn btn-primary btn-xs" data-id="{{ order['_id'] }}" id="delivery-btn"><i class="fa fa-pencil"></i> 发货 </a><br/>
+                            {% if order.has_key('_status') %}
+                                {% if order['_status'] == 0 or order['_status'] == 200 %}
+                                <a href="#" class="btn btn-primary btn-xs" data-id="{{ order['_id'] }}" data-toggle="modal" data-target=".bs-example-modal-sm" id="dis-btn"><i class="fa fa-pencil"></i> 分配 </a><br/>
+                                {% elif order['_status'] == 300 %}
+                                <a href="#" class="btn btn-primary btn-xs" data-id="{{ order['_id'] }}" id="delivery-btn"><i class="fa fa-pencil"></i> 发货 </a><br/>
+                                {% elif order['_status'] == 400 %}
+                                <a href="#" class="btn btn-primary btn-xs" data-id="{{ order['_id'] }}" id="finish-btn"><i class="fa fa-pencil"></i> 签收 </a><br/>
+                                {% end %}
+                              {% else %}
+                              <a href="#" class="btn btn-primary btn-xs" data-id="{{ order['_id'] }}" data-toggle="modal" data-target=".bs-example-modal-sm" id="dis-btn"><i class="fa fa-pencil"></i> 分配 </a><br/>
+                            {% end %}
+
                           <a href="#" class="btn btn-primary btn-xs" data-id="{{ order['_id'] }}" id="refund-btn"><i class="fa fa-pencil"></i> 退款 </a>
                           {% end %}
                         </td>
@@ -398,7 +409,7 @@
     $('#dis-btn').on('click',function(){
       var _id = $(this).attr('data-id');
       var self = $(this);
-      console.log(_id);
+      // console.log(_id);
       $('#dis-save-btn').on('click',function(){
         var distributor_id = $('#dis-list option:checked').val();
         var distributor_name = $('#dis-list option:checked').text();
@@ -415,7 +426,8 @@
           success: function(data, status, xhr) {
             console.log(data);
               if(data.err_code == 200){
-                self.parent().prev().children(".dis-status").removeClass('btn-danger').addClass('btn-success').text('已分配');
+                self.attr({'id':'delivery-btn'}).html('<i class="fa fa-pencil"></i> 发货 ');
+                self.parent().prev().children(".delive-status").removeClass('btn-danger').addClass('btn-warning').text('未发货');
                 self.parent().next().text(distributor_name);
               }
           }
@@ -428,19 +440,40 @@
       var _id = $(this).attr('data-id');
       var _this = $(this);
       $.confirm("确定已经发货?",function(){
-        var data = {'delivered_status':1}
-        var _json = JSON.stringify(data);
         $.ajax({
           type: "POST",
           url: "{{ API_DOMAIN }}/api/orders/"+_id+"/delivered",
           headers: {"Authorization": "Bearer {{ access_token }}"},
           dataType: "json",
-          data:_json,
           contentType: 'application/json',
           success: function(data, status, xhr) {
             console.log(data);
               if(data.err_code == 200){
-                _this.parent().prev().children(".delive-status").removeClass('btn-danger').addClass('btn-success').text('已发货');
+                _this.attr({'id':'finish-btn'}).html('<i class="fa fa-pencil"></i> 签收 ');
+                _this.parent().prev().children(".delive-status").removeClass('btn-warning').addClass('btn-info').text('未签收');
+              }
+          }
+        })
+      },function(){
+        //cancle
+      })
+    });
+
+    $('#finish-btn').on('click',function(){
+      var _id = $(this).attr('data-id');
+      var _this = $(this);
+      $.confirm("确定已经签收?",function(){
+        $.ajax({
+          type: "POST",
+          url: "{{ API_DOMAIN }}/api/orders/"+_id+"/signed-receipt",
+          headers: {"Authorization": "Bearer {{ access_token }}"},
+          dataType: "json",
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+            console.log(data);
+              if(data.err_code == 200){
+                _this.parent().prev().children(".delive-status").removeClass('btn-info').addClass('btn-primary').text('已签收');
+                _this.remove();
               }
           }
         })

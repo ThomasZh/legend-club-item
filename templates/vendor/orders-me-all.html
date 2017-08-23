@@ -146,11 +146,13 @@
                     </div>
                   </div>
                   <div class="col-md-12 col-sm-12 col-xs-12" style="margin-top: 1rem;">
-                    <label class="control-label col-md-1 col-sm-3 col-xs-12">是否分配:</label>
+                    <label class="control-label col-md-1 col-sm-3 col-xs-12">订单状态:</label>
                     <div class="col-md-6 xdisplay_inputx form-group has-feedback" id="check_status">
                       <label class="z-right"><input type="radio" class="flat" checked="checked" name="check-status" value="all"> 全部</label>
-                      <label class="z-right"><input type="radio" class="flat" name="check-status" value="1"> 是</label>
-                      <label class="z-right"><input type="radio" class="flat" name="check-status" value="0"> 否</label>
+                      <label class="z-right"><input type="radio" class="flat" name="check-status" value="200"> 未分配</label>
+                      <label class="z-right"><input type="radio" class="flat" name="check-status" value="300"> 未发货</label>
+                      <label class="z-right"><input type="radio" class="flat" name="check-status" value="400"> 未签收</label>
+                      <label class="z-right"><input type="radio" class="flat" name="check-status" value="500"> 已签收</label>
                       <button type="button" class="btn btn-info" id="order-search" style="padding:3px 10px; margin-bottom:0;">查询</button>
                     </div>
 
@@ -301,7 +303,7 @@
       function gotoPage(pageNum,distributor_id,check_status,pay_status,begin_time,end_time) {
         $.ajax({
           type: "GET",
-          url: "{{API_DOMAIN}}/api/orders?club_id={{vendor_id}}&order_type=buy_item&distributor_id="+distributor_id+"&check_status="+check_status+"&pay_status="+pay_status+"&begin_time="+begin_time+"&end_time="+end_time+"&page="+pageNum+"&limit="+limit,
+          url: "{{API_DOMAIN}}/api/orders?club_id={{vendor_id}}&order_type=buy_item&distributor_id="+distributor_id+"&_status="+check_status+"&pay_status="+pay_status+"&begin_time="+begin_time+"&end_time="+end_time+"&page="+pageNum+"&limit="+limit,
           headers: {"Authorization": "Bearer {{ access_token }}"},
           dataType: "json",
           contentType: 'application/json',
@@ -361,18 +363,26 @@
                   inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a><br/>';
                 else if (pageData[i].pay_status == 31)
                   inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a><br/>';
-                else if (pageData[i].pay_status == 30)
+                else if (pageData[i].pay_status == 30){
                   inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a><br/>';
 
-                if (pageData[i].check_status == '0')
-                  inner_html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未分配 </a><br/>';
-                else
-                  inner_html += '<a href="#" class="btn btn-success btn-xs dis-status"> 已分配 </a><br/>';
+                  if (pageData[i]._status == 0 || pageData[i]._status == 200){
+                    inner_html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未分配 </a><br/>';
+                  }
+                  else if (pageData[i]._status == 300){
+                    inner_html += '<a href="#" class="btn btn-warning btn-xs dis-status"> 未发货 </a><br/>';
+                  }
+                  else if (pageData[i]._status == 400){
+                    inner_html += '<a href="#" class="btn btn-info btn-xs dis-status"> 未签收 </a><br/>';
+                  }
+                  else if (pageData[i]._status == 500){
+                    inner_html += '<a href="#" class="btn btn-primary btn-xs dis-status"> 已签收 </a><br/>';
+                  }
+                  else{
+                    inner_html += '<a href="#" class="btn btn-success btn-xs dis-status"> '+pageData[i]._status+' </a><br/>';
+                  }
+                }
 
-                if (pageData[i].delivered_status == '0')
-                  inner_html += '<a href="#" class="btn btn-danger btn-xs delive-status"> 未发货 </a><br/>';
-                else
-                  inner_html += '<a href="#" class="btn btn-success btn-xs delive-status"> 已发货 </a><br/>';
 
                 if (pageData[i].refund_amount > 0)
                   inner_html += '<a href="#" class="btn btn-success btn-xs refund-status"> 已退款 </a><br/>';
@@ -381,8 +391,15 @@
                 inner_html += '<td class="">';
                 inner_html += '<a href="/vendors/{{ vendor_id }}/orders/'+pageData[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a><br/>';
                 if (pageData[i].pay_status == 30){
-                  inner_html += '<a href="javascript:;" data-id="'+pageData[i]._id+'" class="btn btn-primary btn-xs dis-btn" data-toggle="modal" data-target=".bs-example-modal-sm"><i class="fa fa-pencil"></i> 分配 </a></a><br/>';
-                  inner_html += '<a href="javascript:;" data-id="'+pageData[i]._id+'" class="btn btn-primary btn-xs delivery-btn"><i class="fa fa-pencil"></i> 发货 </a><br/>';
+                  if(pageData[i]._status == 0 || pageData[i]._status == 200){
+                    inner_html += '<a href="javascript:;" data-id="'+pageData[i]._id+'" class="btn btn-primary btn-xs dis-btn" data-toggle="modal" data-target=".bs-example-modal-sm"><i class="fa fa-pencil"></i> 分配 </a></a><br/>';
+                  }
+                  else if(pageData[i]._status == 300){
+                    inner_html += '<a href="javascript:;" data-id="'+pageData[i]._id+'" class="btn btn-primary btn-xs delivery-btn"><i class="fa fa-pencil"></i> 发货 </a><br/>';
+                  }
+                  else if(pageData[i]._status == 400){
+                    inner_html += '<a href="javascript:;" data-id="'+pageData[i]._id+'" class="btn btn-primary btn-xs finish-btn"><i class="fa fa-pencil"></i> 签收 </a><br/>';
+                  }
                   inner_html += '<a href="javascript:;" data-id="'+pageData[i]._id+'" class="btn btn-primary btn-xs refund-btn"><i class="fa fa-pencil"></i> 退款 </a>';
                 }
                 inner_html += '</td>';
@@ -468,23 +485,77 @@
           or_id = $(this).attr('data-id');
           // console.log(or_id);
           self = $(this);
+      }).on('click','#dis-save-btn',function(){
+        // console.log(or_id);
+        var distributor_id = $('#dis-list option:checked').val();
+        var distributor_name = $('#dis-list option:checked').text();
+        var data = {'distributor_id':distributor_id}
+        var _json = JSON.stringify(data);
+        // console.log(_json);
+        $.ajax({
+          type: "POST",
+          url: "{{ API_DOMAIN }}/api/orders/"+or_id+"/distributor",
+          headers: {"Authorization": "Bearer {{ access_token }}"},
+          dataType: "json",
+          data:_json,
+          contentType: 'application/json',
+          success: function(data, status, xhr) {
+            // console.log(data);
+              if(data.err_code == 200){
+                $.ajax({
+                  type: "PUT",
+                  url: "{{ API_DOMAIN }}/api/counters/{{ vendor_id }}/parameters/item_order/decrease",
+                  headers: {"Authorization": "Bearer {{ access_token }}"},
+                  dataType: "json",
+                  contentType: 'application/json',
+                  success: function(data, status, xhr) {
+                    // console.log(data);
+                  }
+                });
+                self.removeAttr("data-toggle").removeClass('dis-btn').addClass('delivery-btn').html('<i class="fa fa-pencil"></i> 发货 ');
+                self.parent().prev().children(".dis-status").removeClass('btn-danger').addClass('btn-warning').text('未发货');
+                self.parent().next().text(distributor_name);
+              }
+          }
+        })
       }).on('click','.delivery-btn',function(){
         var _id = $(this).attr('data-id');
         var _this = $(this);
         $.confirm("确定已经发货?",function(){
-          var data = {'delivered_status':1}
-          var _json = JSON.stringify(data);
           $.ajax({
             type: "POST",
             url: "{{ API_DOMAIN }}/api/orders/"+_id+"/delivered",
             headers: {"Authorization": "Bearer {{ access_token }}"},
             dataType: "json",
-            data:_json,
+            contentType: 'application/json',
+            success: function(data, status, xhr) {
+              console.log(data);
+                if(data.err_code == 200){
+                  _this.removeClass('delivery-btn').addClass('finish-btn').html('<i class="fa fa-pencil"></i> 签收 ');
+                  _this.parent().prev().children(".dis-status").removeClass('btn-warning').addClass('btn-info').text('未签收');
+                }
+            }
+          })
+        },function(){
+          //cancle
+        })
+      }).on('click','.finish-btn',function(){
+        var _id = $(this).attr('data-id');
+        var _this = $(this);
+        $.confirm("确定已经签收?",function(){
+          // var data = {'_status':500}
+          // var _json = JSON.stringify(data);
+          $.ajax({
+            type: "POST",
+            url: "{{ API_DOMAIN }}/api/orders/"+_id+"/signed-receipt",
+            headers: {"Authorization": "Bearer {{ access_token }}"},
+            dataType: "json",
             contentType: 'application/json',
             success: function(data, status, xhr) {
               // console.log(data);
                 if(data.err_code == 200){
-                  _this.parent().prev().children(".delive-status").removeClass('btn-danger').addClass('btn-success').text('已发货');
+                  _this.parent().prev().children(".dis-status").removeClass('btn-danger btn-info').addClass('btn-primary btn-success').text('已签收');
+                  _this.remove();
                 }
             }
           })
@@ -518,40 +589,7 @@
         })
       });
 
-      $('#dis-save-btn').on('click',function(){
-        // console.log(or_id);
-        var distributor_id = $('#dis-list option:checked').val();
-        var distributor_name = $('#dis-list option:checked').text();
-        var data = {'distributor_id':distributor_id}
-        var _json = JSON.stringify(data);
-        // console.log(_json);
-        $.ajax({
-          type: "POST",
-          url: "{{ API_DOMAIN }}/api/orders/"+or_id+"/distributor",
-          headers: {"Authorization": "Bearer {{ access_token }}"},
-          dataType: "json",
-          data:_json,
-          contentType: 'application/json',
-          success: function(data, status, xhr) {
-            // console.log(data);
-              if(data.err_code == 200){
-                $.ajax({
-                  type: "PUT",
-                  url: "{{ API_DOMAIN }}/api/counters/{{ vendor_id }}/parameters/item_order/decrease",
-                  headers: {"Authorization": "Bearer {{ access_token }}"},
-                  dataType: "json",
-                  contentType: 'application/json',
-                  success: function(data, status, xhr) {
-                    // console.log(data);
-                  }
-                })
-
-                self.parent().prev().children(".dis-status").removeClass('btn-danger').addClass('btn-success').text('已分配');
-                self.parent().next().text(distributor_name);
-              }
-          }
-        })
-    });   // 分配发货操作结束
+      // 分配发货操作结束
 
       // 导出报表
       $(document).on('click','#createExcel',function(){ // This event fires when a button is clicked
