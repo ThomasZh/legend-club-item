@@ -664,20 +664,20 @@
                 _html += '<a href="/vendors/{{ vendor_id }}/customers/'+pageData[i].account_id+'">'+pageData[i].nickname+'</a>';
                 _html += '<br />';
                 _html += '</td>';
-                _html += '<td class=" ">'+parseFloat(pageData[i].actual_payment).toFixed(2)+'元<br /></td>';
+                _html += '<td class=" ">'+parseFloat(pageData[i].actual_payment /100).toFixed(2)+'元<br /></td>';
                 if (pageData[i].pay_status == 30){
-                  _html += '<td>'+parseFloat(pageData[i].actual_payment).toFixed(2)+'元</td>';
+                  _html += '<td>'+parseFloat(pageData[i].actual_payment/100).toFixed(2)+'元</td>';
                 }else{
                   _html += '<td>--</td>';
                 }
                 _html += '<td class="refund-amount-td">';
                 if (pageData[i].refund_amount > 0){
-                  _html += parseFloat(pageData[i].refund_amount/100).toFixed(2)+'元';
+                  _html += (parseFloat(pageData[i].refund_amount)/100).toFixed(2)+'元';
                 }else{
                   _html += '--';
                 }
                 _html += '</td>';
-                _html += '<td class=" ">'+pageData[i].create_time+'</td>';
+                _html += '<td class=" ">'+getLocalTime(pageData[i].create_time)+'</td>';
                 _html += '<td class=" ">'
                     if(pageData[i].billing_required == '1'){
                       _html += '是'
@@ -692,18 +692,26 @@
                   _html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a><br/>';
                 else if (pageData[i].pay_status == 31)
                   _html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a><br/>';
-                else if (pageData[i].pay_status == 30)
+                else if (pageData[i].pay_status == 30){
                   _html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a><br/>';
 
-                if (pageData[i].check_status == '0')
-                  _html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未分配 </a><br/>';
-                else
-                  _html += '<a href="#" class="btn btn-success btn-xs dis-status"> 已分配 </a><br/>';
+                  if (pageData[i]._status == 0 || pageData[i]._status == 200){
+                    _html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未分配 </a><br/>';
+                  }
+                  else if (pageData[i]._status == 300){
+                    _html += '<a href="#" class="btn btn-warning btn-xs dis-status"> 未发货 </a><br/>';
+                  }
+                  else if (pageData[i]._status == 400){
+                    _html += '<a href="#" class="btn btn-info btn-xs dis-status"> 未签收 </a><br/>';
+                  }
+                  else if (pageData[i]._status == 500){
+                    _html += '<a href="#" class="btn btn-primary btn-xs dis-status"> 已签收 </a><br/>';
+                  }
+                  else{
+                    _html += '<a href="#" class="btn btn-success btn-xs dis-status"> '+pageData[i]._status+' </a><br/>';
+                  }
+                }
 
-                if (pageData[i].delivered_status == '0')
-                  _html += '<a href="#" class="btn btn-danger btn-xs delive-status"> 未发货 </a><br/>';
-                else
-                  _html += '<a href="#" class="btn btn-success btn-xs delive-status"> 已发货 </a><br/>';
 
                 if (pageData[i].refund_amount > 0)
                   _html += '<a href="#" class="btn btn-success btn-xs refund-status"> 已退款 </a><br/>';
@@ -712,8 +720,15 @@
                 _html += '<td class="">';
                 _html += '<a href="/vendors/{{ vendor_id }}/orders/'+pageData[i]._id+'" class="btn btn-info btn-xs"><i class="fa fa-eye"></i> 查看详情 </a><br/>';
                 if (pageData[i].pay_status == 30){
-                  _html += '<a href="javascript:;" data-id="'+pageData[i]._id+'" class="btn btn-primary btn-xs dis-btn" data-toggle="modal" data-target=".bs-example-modal-sm"><i class="fa fa-pencil"></i> 分配 </a></a><br/>';
-                  _html += '<a href="javascript:;" data-id="'+pageData[i]._id+'" class="btn btn-primary btn-xs delivery-btn"><i class="fa fa-pencil"></i> 发货 </a><br/>';
+                  if(pageData[i]._status == 0 || pageData[i]._status == 200){
+                    _html += '<a href="javascript:;" data-id="'+pageData[i]._id+'" class="btn btn-primary btn-xs dis-btn" data-toggle="modal" data-target=".bs-example-modal-sm"><i class="fa fa-pencil"></i> 分配 </a></a><br/>';
+                  }
+                  else if(pageData[i]._status == 300){
+                    _html += '<a href="javascript:;" data-id="'+pageData[i]._id+'" class="btn btn-primary btn-xs delivery-btn"><i class="fa fa-pencil"></i> 发货 </a><br/>';
+                  }
+                  else if(pageData[i]._status == 400){
+                    _html += '<a href="javascript:;" data-id="'+pageData[i]._id+'" class="btn btn-primary btn-xs finish-btn"><i class="fa fa-pencil"></i> 签收 </a><br/>';
+                  }
                   _html += '<a href="javascript:;" data-id="'+pageData[i]._id+'" class="btn btn-primary btn-xs refund-btn"><i class="fa fa-pencil"></i> 退款 </a>';
                 }
                 _html += '</td>';
