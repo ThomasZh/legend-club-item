@@ -251,9 +251,9 @@ class ApiActivityExportXHR(AuthorizationHandler):
 
         check_status = self.get_argument("check_status","")
         logging.info("got check_status %r",check_status)
-
-        pay_status = self.get_argument("pay_status","")
-        logging.info("got pay_status %r",pay_status)
+            #
+            # pay_status = self.get_argument("pay_status","")
+            # logging.info("got pay_status %r",pay_status)
 
         pagenum = self.get_argument("pagenum","")
         logging.info("got pagenum %r",pagenum)
@@ -292,7 +292,7 @@ class ApiActivityExportXHR(AuthorizationHandler):
         _table.write(rownum, 8, unicode(u'仓库').encode(_unicode))
 
         # table
-        params = {"club_id":vendor_id, "distributor_id":distributor_id, "check_status":check_status,"pay_status":pay_status, "page":pagenum, "limit":limit, "order_type":"buy_item","begin_time":begin_time, "end_time":end_time}
+        params = {"club_id":vendor_id, "distributor_id":distributor_id, "check_status":check_status,"pay_status":"all", "page":pagenum, "limit":limit, "order_type":"buy_item","begin_time":begin_time, "end_time":end_time}
         url = url_concat(API_DOMAIN + "/api/orders", params)
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
@@ -319,7 +319,7 @@ class ApiActivityExportXHR(AuthorizationHandler):
             if order.has_key('_status'):
                 _status = order['_status']
                 if _status == 0:
-                    _status = u'未分配'
+                    _status = u'未付款'
                 elif _status == 200:
                     _status = u'未分配'
                 elif _status == 300:
@@ -329,14 +329,14 @@ class ApiActivityExportXHR(AuthorizationHandler):
                 elif _status == 500:
                     _status = u'已签收'
 
-            pay_status = ''
-            if order.has_key('pay_status'):
-                pay_status = order['pay_status']
-                if pay_status == 30:
-                    pay_status = u'是'
-                else:
-                    pay_status = u'否'
-                    order['actual_payment'] = '--'
+            # pay_status = ''
+            # if order.has_key('pay_status'):
+            #     pay_status = order['pay_status']
+            #     if pay_status == 30:
+            #         pay_status = u'是'
+            #     else:
+            #         pay_status = u'否'
+            #         order['actual_payment'] = '--'
 
             refund = ''
             if order.has_key('refund_amount'):
@@ -345,7 +345,7 @@ class ApiActivityExportXHR(AuthorizationHandler):
                     refund = u'是'
                 else:
                     refund = u'否'
-            _status = u"是否付款："+pay_status+u"\n订单状态："+_status+u"\n是否退款："+ refund
+            _status = u"\n订单状态："+_status+u"\n是否退款："+ refund
 
             _table.write(rownum, 0, order['trade_no'])
             _table.write(rownum, 1, order['nickname'])

@@ -362,16 +362,10 @@
                     }
                 '</td>';
                 inner_html += '<td class=" ">';
-                if (pageData[i].pay_status <= 20)
-                  inner_html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a><br/>';
-                else if(pageData[i].pay_status == 21)
-                  inner_html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a><br/>';
-                else if (pageData[i].pay_status == 31)
-                  inner_html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a><br/>';
-                else if (pageData[i].pay_status == 30){
-                  inner_html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a><br/>';
-
-                  if (pageData[i]._status == 0 || pageData[i]._status == 200){
+                  if (pageData[i]._status == 0){
+                    inner_html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未付款 </a><br/>';
+                  }
+                  else if (pageData[i]._status == 200){
                     inner_html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未分配 </a><br/>';
                   }
                   else if (pageData[i]._status == 300){
@@ -386,8 +380,6 @@
                   else{
                     inner_html += '<a href="#" class="btn btn-success btn-xs dis-status"> '+pageData[i]._status+' </a><br/>';
                   }
-                }
-
 
                 if (pageData[i].refund_amount > 0)
                   inner_html += '<a href="#" class="btn btn-success btn-xs refund-status"> 已退款 </a><br/>';
@@ -615,7 +607,7 @@
           //  }else{
           //    end_time = 0;
           //  }
-        $.get("/bf/api/vendors/{{ vendor_id }}/items/applys/export?check_status="+check_status+"&pay_status="+pay_status+"&distributor_id="+distributor_id+"&pagenum="+currentPage+"&limit="+limit+"&begin_time="+begin_time+"&end_time="+end_time,function(data,status){
+        $.get("/bf/api/vendors/{{ vendor_id }}/items/applys/export?check_status="+check_status+"&distributor_id="+distributor_id+"&pagenum="+currentPage+"&limit="+limit+"&begin_time="+begin_time+"&end_time="+end_time,function(data,status){
           var ajaxobj = JSON.parse(data);
           $("#downloadExcel").attr("href", ajaxobj).attr("disabled",false);
         });
@@ -691,16 +683,10 @@
                     }
                 '</td>';
                 _html += '<td class=" ">';
-                if (pageData[i].pay_status <= 20)
-                  _html += '<a href="#" class="btn btn-warning btn-xs"> 待付款 </a><br/>';
-                else if(pageData[i].pay_status == 21)
-                  _html += '<a href="#" class="btn btn-danger btn-xs"> 下单失败 </a><br/>';
-                else if (pageData[i].pay_status == 31)
-                  _html += '<a href="#" class="btn btn-danger btn-xs"> 支付失败 </a><br/>';
-                else if (pageData[i].pay_status == 30){
-                  _html += '<a href="#" class="btn btn-success btn-xs"> 支付成功 </a><br/>';
-
-                  if (pageData[i]._status == 0 || pageData[i]._status == 200){
+                  if (pageData[i]._status == 0){
+                    _html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未付款 </a><br/>';
+                  }
+                  else if (pageData[i]._status == 200){
                     _html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未分配 </a><br/>';
                   }
                   else if (pageData[i]._status == 300){
@@ -715,8 +701,6 @@
                   else{
                     _html += '<a href="#" class="btn btn-success btn-xs dis-status"> '+pageData[i]._status+' </a><br/>';
                   }
-                }
-
 
                 if (pageData[i].refund_amount > 0)
                   _html += '<a href="#" class="btn btn-success btn-xs refund-status"> 已退款 </a><br/>';

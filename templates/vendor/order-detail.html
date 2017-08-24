@@ -148,17 +148,10 @@
                           {% end %}
                         </td>
                         <td>
-                          {% if order['pay_status'] == 20 %}
-                              <a href="#" class="btn btn-warning btn-xs"> 待付款 </a><br/>
-                            {% elif order['pay_status'] == 21 %}
-                              <a href="#" class="btn btn-danger btn-xs"> 下单失败 </a><br/>
-                            {% elif order['pay_status'] == 31 %}
-                              <a href="#" class="btn btn-danger btn-xs"> 支付失败 </a><br/>
-                            {% elif order['pay_status'] == 30 %}
-                              <a href="#" class="btn btn-success btn-xs"> 支付成功 </a><br/>
-
-                              {% if order.has_key('_status') %}
-                                  {% if order['_status'] == 0 or order['_status'] == 200 %}
+                          {% if order.has_key('_status') %}
+                              {% if order['_status'] == 0 %}
+                                  <a href="#" class="btn btn-danger btn-xs delive-status"> 未付款 </a><br/>
+                                  {% elif order['_status'] == 200 %}
                                   <a href="#" class="btn btn-danger btn-xs delive-status"> 未分配 </a><br/>
                                   {% elif order['_status'] == 300 %}
                                   <a href="#" class="btn btn-warning btn-xs delive-status"> 未发货 </a><br/>
@@ -166,20 +159,16 @@
                                   <a href="#" class="btn btn-info btn-xs delive-status"> 未签收 </a><br/>
                                   {% elif order['_status'] == 500 %}
                                   <a href="#" class="btn btn-primary btn-xs delive-status"> 已签收 </a><br/>
-                                  {% end %}
-                                {% else %}
-                                <a href="#" class="btn btn-danger btn-xs delive-status"> 未分配 </a><br/>
                               {% end %}
-
-                            {% else %}
-                              <a href="#" class="btn btn-success btn-xs"> {{ order['pay_status'] }} </a><br/>
+                          {% else %}
+                              <a href="#" class="btn btn-danger btn-xs delive-status"> 未分配 </a><br/>
                           {% end %}
 
-                        {% if order.has_key('refund_amount') %}
-                          {% if order['refund_amount'] > 0 %}
-                          <a href="#" class="btn btn-success btn-xs refund-status"> 已退款 </a><br/>
+                          {% if order.has_key('refund_amount') %}
+                            {% if order['refund_amount'] > 0 %}
+                            <a href="#" class="btn btn-success btn-xs refund-status"> 已退款 </a><br/>
+                            {% end %}
                           {% end %}
-                        {% end %}
                         </td>
                         <td>
                           {% if order['pay_status'] == 30 %}
