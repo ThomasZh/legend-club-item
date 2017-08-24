@@ -152,21 +152,21 @@
                               {% if order['_status'] == 0 %}
                                   <a href="#" class="btn btn-danger btn-xs delive-status"> 未付款 </a><br/>
                                   {% elif order['_status'] == 200 %}
-                                  <a href="#" class="btn btn-danger btn-xs delive-status"> 未分配 </a><br/>
+                                  <a href="#" class="btn btn-warning btn-xs delive-status"> 未分配 </a><br/>
                                   {% elif order['_status'] == 300 %}
-                                  <a href="#" class="btn btn-warning btn-xs delive-status"> 未发货 </a><br/>
+                                  <a href="#" class="btn btn-info btn-xs delive-status"> 未发货 </a><br/>
                                   {% elif order['_status'] == 400 %}
-                                  <a href="#" class="btn btn-info btn-xs delive-status"> 未签收 </a><br/>
+                                  <a href="#" class="btn btn-primary btn-xs delive-status"> 未签收 </a><br/>
                                   {% elif order['_status'] == 500 %}
-                                  <a href="#" class="btn btn-primary btn-xs delive-status"> 已签收 </a><br/>
+                                  <a href="#" class="btn btn-success btn-xs delive-status"> 已签收 </a><br/>
                               {% end %}
                           {% else %}
-                              <a href="#" class="btn btn-danger btn-xs delive-status"> 未分配 </a><br/>
+                              <a href="#" class="btn btn-danger btn-xs delive-status"> 未付款 </a><br/>
                           {% end %}
 
                           {% if order.has_key('refund_amount') %}
                             {% if order['refund_amount'] > 0 %}
-                            <a href="#" class="btn btn-success btn-xs refund-status"> 已退款 </a><br/>
+                            <a href="#" class="btn btn-danger btn-xs refund-status"> 已退款 </a><br/>
                             {% end %}
                           {% end %}
                         </td>
@@ -416,7 +416,7 @@
             console.log(data);
               if(data.err_code == 200){
                 self.attr({'id':'delivery-btn'}).html('<i class="fa fa-pencil"></i> 发货 ');
-                self.parent().prev().children(".delive-status").removeClass('btn-danger').addClass('btn-warning').text('未发货');
+                self.parent().prev().children(".delive-status").removeClass('btn-warning').addClass('btn-info').text('未发货');
                 self.parent().next().text(distributor_name);
               }
           }
@@ -439,7 +439,7 @@
             console.log(data);
               if(data.err_code == 200){
                 _this.attr({'id':'finish-btn'}).html('<i class="fa fa-pencil"></i> 签收 ');
-                _this.parent().prev().children(".delive-status").removeClass('btn-warning').addClass('btn-info').text('未签收');
+                _this.parent().prev().children(".delive-status").removeClass('btn-info').addClass('btn-primary').text('未签收');
               }
           }
         })
@@ -461,7 +461,7 @@
           success: function(data, status, xhr) {
             console.log(data);
               if(data.err_code == 200){
-                _this.parent().prev().children(".delive-status").removeClass('btn-info').addClass('btn-primary').text('已签收');
+                _this.parent().prev().children(".delive-status").removeClass('btn-primary').addClass('btn-success').text('已签收');
                 _this.remove();
               }
           }

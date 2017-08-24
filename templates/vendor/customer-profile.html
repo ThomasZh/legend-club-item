@@ -427,23 +427,23 @@
                     inner_html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未付款 </a><br/>';
                   }
                   else if (pageData[i]._status == 200){
-                    inner_html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未分配 </a><br/>';
+                    inner_html += '<a href="#" class="btn btn-warning btn-xs dis-status"> 未分配 </a><br/>';
                   }
                   else if (pageData[i]._status == 300){
-                    inner_html += '<a href="#" class="btn btn-warning btn-xs dis-status"> 未发货 </a><br/>';
+                    inner_html += '<a href="#" class="btn btn-info btn-xs dis-status"> 未发货 </a><br/>';
                   }
                   else if (pageData[i]._status == 400){
-                    inner_html += '<a href="#" class="btn btn-info btn-xs dis-status"> 未签收 </a><br/>';
+                    inner_html += '<a href="#" class="btn btn-primary btn-xs dis-status"> 未签收 </a><br/>';
                   }
                   else if (pageData[i]._status == 500){
-                    inner_html += '<a href="#" class="btn btn-primary btn-xs dis-status"> 已签收 </a><br/>';
+                    inner_html += '<a href="#" class="btn btn-success btn-xs dis-status"> 已签收 </a><br/>';
                   }
                   else{
-                    inner_html += '<a href="#" class="btn btn-success btn-xs dis-status"> '+pageData[i]._status+' </a><br/>';
+                    inner_html += '<a href="#" class="btn btn-danger btn-xs dis-status"> '+pageData[i]._status+' </a><br/>';
                   }
 
                 if (pageData[i].refund_amount > 0)
-                  inner_html += '<a href="#" class="btn btn-success btn-xs refund-status"> 已退款 </a><br/>';
+                  inner_html += '<a href="#" class="btn btn-danger btn-xs refund-status"> 已退款 </a><br/>';
 
                 inner_html += '</td>';
                 inner_html += '<td class="">';

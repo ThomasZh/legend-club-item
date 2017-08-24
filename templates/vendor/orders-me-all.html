@@ -366,23 +366,23 @@
                     inner_html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未付款 </a><br/>';
                   }
                   else if (pageData[i]._status == 200){
-                    inner_html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未分配 </a><br/>';
+                    inner_html += '<a href="#" class="btn btn-warning btn-xs dis-status"> 未分配 </a><br/>';
                   }
                   else if (pageData[i]._status == 300){
-                    inner_html += '<a href="#" class="btn btn-warning btn-xs dis-status"> 未发货 </a><br/>';
+                    inner_html += '<a href="#" class="btn btn-info btn-xs dis-status"> 未发货 </a><br/>';
                   }
                   else if (pageData[i]._status == 400){
-                    inner_html += '<a href="#" class="btn btn-info btn-xs dis-status"> 未签收 </a><br/>';
+                    inner_html += '<a href="#" class="btn btn-primary btn-xs dis-status"> 未签收 </a><br/>';
                   }
                   else if (pageData[i]._status == 500){
-                    inner_html += '<a href="#" class="btn btn-primary btn-xs dis-status"> 已签收 </a><br/>';
+                    inner_html += '<a href="#" class="btn btn-success btn-xs dis-status"> 已签收 </a><br/>';
                   }
                   else{
-                    inner_html += '<a href="#" class="btn btn-success btn-xs dis-status"> '+pageData[i]._status+' </a><br/>';
+                    inner_html += '<a href="#" class="btn btn-danger btn-xs dis-status"> '+pageData[i]._status+' </a><br/>';
                   }
 
                 if (pageData[i].refund_amount > 0)
-                  inner_html += '<a href="#" class="btn btn-success btn-xs refund-status"> 已退款 </a><br/>';
+                  inner_html += '<a href="#" class="btn btn-danger btn-xs refund-status"> 已退款 </a><br/>';
 
                 inner_html += '</td>';
                 inner_html += '<td class="">';
@@ -510,7 +510,7 @@
                   }
                 });
                 self.removeAttr("data-toggle").removeClass('dis-btn').addClass('delivery-btn').html('<i class="fa fa-pencil"></i> 发货 ');
-                self.parent().prev().children(".dis-status").removeClass('btn-danger').addClass('btn-warning').text('未发货');
+                self.parent().prev().children(".dis-status").removeClass('btn-warning').addClass('btn-info').text('未发货');
                 self.parent().next().text(distributor_name);
               }
           }
@@ -529,7 +529,7 @@
               console.log(data);
                 if(data.err_code == 200){
                   _this.removeClass('delivery-btn').addClass('finish-btn').html('<i class="fa fa-pencil"></i> 签收 ');
-                  _this.parent().prev().children(".dis-status").removeClass('btn-warning').addClass('btn-info').text('未签收');
+                  _this.parent().prev().children(".dis-status").removeClass('btn-info').addClass('btn-primary').text('未签收');
                 }
             }
           })
@@ -551,7 +551,7 @@
             success: function(data, status, xhr) {
               // console.log(data);
                 if(data.err_code == 200){
-                  _this.parent().prev().children(".dis-status").removeClass('btn-danger btn-info').addClass('btn-primary btn-success').text('已签收');
+                  _this.parent().prev().children(".dis-status").removeClass('btn-primary').addClass('btn-success').text('已签收');
                   _this.remove();
                 }
             }
@@ -687,23 +687,23 @@
                     _html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未付款 </a><br/>';
                   }
                   else if (pageData[i]._status == 200){
-                    _html += '<a href="#" class="btn btn-danger btn-xs dis-status"> 未分配 </a><br/>';
+                    _html += '<a href="#" class="btn btn-warning btn-xs dis-status"> 未分配 </a><br/>';
                   }
                   else if (pageData[i]._status == 300){
-                    _html += '<a href="#" class="btn btn-warning btn-xs dis-status"> 未发货 </a><br/>';
+                    _html += '<a href="#" class="btn btn-info btn-xs dis-status"> 未发货 </a><br/>';
                   }
                   else if (pageData[i]._status == 400){
-                    _html += '<a href="#" class="btn btn-info btn-xs dis-status"> 未签收 </a><br/>';
+                    _html += '<a href="#" class="btn btn-primary btn-xs dis-status"> 未签收 </a><br/>';
                   }
                   else if (pageData[i]._status == 500){
-                    _html += '<a href="#" class="btn btn-primary btn-xs dis-status"> 已签收 </a><br/>';
+                    _html += '<a href="#" class="btn btn-success btn-xs dis-status"> 已签收 </a><br/>';
                   }
                   else{
-                    _html += '<a href="#" class="btn btn-success btn-xs dis-status"> '+pageData[i]._status+' </a><br/>';
+                    _html += '<a href="#" class="btn btn-danger btn-xs dis-status"> '+pageData[i]._status+' </a><br/>';
                   }
 
                 if (pageData[i].refund_amount > 0)
-                  _html += '<a href="#" class="btn btn-success btn-xs refund-status"> 已退款 </a><br/>';
+                  _html += '<a href="#" class="btn btn-danger btn-xs refund-status"> 已退款 </a><br/>';
 
                 _html += '</td>';
                 _html += '<td class="">';
