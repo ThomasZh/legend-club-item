@@ -205,13 +205,13 @@
           function getProdJson(){
             var two_id = $("#s-category option:selected").val();
             console.log(two_id);
-            var data =  {'page':1,'limit':1000}
-            var _json = JSON.stringify(data);
+            // var data =  {'page':1,'limit':1000}
+            // var _json = JSON.stringify(data);
             $.ajax({
               type: "GET",
-              url: "{{ API_DOMAIN }}/api/def/categories/"+ two_id +"/items",
+              url: "{{ API_DOMAIN }}/api/def/categories/"+ two_id +"/items?page=1&limit=1000",
               dataType: "json",
-              data:_json,
+              // data:_json,
               headers: {"Authorization":"Bearer {{access_token}}"},
               contentType: 'application/json',
               success: function(data, status, xhr) {
