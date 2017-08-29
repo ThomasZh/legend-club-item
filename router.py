@@ -128,6 +128,12 @@ def map():
         # 我分销某人的订单
         (r"/vendors/([a-z0-9]*)/orders-other-me", getattr(vendor_order, 'VendorOrdersOtherMeHandler')),
 
+
+        # 优惠券
+        (r"/vendors/([a-z0-9]*)/coupons", getattr(vendor_order, 'VendorOrdersCouponsHandler')),
+        # 创建优惠券
+        (r'/vendors/([a-z0-9]*)/coupons/create', getattr(vendor_order, 'VendorCouponsCreateHandler')),
+
         # order
         (r"/vendors/([a-z0-9]*)/orders/([a-z0-9]*)", getattr(vendor_order, 'VendorOrderInfoHandler')),
         (r"/vendors/([a-z0-9]*)/applys", getattr(vendor_order, 'VendorApplyListHandler')),

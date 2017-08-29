@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>{{ ops['club_name'] }} - 创建分类</title>
+  <title>{{ ops['club_name'] }} - 生成优惠券</title>
 
   <!-- Bootstrap core CSS -->
   <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
@@ -18,6 +18,7 @@
   <!-- Custom styling plus plugins -->
   <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/datatables/tools/css/dataTables.tableTools.css') }}" rel="stylesheet">
   <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
 </head>
 
@@ -60,17 +61,17 @@
         <div class="">
           <div class="page-title">
             <div class="title_left">
-              <h3>商品 <small> 创建分类</small></h3>
+              <h3> <small> 生成优惠券</small></h3>
             </div>
           </div>
           <div class="clearfix"></div>
 
           <div class="row">
 
-            <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="col-md-8 col-sm-8 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>商品分类信息 <small>*为必填项</small></h2>
+                  <h2>优惠券信息 <small>*为必填项</small></h2>
                   <ul class="nav navbar-right panel_toolbox">
                     <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
                     </li>
@@ -82,21 +83,41 @@
                 <div class="x_content">
                   <br />
                   <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
-                    action="/vendors/{{ vendor_id }}/categorys/create" method="POST">
+                    action="/vendors/{{ vendor_id }}/coupons/create" method="POST">
   					        {% raw xsrf_form_html() %}
-
                     <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">分类名称 <span class="required">*</span>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">优惠券批次 <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="text" id="title" name="title" required="required" class="form-control col-md-7 col-xs-12">
+                        <input type="text" id="coupon-seq" name="coupon-seq" required="required" class="form-control col-md-7 col-xs-12">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">优惠券金额 <span class="required">*</span>
+                      </label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input type="text" id="coupon-fee" name="coupon-fee" required="required" class="form-control col-md-7 col-xs-12">
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">优惠券有效期 <span class="required">*</span>
+                      </label>
+                      <div class="col-md-3 xdisplay_inputx form-group has-feedback">
+                        <input type="text" name="coupon-time" class="form-control has-feedback-left" id="single_cal1" placeholder="有效时间">
+                        <span class="fa fa-calendar-o form-control-feedback left" aria-hidden="true"></span>
+                      </div>
+                    </div>
+                    <div class="item form-group">
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">优惠券个数 <span class="required">*</span>
+                      </label>
+                      <div class="col-md-6 col-sm-6 col-xs-12">
+                        <input type="text" id="coupon-num" name="coupon-num" required="required" class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
                     <div class="ln_solid"></div>
                     <div class="form-group">
                       <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                        <button type="button" class="btn btn-primary" onclick="history.go(-1);">重置</button>
-                        <button type="submit" class="btn btn-success">创建</button>
+                        <button type="submit" class="btn btn-success">生成</button>
                       </div>
                     </div>
                   </form>
@@ -125,6 +146,33 @@
   <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
   <!-- form validation -->
   <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+  <!-- daterangepicker -->
+  <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
+  <script type="text/javascript">
+  $(function(){
+    // 初始化日历插件
+    $('#single_cal1').daterangepicker({
+        "singleDatePicker": true,
+        "linkedCalendars": false,
+        "autoUpdateInput": false,
+        "showCustomRangeLabel": false,
+        "locale": {
+         applyLabel: '确定',
+         cancelLabel: '取消',
+         fromLabel: '起始时间',
+         toLabel: '结束时间',
+         customRangeLabel: '自定义',
+         daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+         monthNames: ['一月', '二月', '三月', '四月', '五月', '六月',
+             '七月', '八月', '九月', '十月', '十一月', '十二月'],
+         firstDay: 1
+       }
+    }, function(start, end, label) {
+      // console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
+    });
+  });
+  </script>
 </body>
 
 </html>

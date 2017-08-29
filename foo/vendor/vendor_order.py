@@ -292,3 +292,78 @@ class VendorOrderInfoHandler(AuthorizationHandler):
                 order=order,
                 applies=applies,
                 distributors=distributors)
+
+# 优惠券
+class VendorOrdersCouponsHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
+
+        # params = {"page":1,"limit":200}
+        # url = url_concat(API_DOMAIN + "/api/coupons",params)
+        # http_client = HTTPClient()
+        # headers = {"Authorization":"Bearer " + access_token}
+        # response = http_client.fetch(url, method="GET", headers=headers)
+        # logging.info("got response.body %r", response.body)
+        # data = json_decode(response.body)
+        # coupons = data['rs']
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/order-coupon.html',
+                vendor_id=vendor_id,
+                access_token=access_token,
+                API_DOMAIN=API_DOMAIN,
+                LEAGUE_ID=LEAGUE_ID,
+                ops=ops,
+                counter=counter)
+
+
+# 生成优惠券
+class VendorCouponsCreateHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/create-coupons.html',
+                vendor_id=vendor_id,
+                ops=ops,
+                counter=counter)
+
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def post(self,vendor_id):
+        logging.info("GET vendor_id %r", vendor_id)
+
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
+
+        ops = self.get_ops_info()
+
+        coupon_seq = self.get_argument("coupon-seq", "")
+        logging.info("got coupon_seq", coupon_seq)
+        coupon_fee = self.get_argument("coupon-fee", "")
+        logging.info("got coupon_fee", coupon_fee)
+        coupon_time = self.get_argument("coupon-time", "")
+        logging.info("got coupon_time", coupon_time)
+        coupon_time = date_timestamp(coupon_time)
+        coupon_num = self.get_argument("coupon-num", "")
+        logging.info("got coupon_num", coupon_num)
+
+        coupons = {'_seq':coupon_seq, 'num':coupon_num, 'amount':coupon_fee, 'expired_at':coupon_time, 'club_id':vendor_id}
+
+        url = API_DOMAIN+"/api/coupons"
+        http_client = HTTPClient()
+        headers={"Authorization":"Bearer "+access_token}
+        _json = json_encode(coupons)
+        logging.info("request %r body %r", url, _json)
+        response = http_client.fetch(url, method="POST", headers=headers, body=_json)
+        logging.info("got response %r", response.body)
+
+        self.redirect('/vendors/' + vendor_id + '/coupons')

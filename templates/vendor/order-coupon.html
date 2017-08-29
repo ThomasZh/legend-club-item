@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <!-- Meta, title, CSS, favicons, etc. -->
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>{{ ops['club_name'] }} | 优惠券</title>
+
+  <!-- Bootstrap core CSS -->
+  <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
+  <link rel="stylesheet" href="{{ static_url('weui/css/jquery-weui.min.css') }}">
+  <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
+  <!-- Custom styling plus plugins -->
+  <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
+  <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
+  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
+</head>
+<body class="nav-md">
+  <div class="container body">
+    <div class="main_container">
+      <div class="col-md-3 left_col">
+        <div class="left_col scroll-view">
+
+          <!-- navigation title -->
+          {% module Template("vendor/nav-title-block.html", ops=ops) %}
+          <!-- /navigation title -->
+          <div class="clearfix"></div>
+
+          <!-- menu prile quick info -->
+          {% module Template("vendor/menu-prile-quick-info-block.html", ops=ops) %}
+          <!-- /menu prile quick info -->
+
+          <br />
+
+          <!-- sidebar menu -->
+          {% module Template("vendor/sidebar-menu-block.html", vendor_id=vendor_id, counter=counter) %}
+          <!-- /sidebar menu -->
+
+        </div>
+      </div>
+
+      <!-- top navigation -->
+      {% module Template("vendor/top-nav-block.html", ops=ops) %}
+      <!-- /top navigation -->
+
+      <!-- page content -->
+      <div class="right_col" role="main">
+        <div class="">
+
+          <div class="page-title">
+            <div class="title_left">
+              <h3>
+                    订单
+                </h3>
+            </div>
+          </div>
+          <div class="clearfix"></div>
+
+          <div class="row">
+
+            <div class="col-md-8 col-sm-8 col-xs-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>优惠券<small>列表</small></h2>
+
+                  <ul class="nav navbar-right panel_toolbox">
+                  	<li><a href="/vendors/{{ vendor_id }}/coupons/create" class="btn btn-success btn-xs">
+                      <i class="fa fa-plus"></i> 生成优惠券 </a>
+                  	</li>
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <table class="table table-striped">
+                    <thead>
+                      <tr>
+                        <th>批次</th>
+                        <th>Code</th>
+                        <th>金额</th>
+                        <th>有效期</th>
+                        <th>状态</th>
+                        <th>订单</th>
+                      </tr>
+                    </thead>
+                    <tbody id="coupon-wrap"></tbody>
+                  </table>
+                  <div class="clearfix"></div>
+                  <div class="col-md-5 col-sm-12 col-xs-12 center-margin">
+                    <button class="btn btn-success" type="button" id="prev">上一页</button>
+                    <span class="pageBox"></span>
+
+                    <button class="btn btn-success" type="button" id="next">下一页</button>
+                    共<span id="total_page" style="padding:0 5px;"></span>页
+
+                  </div>
+                </div> <!-- x_content -->
+              </div> <!-- x_panel -->
+            </div> <!-- column -->
+
+          </div> <!-- row -->
+        </div>
+
+        <!-- footer content -->
+        {% module Template("vendor/footer-block.html",ops=ops) %}
+        <!-- /footer content -->
+
+      </div>
+      <!-- /page content -->
+    </div>
+
+  </div>
+  <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
+  <!-- bootstrap progress js -->
+  <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
+  <!-- icheck -->
+  <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
+  <script src="{{ static_url('admin/js/custom.js') }}"></script>
+  <!-- pace -->
+  <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
+  <!-- form validation -->
+  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+  <script src="{{ static_url('weui/js/jquery-weui.min.js') }}"></script>
+  <script type="text/javascript">
+  $(function(){
+
+    // function getLocalTime(nS) { //时间戳转换
+    //    return new Date(parseInt(nS) * 1000).toLocaleString().replace(/:\d{1,2}$/,' ');
+    // };
+    function formatDate(now) {
+        var d = new Date(now*1000);
+        var year=d.getFullYear();
+        var month=d.getMonth()+1;
+        var date=d.getDate();
+        return year+"-"+month+"-"+date;
+    }
+    // 初始化分类列表
+    var limit = 10;//每页显示数
+    var currentPage = 0;//当前页
+    var total_page = 0;//总页数
+    // var now = new Date().getTime();
+    function getJson(pageNum){
+      $.ajax({
+        type: "GET",
+        url: "{{ API_DOMAIN }}/api/coupons?filter=club&club_id={{ vendor_id }}&page="+ pageNum +"&limit="+limit,
+        dataType: "json",
+        headers: {"Authorization":"Bearer {{access_token}}"},
+        contentType: 'application/json',
+        success: function(data, status, xhr) {
+              console.log(data);
+          if(data.err_code == 200){
+                currentPage = pageNum;
+                total_page = data.rs.total_page;//总页
+            var dataObj = data.rs.data;
+                $("#total_page").html(total_page);
+                $('#coupon-wrap').html("");
+            for (var i=0; i<dataObj.length;i++){
+              var html = '<tr>';
+                  html += '<th scope="row">'+dataObj[i]['_seq']+'</th>';
+                  html +=  '<td>'+dataObj[i]['code']+'</td>';
+                  html +=  '<td>'+dataObj[i]['amount']+'</td>';
+                  html +=  '<td>'+formatDate(dataObj[i]['expired_at'])+'</td>';
+                  html +=  '<td>'
+                    if( dataObj[i]['_status'] == 0 ){
+                      html += "未使用"
+                    }else if(dataObj[i]['_status'] == 1){
+                      html += "下单"
+                    }else if(dataObj[i]['_status'] == 2){
+                      html += '已使用'
+                    }
+                  html += '</td>';
+                  html +=  '<td><a href="/vendors/{{ vendor_id }}/orders/'+ dataObj[i]['order_id'] +'">'+dataObj[i]['trade_no']+'</a></td>';
+                  html +=  '</tr>';
+                $('#coupon-wrap').append(html);
+            }
+
+              pageNext = parseInt((currentPage-1)/5) + 1;
+          var start = (pageNext-1)*5+1;
+          var end = pageNext*5;
+              if(end > total_page){
+                end = total_page;
+              }
+              $(".pageBox").html("");
+              for (var k=start;k<=end;k++){
+                var inner_html = '<button class="btn btn-info" type="button" id="num'+k+'">'+k+'</button>';
+
+                $(".pageBox").append(inner_html);
+              };
+               $("#num"+currentPage).addClass("on").siblings().removeClass("on");
+          }
+
+        },
+        error: function(XMLHttpRequest, textStatus, errorThrown) {
+          console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+          $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+        }
+      });
+    };
+
+      getJson("1");
+      $(document).on('click','.pageBox > button',function(){
+        var num = $(this).text();
+        getJson(num);
+      })
+
+      $("#prev").on("click",function(){
+          if(currentPage<=1){}
+          else{
+              getJson(--currentPage);
+          }
+      });
+
+      $("#next").on("click",function(){
+          if(currentPage>=total_page){}
+          else{
+              getJson(++currentPage);
+          }
+      });
+
+  })
+  </script>
+</body>
+
+</html>
