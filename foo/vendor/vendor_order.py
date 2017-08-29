@@ -350,6 +350,8 @@ class VendorCouponsCreateHandler(AuthorizationHandler):
         logging.info("got coupon_seq", coupon_seq)
         coupon_fee = self.get_argument("coupon-fee", "")
         logging.info("got coupon_fee", coupon_fee)
+        coupon_fee = int(float(coupon_fee) * 100)
+        logging.info("got coupon_fee", coupon_fee)
         coupon_time = self.get_argument("coupon-time", "")
         logging.info("got coupon_time", coupon_time)
         coupon_time = date_timestamp(coupon_time)

@@ -82,25 +82,24 @@
                 </div>
                 <div class="x_content">
                   <br />
-                  <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left"
-                    action="/vendors/{{ vendor_id }}/coupons/create" method="POST">
-  					        {% raw xsrf_form_html() %}
+                  <form id="demo-form2" data-parsley-validate class="form-horizontal form-label-left" action="/vendors/{{ vendor_id }}/coupons/create" method="POST">
+                    {% raw xsrf_form_html() %}
                     <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">优惠券批次 <span class="required">*</span>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-seq">优惠券批次 <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
                         <input type="text" id="coupon-seq" name="coupon-seq" required="required" class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
                     <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">优惠券金额 <span class="required">*</span>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-fee">优惠券金额(元) <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="text" id="coupon-fee" name="coupon-fee" required="required" class="form-control col-md-7 col-xs-12">
+                        <input type="number" id="coupon-fee" name="coupon-fee" required="required" class="form-control col-md-7 col-xs-12">
                       </div>
                     </div>
                     <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">优惠券有效期 <span class="required">*</span>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-time">优惠券有效期 <span class="required">*</span>
                       </label>
                       <div class="col-md-3 xdisplay_inputx form-group has-feedback">
                         <input type="text" name="coupon-time" class="form-control has-feedback-left" id="single_cal1" placeholder="有效时间">
@@ -108,7 +107,7 @@
                       </div>
                     </div>
                     <div class="item form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="title">优惠券个数 <span class="required">*</span>
+                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="coupon-num">优惠券个数 <span class="required">*</span>
                       </label>
                       <div class="col-md-6 col-sm-6 col-xs-12">
                         <input type="text" id="coupon-num" name="coupon-num" required="required" class="form-control col-md-7 col-xs-12">
@@ -150,28 +149,29 @@
   <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
   <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
   <script type="text/javascript">
-  $(function(){
-    // 初始化日历插件
-    $('#single_cal1').daterangepicker({
+    $(function() {
+      // 初始化日历插件
+      $('#single_cal1').daterangepicker({
         "singleDatePicker": true,
         "linkedCalendars": false,
         "autoUpdateInput": false,
         "showCustomRangeLabel": false,
         "locale": {
-         applyLabel: '确定',
-         cancelLabel: '取消',
-         fromLabel: '起始时间',
-         toLabel: '结束时间',
-         customRangeLabel: '自定义',
-         daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
-         monthNames: ['一月', '二月', '三月', '四月', '五月', '六月',
-             '七月', '八月', '九月', '十月', '十一月', '十二月'],
-         firstDay: 1
-       }
-    }, function(start, end, label) {
-      // console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
+          applyLabel: '确定',
+          cancelLabel: '取消',
+          fromLabel: '起始时间',
+          toLabel: '结束时间',
+          customRangeLabel: '自定义',
+          daysOfWeek: ['日', '一', '二', '三', '四', '五', '六'],
+          monthNames: ['一月', '二月', '三月', '四月', '五月', '六月',
+            '七月', '八月', '九月', '十月', '十一月', '十二月'
+          ],
+          firstDay: 1
+        }
+      }, function(start, end, label) {
+        // console.log("New date range selected: ' + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD') + ' (predefined range: ' + label + ')");
+      });
     });
-  });
   </script>
 </body>
 
