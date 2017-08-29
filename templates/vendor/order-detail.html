@@ -123,8 +123,12 @@
                           <a href="/vendors/{{ vendor_id }}/customers/{{ order['account_id'] }}">{{ order['nickname'] }}</a>
                           <br />
                         </td>
-                        <td> 商品价格:{{ order['amount'] }}元<br /><br />
-                             运费:{{ order['shipping_cost'] }}元
+                        <td> 商品价格:{{ order['amount'] }}元<br />
+                             运费:{{ order['shipping_cost'] }}元<br />
+                             {% if order.has_key('coupon') %}
+                                优惠: {{ float(order['coupon']['actual_discount'])/100 }}元
+                             {% end %}
+
                         </td>
                         <td>
                           {% if order['pay_status'] == 30 %}

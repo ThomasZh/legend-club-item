@@ -518,8 +518,12 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
         line = line + 1
         rownum = rownum + 1
         sheet_1.write(rownum, 0, line,set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
+        coupon = 0
+        if order.has_key('coupon'):
+            coupon = float(order['coupon']['actual_discount']) / 100
         sheet_1.write_merge(rownum,rownum,1,3,unicode(u'优惠').encode(_unicode),set_style('Times New Roman',220,False,True,xlwt.Alignment.HORZ_LEFT))
-        sheet_1.write(rownum, 5, "",set_style('Times New Roman',220,False,True))
+        sheet_1.write(rownum, 4, coupon,set_style('Times New Roman',220,False,True,True,xlwt.Alignment.HORZ_RIGHT))
+        sheet_1.write(rownum, 5, '',set_style('Times New Roman',220,False,True))
 
         rownum = rownum + 1
         sheet_1.write(rownum, 0, unicode(u'合计').encode(_unicode),set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
