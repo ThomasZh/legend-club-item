@@ -142,9 +142,9 @@
             for (var i=0; i<dataObj.length;i++){
               var html = '<tr>';
                   html += '<th scope="row">'+dataObj[i]['_seq']+'</th>';
-                  html +=  '<td>'+dataObj[i]['_min']+'</td>';
-                  html +=  '<td>'+dataObj[i]['_max']+'</td>';
-                  html +=  '<td>'+dataObj[i]['cost']+'</td>';
+                  html +=  '<td>'+parseFloat(dataObj[i]['_min'])/100+'</td>';
+                  html +=  '<td>'+parseFloat(dataObj[i]['_max'])/100+'</td>';
+                  html +=  '<td>'+parseFloat(dataObj[i]['cost'])/100+'</td>';
                   html +=  '<td>';
                   html +=  '<a data_id = "'+ dataObj[i]['_id'] +'" class="btn btn-info btn-xs cate-edit">';
                   html +=  '<i class="fa fa-pencil"></i> 编辑 </a>';
@@ -186,10 +186,13 @@
         var minNum = $(this).parent().prev().prev().prev().children().val();
         var maxNum = $(this).parent().prev().prev().children().val();
         var costNum = $(this).parent().prev().children().val();
+        var _costNum = costNum*100;
+        var _minNum = minNum*100;
+        var _maxNum = maxNum*100;
         if(minNum == '' || maxNum == '' || costNum == ''){
           $.alert("填写不完整!");
         }else{
-          var data = {'_min':minNum, '_max':maxNum, 'cost':costNum}
+          var data = {'_min':_minNum, '_max':_maxNum, 'cost':_costNum}
           var _json = JSON.stringify(data);
               console.log(_json);
             $.ajax({
@@ -300,13 +303,16 @@
         var min = $(this).parent().prev().prev().prev().children().val();
         var max = $(this).parent().prev().prev().children().val();
         var cost = $(this).parent().prev().children().val();
+        var _cost = cost*100;
+        var _min = min*100;
+        var _max = max*100;
         var seq = $(this).parent().prev().prev().prev().prev().children().val();
         if(min == "" || max == "" || cost=="" || seq == ""){
           $.alert('填写不完整！');
           return false;
         }
         var _id = $(this).attr('data_id');
-        cateEidt(_id,min,max,cost,seq);
+        cateEidt(_id,_min,_max,_cost,seq);
         $(this).parent().prev().html(cost);
         $(this).parent().prev().prev().html(max);
         $(this).parent().prev().prev().prev().html(min);
