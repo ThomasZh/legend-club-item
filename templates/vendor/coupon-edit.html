@@ -8,7 +8,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>{{ ops['club_name'] }} | 运费分类</title>
+  <title>{{ ops['club_name'] }} | 优惠条件</title>
 
   <!-- Bootstrap core CSS -->
   <link rel="stylesheet" href="{{ static_url('weui/css/weui.min.css') }}">
@@ -67,7 +67,7 @@
             <div class="col-md-6 col-sm-6 col-xs-12">
               <div class="x_panel">
                 <div class="x_title">
-                  <h2>运费分类<small>列表</small></h2>
+                  <h2>优惠条件<small>列表</small></h2>
 
                   <ul class="nav navbar-right panel_toolbox">
                   	<li><a href="javascript:;" id="add-btn" class="btn btn-success btn-xs">
@@ -86,9 +86,9 @@
                     <thead>
                       <tr>
                         <th>序号</th>
-                        <th>最小值</th>
-                        <th>最大值</th>
-                        <th>运费价格</th>
+                        <th>最低价(元)</th>
+                        <th>最高价(元)</th>
+                        <th>优惠券价格(元)</th>
                         <th>操作</th>
                       </tr>
                     </thead>
@@ -130,21 +130,20 @@
     function getJson(){
       $.ajax({
         type: "GET",
-        url: "{{ API_DOMAIN }}/api/def/leagues/{{ LEAGUE_ID }}/shipping-costs",
+        url: "{{ API_DOMAIN }}/api/def/club/{{ vendor_id }}/coupon-conds",
         dataType: "json",
         headers: {"Authorization":"Bearer {{access_token}}"},
         contentType: 'application/json',
         success: function(data, status, xhr) {
           console.log(data);
           var dataObj = data.rs;
-          console.log(dataObj);
           if(data.err_code == 200){
             for (var i=0; i<dataObj.length;i++){
               var html = '<tr>';
                   html += '<th scope="row">'+dataObj[i]['_seq']+'</th>';
                   html +=  '<td>'+dataObj[i]['_min']+'</td>';
                   html +=  '<td>'+dataObj[i]['_max']+'</td>';
-                  html +=  '<td>'+dataObj[i]['cost']+'</td>';
+                  html +=  '<td>'+parseFloat(dataObj[i]['discount'])/100+'</td>';
                   html +=  '<td>';
                   html +=  '<a data_id = "'+ dataObj[i]['_id'] +'" class="btn btn-info btn-xs cate-edit">';
                   html +=  '<i class="fa fa-pencil"></i> 编辑 </a>';
@@ -160,13 +159,10 @@
         error: function(XMLHttpRequest, textStatus, errorThrown) {
           console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
           $('.lostpwd-form-main-message').addClass('error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
-        },
-        complete: function(XMLHttpRequest, textStatus) {
-          this; // 调用本次AJAX请求时传递的options参数
         }
       });
     };
-    // 添加运费操作
+    // 添加优惠条件操作
       $(document).on('click','#add-btn',function(){
         var html = '<tr>';
             html += '<th scope="row">'+num+'</th>';
@@ -186,15 +182,16 @@
         var minNum = $(this).parent().prev().prev().prev().children().val();
         var maxNum = $(this).parent().prev().prev().children().val();
         var costNum = $(this).parent().prev().children().val();
+        var _costNum = costNum*100;
         if(minNum == '' || maxNum == '' || costNum == ''){
           $.alert("填写不完整!");
         }else{
-          var data = {'_min':minNum, '_max':maxNum, 'cost':costNum}
+          var data = {'_min':minNum, '_max':maxNum, 'discount':_costNum}
           var _json = JSON.stringify(data);
               console.log(_json);
             $.ajax({
               type: "POST",
-              url: "{{ API_DOMAIN }}/api/def/leagues/{{ LEAGUE_ID }}/shipping-costs",
+              url: "{{ API_DOMAIN }}/api/def/club/{{ vendor_id }}/coupon-conds",
               dataType: "json",
               data:_json,
               headers: {"Authorization":"Bearer {{access_token}}"},
@@ -225,11 +222,11 @@
 
       })
 
-    // 分类删除
+    // 优惠条件删除
       function dele(cost_id){
         $.ajax({
           type: "DELETE",
-          url: "{{ API_DOMAIN }}/api/def/shipping-costs/"+cost_id,
+          url: "{{ API_DOMAIN }}/api/def/coupon-conds/"+cost_id,
           dataType: "json",
           headers: {"Authorization":"Bearer {{access_token}}"},
           contentType: 'application/json',
@@ -247,12 +244,12 @@
       };
       // 分类编辑
       function cateEidt(cost_id,_min,_max,cost,seq){
-        var data= {'_min':_min, '_max':_max, 'cost':cost, '_seq':seq};
+        var data= {'_min':_min, '_max':_max, 'discount':cost, '_seq':seq};
         var _json = JSON.stringify(data);
         console.log(_json);
         $.ajax({
           type: "PUT",
-          url: "{{ API_DOMAIN }}/api/def/shipping-costs/"+cost_id,
+          url: "{{ API_DOMAIN }}/api/def/coupon-conds/"+cost_id,
           dataType: "json",
           data:_json,
           headers: {"Authorization":"Bearer {{access_token}}"},
@@ -272,7 +269,7 @@
       $(document).on('click','.cate-dele',function(){
         category_id = $(this).attr('data_id');
         var _this = $(this);
-        $.confirm('确定删除该运费配置吗？',function(){
+        $.confirm('确定删除该优惠券配置吗？',function(){
           dele(category_id);
           _this.parent().parent().remove();
         },function(){
@@ -300,13 +297,15 @@
         var min = $(this).parent().prev().prev().prev().children().val();
         var max = $(this).parent().prev().prev().children().val();
         var cost = $(this).parent().prev().children().val();
+        var _cost = cost*100;
+            console.log(cost);
         var seq = $(this).parent().prev().prev().prev().prev().children().val();
         if(min == "" || max == "" || cost=="" || seq == ""){
           $.alert('填写不完整！');
           return false;
         }
         var _id = $(this).attr('data_id');
-        cateEidt(_id,min,max,cost,seq);
+        cateEidt(_id,min,max,_cost,seq);
         $(this).parent().prev().html(cost);
         $(this).parent().prev().prev().html(max);
         $(this).parent().prev().prev().prev().html(min);

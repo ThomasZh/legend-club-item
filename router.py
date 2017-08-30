@@ -73,6 +73,8 @@ def map():
         (r'/vendors/([a-z0-9]*)/recommend-categorys/create', getattr(vendor_recommend, 'VendorRecommendCategoryCreateHandler')),  #添加预估商品
         # 运费
         (r'/vendors/([a-z0-9]*)/activitys/expressfee', getattr(vendor_expressfee, 'VendorActivityExpressFeeHandler')),
+        # 优惠券
+        (r'/vendors/([a-z0-9]*)/activitys/coupons', getattr(vendor_expressfee, 'VendorCouponsHandler')),
 
 
         # vendor activity

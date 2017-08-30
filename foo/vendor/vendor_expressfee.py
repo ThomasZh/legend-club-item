@@ -54,7 +54,7 @@ class VendorCategoryDeleteHandler(AuthorizationHandler):
         self.redirect('/vendors/' + vendor_id + '/categorys')
 
 
-# /vendors/<string:vendor_id>/categorys
+# 运费
 class VendorActivityExpressFeeHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
@@ -82,6 +82,27 @@ class VendorActivityExpressFeeHandler(AuthorizationHandler):
                 ops=ops,
                 counter=counter,
                 recommend_categorys=recommend_categorys)
+
+
+# 优惠券
+class VendorCouponsHandler(AuthorizationHandler):
+    @tornado.web.authenticated  # if no session, redirect to login page
+    def get(self, vendor_id):
+        logging.info("got vendor_id %r in uri", vendor_id)
+
+        ops = self.get_ops_info()
+
+        access_token = self.get_access_token()
+        logging.info("GET access_token %r", access_token)
+
+        counter = self.get_counter(vendor_id)
+        self.render('vendor/coupon-edit.html',
+                vendor_id=vendor_id,
+                access_token=access_token,
+                API_DOMAIN=API_DOMAIN,
+                LEAGUE_ID=LEAGUE_ID,
+                ops=ops,
+                counter=counter)
 
 
  # /vendors/<string:vendor_id>/categorys
