@@ -187,7 +187,13 @@
                   html += '已使用'
                 }
                 html += '</td>';
-                html += '<td><a href="/vendors/{{ vendor_id }}/orders/' + dataObj[i]['order_id'] + '">' + dataObj[i]['trade_no'] + '</a></td>';
+                if (dataObj[i]['_status'] == 0) {
+                  html += '<td></td>';
+                } else if (dataObj[i]['_status'] == 1) {
+                  html += '<td><a href="/vendors/{{ vendor_id }}/orders/' + dataObj[i]['order_id'] + '">' + dataObj[i]['trade_no'] + '</a></td>';
+                } else if (dataObj[i]['_status'] == 2) {
+                  html += '<td><a href="/vendors/{{ vendor_id }}/orders/' + dataObj[i]['order_id'] + '">' + dataObj[i]['trade_no'] + '</a></td>';
+                }
                 html += '</tr>';
                 $('#coupon-wrap').append(html);
               }
