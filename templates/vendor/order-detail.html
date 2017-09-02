@@ -354,11 +354,33 @@
                         <tbody id="tbody">
                           <tr class="even pointer">
                             {% for coupon in order['coupon']['datas'] %}
-                              <td>{{ coupon['_seq'] }}</td>
-                              <td>{{ coupon['code'] }}</td>
-                              <td>{{ coupon['amount'] }}</td>
-                              <td>{{ coupon['expired_at'] }}</td>
-                              <td>{{ coupon['_status'] }}</td>
+                            {% if coupon %}
+                              {% if coupon.has_key('_seq') %}
+                                <td>{{ coupon['_seq'] }}</td>
+                              {% else %}
+                                <td></td>
+                              {% end %}
+                              {% if coupon.has_key('code') %}
+                                <td>{{ coupon['code'] }}</td>
+                              {% else %}
+                                <td></td>
+                              {% end %}
+                              {% if coupon.has_key('amount') %}
+                                <td>{{ coupon['amount'] }}</td>
+                              {% else %}
+                                <td></td>
+                              {% end %}
+                              {% if coupon.has_key('expired_at') %}
+                                <td>{{ coupon['expired_at'] }}</td>
+                              {% else %}
+                                <td></td>
+                              {% end %}
+                              {% if coupon.has_key('_status') %}
+                                <td>{{ coupon['_status'] }}</td>
+                              {% else %}
+                                <td></td>
+                              {% end %}
+                            {% end %}
                             {% end %}
                           </tr>
                         </tbody>

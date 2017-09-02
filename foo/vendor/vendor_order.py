@@ -229,13 +229,17 @@ class VendorOrderInfoHandler(AuthorizationHandler):
             order['activity_amount'] = float(base_fee['fee']) / 100
 
         for coupon in order['coupon']['datas']:
-            # 价格转换成元
-            coupon['expired_at'] = timestamp_date(coupon['expired_at'])
-            coupon['amount'] = float(coupon['amount']) / 100
-            if coupon['_status'] == 1:
-                coupon['_status'] = u"下单"
-            elif coupon['_status'] == 2:
-                coupon['_status'] = u"已使用"
+            if coupon:
+                if coupon.has_key('expired_at'):
+                    coupon['expired_at'] = timestamp_date(coupon['expired_at'])
+                # 价格转换成元
+                if coupon.has_key('amount'):
+                    coupon['amount'] = float(coupon['amount']) / 100
+                if coupon.has_key('_status'):
+                    if coupon['_status'] == 1:
+                        coupon['_status'] = u"下单"
+                    elif coupon['_status'] == 2:
+                        coupon['_status'] = u"已使用"
 
         if not order.has_key('activity_amount'):
             order['activity_amount'] = 0
