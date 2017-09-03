@@ -340,7 +340,9 @@
                 inner_html += '<a href="/vendors/{{ vendor_id }}/customers/'+pageData[i].account_id+'">'+pageData[i].nickname+'</a>';
                 inner_html += '<br />';
                 inner_html += '</td>';
-                inner_html += '<td class=" ">'+parseFloat(pageData[i].amount /100).toFixed(2)+'元<br /></td>';
+                console.log(pageData[i]);
+                var total_amount = pageData[i].amount+pageData[i].shipping_cost;
+                inner_html += '<td class=" ">'+parseFloat(total_amount/100).toFixed(2)+'元<br /></td>';
                 if (pageData[i].pay_status == 30){
                   inner_html += '<td>'+parseFloat(pageData[i].actual_payment/100).toFixed(2)+'元</td>';
                 }else{
