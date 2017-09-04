@@ -126,9 +126,11 @@
                         <td> 商品价格:{{ order['amount'] }}元<br />
                              运费:{{ order['shipping_cost'] }}元<br />
                              {% if order.has_key('coupon') %}
-                                优惠: {{ float(order['coupon']['actual_discount'])/100 }}元
+                                优惠: {{ float(order['coupon']['actual_discount'])/100 }}元<br />
                              {% end %}
-
+                             {% if order.has_key('tax_amount') %}
+                                税金: {{ float(order['tax_amount'])/100 }}元
+                             {% end %}
                         </td>
                         <td>
                           {% if order['pay_status'] == 30 %}

@@ -338,19 +338,22 @@ class ApiActivityExportXHR(AuthorizationHandler):
             #         pay_status = u'否'
             #         order['actual_payment'] = '--'
 
-            refund = ''
-            if order.has_key('refund_amount'):
-                refund = order['refund_amount']
-                if refund > 0:
-                    refund = u'是'
-                else:
-                    refund = u'否'
-            _status = u"\n订单状态："+_status+u"\n是否退款："+ refund
+            # refund = ''
+            # if order.has_key('refund_amount'):
+            #     refund = order['refund_amount']
+            #     if refund > 0:
+            #         refund = u'是'
+            #     else:
+            #         refund = u'否'
+            # _status = u"\n订单状态："+_status+u"\n是否退款："+ refund
 
             _table.write(rownum, 0, order['trade_no'])
             _table.write(rownum, 1, order['nickname'])
-            _table.write(rownum, 2, order['amount'])
-            _table.write(rownum, 3, order['actual_payment'])
+            _table.write(rownum, 2, order['actual_payment'])
+            if int(order['_status']) >= 200:
+                _table.write(rownum, 3, order['actual_payment'])
+            else:
+                _table.write(rownum, 3, 0)
             _table.write(rownum, 4, order['refund_amount'])
             _table.write(rownum, 5, order['create_time'])
             _table.write(rownum, 6, order['billing_required'])
@@ -524,6 +527,16 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
         sheet_1.write_merge(rownum,rownum,1,3,unicode(u'优惠').encode(_unicode),set_style('Times New Roman',220,False,True,xlwt.Alignment.HORZ_LEFT))
         sheet_1.write(rownum, 4, coupon,set_style('Times New Roman',220,False,True,True,xlwt.Alignment.HORZ_RIGHT))
         sheet_1.write(rownum, 5, '',set_style('Times New Roman',220,False,True))
+
+        line = line + 1
+        rownum = rownum + 1
+        sheet_1.write(rownum, 0, line,set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
+        sheet_1.write_merge(rownum,rownum,1,3,unicode(u'税金').encode(_unicode),set_style('Times New Roman',220,False,True,xlwt.Alignment.HORZ_LEFT))
+        tax_amount = 0
+        if order.has_key('tax_amount'):
+            tax_amount = float(order['tax_amount']) / 100
+        sheet_1.write(rownum, 4, tax_amount,set_style('Times New Roman',220,False,True,True,xlwt.Alignment.HORZ_RIGHT))
+        sheet_1.write(rownum, 5, "",set_style('Times New Roman',220,False,True))
 
         rownum = rownum + 1
         sheet_1.write(rownum, 0, unicode(u'合计').encode(_unicode),set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
