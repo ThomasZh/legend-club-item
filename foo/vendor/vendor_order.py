@@ -257,7 +257,10 @@ class VendorOrderInfoHandler(AuthorizationHandler):
             insurance['fee'] = float(insurance['fee']) / 100
         order['create_time'] = timestamp_datetime(order['create_time'])
         order['amount'] = float(order['amount']) / 100
-        order['points_used'] = float(order['points_used']) / 100
+        if order.has_key('points_used'):
+            order['points_used'] = float(order['points_used']) / 100
+        else:
+            order['points_used'] = 0
         order['shipping_cost'] = float(order['shipping_cost']) / 100
         # order['actual_payment'] = float(order['actual_payment']) / 100
         # order['amount'] = float(order['amount']) / 100
