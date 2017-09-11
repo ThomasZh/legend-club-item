@@ -166,6 +166,16 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
         data = json_decode(response.body)
         billings = data['rs']
 
+        url = API_DOMAIN + "/api/clubs/"+vendor_id+"/acquaintance/"+account_id+"/higher"
+        http_client = HTTPClient()
+        headers = {"Authorization":"Bearer " + access_token}
+        response = http_client.fetch(url, method="GET", headers=headers)
+        logging.info("got response.body %r", response.body)
+        data = json_decode(response.body)
+        higher = data['rs']
+        if higher:
+            higher['ctime'] = timestamp_datetime(float(higher['ctime']))
+
         params = {"filter":"account", "account_id":account_id, "page":1, "limit":20,}
         url = url_concat(API_DOMAIN + "/api/orders", params)
         http_client = HTTPClient()
@@ -207,12 +217,16 @@ class VendorCustomerProfileHandler(AuthorizationHandler):
         counter = self.get_counter(vendor_id)
         self.render('vendor/customer-profile.html',
                 access_token=access_token,
+                api_domain=API_DOMAIN,
                 vendor_id=vendor_id,
                 ops=ops,
                 account_id=account_id,
                 counter=counter,
                 profile=_customer_profile,
-                contacts=_contacts,billings=billings, orders=orders, tasks =personal_tasks)
+                contacts=_contacts,billings=billings,
+                orders=orders,
+                higher=higher,
+                tasks =personal_tasks)
 
 
     @tornado.web.authenticated  # if no session, redirect to login page

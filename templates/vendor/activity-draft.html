@@ -178,7 +178,7 @@
           var total_page = 0;//总页数
 
           function gotoPage(pageNum) {
-            $.get("{{ API_DOMAIN }}/api/items?filter=club&club_id={{ vendor_id }}&_status=10&page="+pageNum+"&limit="+limit+"",function(data,status){
+            $.get("{{ API_DOMAIN }}/api/items?filter=club&club_id={{ vendor_id }}&_status=10&page="+pageNum+"&limit="+limit,function(data,status){
                   console.log(data);
                   data_obj = JSON.parse(data);
                   data = data_obj.rs;

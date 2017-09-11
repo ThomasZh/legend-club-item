@@ -337,6 +337,97 @@
               </div>
             </div>
 
+
+            <div class="col-md-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>上级关系</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <p>分享自谁的详情</p>
+
+                  <!-- start project list -->
+                  <table class="table table-striped projects">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>上级</th>
+                        <th>日期</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% if higher %}
+                      <tr>
+                        <td>#</td>
+                        <td>
+                          <ul class="list-inline">
+                            <li>
+                            <img src="{{ higher['avatar'] }}" class="avatar" alt="Avatar">
+                            </li>
+                          </ul>
+                          <a href="#">{{ higher['nickname'] }}</a>
+                        </td>
+                        <td>{{ higher['ctime'] }}</td>
+                      </tr>
+                      {% end %}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+
+            <div class="col-md-12">
+              <div class="x_panel">
+                <div class="x_title">
+                  <h2>下级关系</h2>
+                  <ul class="nav navbar-right panel_toolbox">
+                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
+                    </li>
+                    <li><a class="close-link"><i class="fa fa-close"></i></a>
+                    </li>
+                  </ul>
+                  <div class="clearfix"></div>
+                </div>
+                <div class="x_content">
+
+                  <p>我分享之后的购买关系</p>
+
+                  <!-- start project list -->
+                  <table class="table table-striped projects">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>下级</th>
+                        <th>日期</th>
+                      </tr>
+                    </thead>
+                    <tbody id="t_tbody">
+                    </tbody>
+                  </table>
+                  <!-- end project list -->
+                  <div class="clearfix"></div>
+                  <div class="col-md-5 col-sm-12 col-xs-12 center-margin">
+                    <button class="btn btn-success" type="button" id="t_prev">上一页</button>
+                    <span class="t_pageBox"></span>
+
+                    <button class="btn btn-success" type="button" id="t_next">下一页</button>
+                    共<span id="t_total_page" style="padding:0 5px;"></span>页
+
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -376,6 +467,7 @@
       var total_page;//订单总页数
       var point_total_page;//积分总页数
 
+      // 订单列表
       function gotoPage(pageNum) {
         currentPage = pageNum;
         $.ajax({
@@ -385,7 +477,7 @@
           dataType: "json",
           contentType: 'application/json',
           success: function(data, status, xhr) {
-              console.log(data);
+              // console.log(data);
           var pageData = data.data;
               total_page = data.total_page;//总页
               $("#total_page").html(total_page);
@@ -470,7 +562,25 @@
           }
         });
       };
+      gotoPage("1");
+      $(document).on('click','.pageBox > button',function(){
+          var num = $(this).text();
+          gotoPage(num);
+      });
+      $("#prev").on("click",function(){
+          if(currentPage<=1){
+          }else{
+                gotoPage(--currentPage);
+          }
+      });
+      $("#next").on("click",function(){
+          if(currentPage>=total_page){
+          }else{
+                gotoPage(++currentPage);
+          }
+      });
 
+      // 积分消费记录
       function query(pageNum) {
         point_currentPage = pageNum;
         $.ajax({
@@ -526,26 +636,7 @@
           }
         });
       };
-
-        gotoPage("1");
         query("1");
-        $(document).on('click','.pageBox > button',function(){
-            var num = $(this).text();
-            gotoPage(num);
-        });
-        $("#prev").on("click",function(){
-            if(currentPage<=1){
-            }else{
-                  gotoPage(--currentPage);
-            }
-        });
-        $("#next").on("click",function(){
-            if(currentPage>=total_page){
-            }else{
-                  gotoPage(++currentPage);
-            }
-        });
-
         $(document).on('click','.point_pageBox > button',function(){
             var num = $(this).text();
             query(num);
@@ -563,6 +654,73 @@
                   query(++point_currentPage);
             }
         });
+
+        // 上下级关系数据
+        function getJson(pageNum) {
+          t_currentPage = pageNum;
+          $.ajax({
+            type: "GET",
+            url: "{{ api_domain }}/api/clubs/{{ vendor_id }}/acquaintance/{{ account_id }}/lowers?page="+pageNum+"&limit="+limit,
+            headers: {"Authorization": "Bearer {{ access_token }}"},
+            dataType: "json",
+            contentType: 'application/json',
+            success: function(data, status, xhr) {
+                console.log(data);
+                t_total_page = data.rs.total_page;//总页
+            var ajaxobj = data.rs.data;
+                $("#t_total_page").html(t_total_page);
+            $('#t_tbody').html("");
+            for (var i in ajaxobj) {
+              var inner_html = '<tr><td>#</td>';
+              inner_html += '<td class=" ">';
+              inner_html += '<ul class="list-inline">';
+              inner_html += '<li>';
+              inner_html += '<img src="'+ajaxobj[i].avatar+'" class="avatar" alt="Avatar">';
+              inner_html += '</li>';
+              inner_html += '</ul>';
+              inner_html += '<a href="#">'+ajaxobj[i].nickname+'</a>';
+              inner_html += '<br />';
+              inner_html += '</td>';
+              inner_html += '<td>'+getLocalTime(ajaxobj[i].ctime)+'</td>';
+              inner_html += '</tr>';
+
+              $('#t_tbody').append(inner_html);
+            };
+
+              pageNext = parseInt((t_currentPage-1)/5) + 1;
+              start = (pageNext-1)*5+1;
+              end = pageNext*5;
+              if(end > t_total_page){
+                end = t_total_page;
+              }
+              $(".t_pageBox").html("");
+              for (var k=start;k<=end;k++){
+                var inner_html = '<button class="btn btn-info" type="button" id="t_num'+k+'">'+k+'</button>';
+                $(".t_pageBox").append(inner_html);
+              };
+               $("#t_num"+t_currentPage).addClass("on").siblings().removeClass("on");
+            }
+          });
+        };
+
+          getJson("1");
+          $(document).on('click','.t_pageBox > button',function(){
+              var num = $(this).text();
+              getJson(num);
+          });
+          $("#t_prev").on("click",function(){
+              if(t_currentPage<=1){
+              }else{
+                    getJson(--t_currentPage);
+              }
+          });
+          $("#t_next").on("click",function(){
+              if(t_currentPage>=t_total_page){
+
+              }else{
+                    getJson(++t_currentPage);
+              }
+          });
         // $("#rank_btn").on("click",function(){
         //   var data = {"_rank":"100"};
         //   var json = JSON.stringify(data);
@@ -584,7 +742,5 @@
         // });
   });
 </script>
-
 </body>
-
 </html>
