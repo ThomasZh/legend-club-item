@@ -110,8 +110,12 @@
                           {% if order['pay_status'] == 20 %}
                             <br />微信订单号:{{ order['prepay_id'] }}
                           {% elif order['pay_status'] > 20 %}
+                            {% if order['prepay_id'] != "00000000000000000000000000000000" %}
                             <br />微信订单号:{{ order['prepay_id'] }}
+                            {% end %}
+                            {% if order['transaction_id'] != "00000000000000000000000000000000" %}
                             <br />微信交易号:{{ order['transaction_id'] }}
+                            {% end %}
                           {% end %}
                         </td>
                         <td>
@@ -129,7 +133,10 @@
                                 优惠: {{ float(order['coupon']['actual_discount'])/100 }}元<br />
                              {% end %}
                              {% if order.has_key('tax_amount') %}
-                                税金: {{ float(order['tax_amount'])/100 }}元
+                                税金: {{ float(order['tax_amount'])/100 }}元<br />
+                             {% end %}
+                             {% if order.has_key('points_used') and order['points_used']>0 %}
+                                使用积分: {{ float(order['points_used'])/100 }}元
                              {% end %}
                         </td>
                         <td>

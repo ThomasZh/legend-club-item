@@ -538,6 +538,16 @@ class ApiActivityDetailExportXHR(AuthorizationHandler):
         sheet_1.write(rownum, 4, tax_amount,set_style('Times New Roman',220,False,True,True,xlwt.Alignment.HORZ_RIGHT))
         sheet_1.write(rownum, 5, "",set_style('Times New Roman',220,False,True))
 
+        line = line + 1
+        rownum = rownum + 1
+        sheet_1.write(rownum, 0, line,set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
+        sheet_1.write_merge(rownum,rownum,1,3,unicode(u'使用积分').encode(_unicode),set_style('Times New Roman',220,False,True,xlwt.Alignment.HORZ_LEFT))
+        points_used = 0
+        if order.has_key('points_used'):
+            points_used = float(order['points_used']) / 100
+        sheet_1.write(rownum, 4, points_used,set_style('Times New Roman',220,False,True,True,xlwt.Alignment.HORZ_RIGHT))
+        sheet_1.write(rownum, 5, "",set_style('Times New Roman',220,False,True))
+
         rownum = rownum + 1
         sheet_1.write(rownum, 0, unicode(u'合计').encode(_unicode),set_style('Times New Roman',220,False,True,False,xlwt.Alignment.HORZ_CENTER))
         actual_payment = float(order['actual_payment']) / 100
