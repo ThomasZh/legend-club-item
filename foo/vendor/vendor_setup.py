@@ -225,41 +225,62 @@ class VendorSetupClubHandler(AuthorizationHandler):
     @tornado.web.authenticated  # if no session, redirect to login page
     def get(self, vendor_id):
         logging.info("got vendor_id %r in uri", vendor_id)
-
+        access_token = self.get_secure_cookie("access_token")
         ops = self.get_ops_info()
 
-        club = club_dao.club_dao().query(vendor_id)
+        UPYUN_DOMAIN = "https://tripc2c-club-title.b0.upaiyun.com"
+        UPYUN_NOTIFY_URL = "http://upyun.com"
+        UPYUN_FORM_API_SECRET = "CRKAOsKHGbbCnU+yztBxUT0bYR0="
+        UPYUN_BUCKET = "tripc2c-club-title"
+
+        url = API_DOMAIN+"/api/clubs/"+ops['club_id']
+        http_client = HTTPClient()
+        response = http_client.fetch(url, method="GET")
+        logging.info("got response %r", response.body)
+        data = json_decode(response.body)
+        club = data['rs']
+        if not club.has_key('img'):
+            club['img'] = ''
+        if not club.has_key('paragraphs'):
+            club['paragraphs'] = ''
+
         counter = self.get_counter(vendor_id)
         self.render('vendor/setup-club.html',
                 vendor_id=vendor_id,
                 ops=ops,
                 counter=counter,
-                club=club)
+                club=club,
+                access_token=access_token,
+                api_domain=API_DOMAIN,
+                upyun_domain=UPYUN_DOMAIN,
+                upyun_notify_url=UPYUN_NOTIFY_URL,
+                upyun_form_api_secret=UPYUN_FORM_API_SECRET,
+                upyun_bucket=UPYUN_BUCKET)
 
-    @tornado.web.authenticated  # if no session, redirect to login page
-    def post(self, vendor_id):
-        logging.info("got vendor_id %r in uri", vendor_id)
-
-        ops = self.get_ops_info()
-
-        _name = self.get_argument("club_name", "")
-        _desc = self.get_argument("club_desc", "")
-        logo_img_url = self.get_argument("logo_img_url","")
-        bk_img_url = self.get_argument("bk_img_url","")
-
-        club = club_dao.club_dao().query_not_safe(vendor_id)
-        _timestamp = time.time()
-        json = {"_id":vendor_id,
-                "last_update_time":_timestamp,
-                "club_name":_name, "club_desc":_desc,
-                "logo_img_url":logo_img_url,
-                "bk_img_url":bk_img_url}
-        if not club:
-            club_dao.club_dao().create(json)
-        else:
-            club_dao.club_dao().update(json)
-
-        self.redirect('/vendors/' + vendor_id + '/setup/club')
+    # @tornado.web.authenticated  # if no session, redirect to login page
+    # def post(self, vendor_id):
+    #     logging.info("got vendor_id %r in uri", vendor_id)
+    #
+    #     ops = self.get_ops_info()
+    #
+    #     _name = self.get_argument("club_name", "")
+    #     _desc = self.get_argument("club_desc", "")
+    #     logo_img_url = self.get_argument("logo_img_url","")
+    #     bk_img_url = self.get_argument("bk_img_url","")
+    #
+    #     club = club_dao.club_dao().query_not_safe(vendor_id)
+    #     _timestamp = time.time()
+    #     json = {"_id":vendor_id,
+    #             "last_update_time":_timestamp,
+    #             "club_name":_name, "club_desc":_desc,
+    #             "logo_img_url":logo_img_url,
+    #             "bk_img_url":bk_img_url}
+    #     if not club:
+    #         club_dao.club_dao().create(json)
+    #     else:
+    #         club_dao.club_dao().update(json)
+    #
+    #     self.redirect('/vendors/' + vendor_id + '/setup/club')
 
 
 class VendorSetupHhaHandler(AuthorizationHandler):

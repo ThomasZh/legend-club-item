@@ -11,27 +11,17 @@
   <title>{{ ops['club_name'] }}</title>
 
   <!-- Bootstrap core CSS -->
-
+  <link href="{{ static_url('weui/css/weui.min.css') }}" rel="stylesheet">
+  <link href="{{ static_url('weui/css/jquery-weui.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/bootstrap.min.css') }}" rel="stylesheet">
-
   <link href="{{ static_url('admin/fonts/css/font-awesome.min.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/animate.min.css') }}" rel="stylesheet">
-
   <!-- Custom styling plus plugins -->
   <link href="{{ static_url('admin/css/custom.css') }}" rel="stylesheet">
   <link href="{{ static_url('admin/css/icheck/flat/green.css') }}" rel="stylesheet">
-
-
-  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
-
   <!-- fileinput -->
   <link rel="stylesheet" href="{{ static_url("css/fileinput.min.css")}}">
-
-  <!-- fileinput -->
-  <script src="{{ static_url("js/fileinput.min.js")}}"></script>
-	<script src="{{ static_url("js/spark-md5.min.js")}}"></script>
-	<script src="{{ static_url("js/async.js")}}"></script>
-	<script src="{{ static_url("js/upyun-mu.js")}}"></script>
+  <script src="{{ static_url('admin/js/jquery.min.js') }}"></script>
 
   <!--[if lt IE 9]>
         <script src="../assets/js/ie8-responsive-file-warning.js"></script>
@@ -47,15 +37,10 @@
 
 
 <body class="nav-md">
-
   <div class="container body">
-
-
     <div class="main_container">
-
       <div class="col-md-3 left_col">
         <div class="left_col scroll-view">
-
           <!-- navigation title -->
           {% module Template("vendor/nav-title-block.html", ops=ops) %}
           <!-- /navigation title -->
@@ -73,246 +58,490 @@
 
         </div>
       </div>
-
       <!-- top navigation -->
       {% module Template("vendor/top-nav-block.html", ops=ops) %}
       <!-- /top navigation -->
 
       <!-- page content -->
       <div class="right_col" role="main">
-
-        <div class="">
-          <div class="page-title">
+          <div style="height:auto;" class="page-title">
             <div class="title_left">
-              <h3>配置 <small> 编辑</small></h3>
+              <h3>配置</h3>
+            </div>
+            <div class="clearfix"></div>
+            <div class="row">
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                  <div class="x_panel">
+                    <div class="x_title">
+                      <h2>俱乐部信息</h2>
+                      <ul class="nav navbar-right panel_toolbox">
+                      </ul>
+                      <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                      <form id="create-form" class="form-horizontal form-label-left" enctype="multipart/form-data" onsubmit="return false;">
+
+                        <div class="form-group">
+                            <!-- uploading toast -->
+                            <div id="loadingToast" class="weui_loading_toast" style="display:none;">
+                                <div class="weui_mask_transparent"></div>
+                                <div class="weui_toast">
+                                    <div class="weui_loading">
+                                        <div class="weui_loading_leaf weui_loading_leaf_0"></div>
+                                        <div class="weui_loading_leaf weui_loading_leaf_1"></div>
+                                        <div class="weui_loading_leaf weui_loading_leaf_2"></div>
+                                        <div class="weui_loading_leaf weui_loading_leaf_3"></div>
+                                        <div class="weui_loading_leaf weui_loading_leaf_4"></div>
+                                        <div class="weui_loading_leaf weui_loading_leaf_5"></div>
+                                        <div class="weui_loading_leaf weui_loading_leaf_6"></div>
+                                        <div class="weui_loading_leaf weui_loading_leaf_7"></div>
+                                        <div class="weui_loading_leaf weui_loading_leaf_8"></div>
+                                        <div class="weui_loading_leaf weui_loading_leaf_9"></div>
+                                        <div class="weui_loading_leaf weui_loading_leaf_10"></div>
+                                        <div class="weui_loading_leaf weui_loading_leaf_11"></div>
+                                    </div>
+                                    <p class="weui_toast_content">图片上传中...</p>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="x_panel">
+                                        <div class="x_content">
+                                            <div id="alerts"></div>
+                                            <div class="btn-toolbar editor" data-role="editor-toolbar" data-target="#editor">
+                                                <div class="btn-group">
+                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font"><i class="fa fa-font"></i><b class="caret"></b></a>
+                                                    <ul class="dropdown-menu">
+                                                    </ul>
+                                                </div>
+
+                                                <div class="btn-group">
+                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" title="Font Size"><i class="fa fa-text-height"></i>&nbsp;<b class="caret"></b></a>
+                                                    <ul class="dropdown-menu">
+                                                        <li>
+                                                            <a data-edit="fontSize 5">
+                                                                <p style="font-size:17px">Huge</p>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a data-edit="fontSize 3">
+                                                                <p style="font-size:14px">Normal</p>
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a data-edit="fontSize 1">
+                                                                <p style="font-size:11px">Small</p>
+                                                            </a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                                <div class="btn-group">
+                                                    <a class="btn" data-edit="bold" title="Bold (Ctrl/Cmd+B)"><i class="fa fa-bold"></i></a>
+                                                    <a class="btn" data-edit="italic" title="Italic (Ctrl/Cmd+I)"><i class="fa fa-italic"></i></a>
+                                                    <a class="btn" data-edit="strikethrough" title="Strikethrough"><i class="fa fa-strikethrough"></i></a>
+                                                    <a class="btn" data-edit="underline" title="Underline (Ctrl/Cmd+U)"><i class="fa fa-underline"></i></a>
+                                                </div>
+
+                                                <div class="btn-group">
+                                                    <a class="btn" data-edit="insertunorderedlist" title="Bullet list"><i class="fa fa-list-ul"></i></a>
+                                                    <a class="btn" data-edit="insertorderedlist" title="Number list"><i class="fa fa-list-ol"></i></a>
+                                                    <!-- <a class="btn" data-edit="outdent" title="Reduce indent (Shift+Tab)"><i class="fa fa-dedent"></i></a>
+                  <a class="btn" data-edit="indent" title="Indent (Tab)"><i class="fa fa-indent"></i></a> -->
+                                                </div>
+
+                                                <div class="btn-group">
+                                                    <a class="btn" data-edit="justifyleft" title="Align Left (Ctrl/Cmd+L)"><i class="fa fa-align-left"></i></a>
+                                                    <a class="btn" data-edit="justifycenter" title="Center (Ctrl/Cmd+E)"><i class="fa fa-align-center"></i></a>
+                                                    <a class="btn" data-edit="justifyright" title="Align Right (Ctrl/Cmd+R)"><i class="fa fa-align-right"></i></a>
+                                                    <a class="btn" data-edit="justifyfull" title="Jus tify (Ctrl/Cmd+J)"><i class="fa fa-align-justify"></i></a>
+                                                </div>
+
+                                                <div class="btn-group">
+                                                    <a class="btn dropdown-toggle" data-toggle="dropdown" title="Hyperlink"><i class="fa fa-link"></i></a>
+                                                    <div class="dropdown-menu input-append">
+                                                        <input class="span2" placeholder="URL" type="text" data-edit="createLink" />
+                                                        <button class="btn" type="button">Add</button>
+                                                    </div>
+                                                    <a class="btn" data-edit="unlink" title="Remove Hyperlink"><i class="fa fa-cut"></i></a>
+                                                </div>
+
+                                                <div class="btn-group">
+                                                    <a class="btn" title="Insert picture (or just drag & drop)" id="pictureBtn"><i class="fa fa-picture-o"></i></a>
+                                                    <input type="file" id="file" data-role="magic-overlay" data-target="#pictureBtn" data-edit="insertImage" />
+                                                </div>
+
+                                                <div class="btn-group">
+                                                    <a class="btn" data-edit="undo" title="Undo (Ctrl/Cmd+Z)"><i class="fa fa-undo"></i></a>
+                                                    <a class="btn" data-edit="redo" title="Redo (Ctrl/Cmd+Y)"><i class="fa fa-repeat"></i></a>
+                                                </div>
+                                            </div>
+
+
+                                            <div id="editor" style="height:500px;overflow:auto;"></div>
+
+                                            <!-- <textarea name="descr" id="descr" style="display:none;"></textarea> -->
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <div class="ln_solid"></div> -->
+                        <div class="form-group">
+                          <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                            <button type="submit" class="btn btn-success">保存</button>
+                          </div>
+                        </div>
+
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div id="article-base" class="col-md-4 col-sm-4 col-xs-12">
+
+                  <div class="x_panel">
+                    <div class="x_title">
+                      <h2>俱乐部基本信息</h2>
+                      <ul class="nav navbar-right panel_toolbox">
+                      </ul>
+                      <div class="clearfix"></div>
+                    </div>
+                    <div class="x_content">
+
+                      <form id="title-form" action="" method="" onsubmit="return false;" class="form-horizontal form-label-left">
+
+                        <div class="form-group">
+                          <label class="col-md-8 col-sm-6 col-xs-12" for="title">俱乐部名称 <span class="required">*</span>
+                          </label>
+                          <div class="col-md-12 col-sm-6 col-xs-12">
+                            <input type="text" id="title" name="title" value="{{ club['name'] }}" class="form-control col-md-7 col-xs-12">
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-md-8 col-sm-6 col-xs-12" for="subtitle">俱乐部简介 <span class="required">*</span>
+                            </label>
+                          <div class="col-md-12 col-sm-6 col-xs-12">
+                            <textarea type="text" id="subtitle" rows=3 name="subtitle" class="form-control col-md-7 col-xs-12">{{ club['introduction'] }}</textarea>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <label class="col-md-8 col-sm-6 col-xs-12" for="img">俱乐部背景图片 <span class="required">*</span>
+                            </label>
+                          <div class="col-md-12 col-sm-6 col-xs-12">
+                            <input type="file" id="file1" name="file" class="form-control col-md-7 col-xs-12">
+                            <input id="img" name="img" value="{{ club['img'] }}" type="hidden" />
+                            <small style="color:red;">图片大小：125px * 125px </small>
+                          </div>
+                        </div>
+
+                      <div class="ln_solid"></div>
+                      <div class="form-group">
+                        <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
+                          <button type="submit" class="btn btn-success">保存</button>
+                        </div>
+                      </div>
+
+                      </form>
+
+                    </div>
+                  </div>
+                </div>
             </div>
           </div>
-          <div class="clearfix"></div>
-
-          <div class="row">
-
-            <div class="col-md-12 col-sm-12 col-xs-12">
-              <div class="x_panel">
-                <div class="x_title">
-                  <h2>俱乐部 <small>可以直接编辑</small></h2>
-                  <ul class="nav navbar-right panel_toolbox">
-                    <li><a class="collapse-link"><i class="fa fa-chevron-up"></i></a>
-                    </li>
-                    <li><a class="close-link"><i class="fa fa-close"></i></a>
-                    </li>
-                  </ul>
-                  <div class="clearfix"></div>
-                </div>
-                <div class="x_content">
-                  <br />
-                  <form id="form2" data-parsley-validate class="form-horizontal form-label-left"
-                    method="POST" action="/vendors/{{ vendor_id }}/setup/club">
-                    {% raw xsrf_form_html() %}
-
-                    <div class="form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="distance">名称<span class="required">*</span>
-                      </label>
-                      <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="text" id="club_name" name="club_name" required="required"
-                          value="{{club['club_name']}}"
-                          class="form-control col-md-7 col-xs-12">
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12" for="distance">描述<span class="required">*</span>
-                      </label>
-                      <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="text" id="club_desc" name="club_desc" required="required"
-                          value="{{club['club_desc']}}"
-                          class="form-control col-md-7 col-xs-12">
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12">俱乐部logo <span class="required">*</span>
-                      </label>
-                      <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="file" id="file" name="file" class="form-control col-md-7 col-xs-12">
-                        <input id="logo_img_url" name="logo_img_url" value="{{club['logo_img_url']}}" type="hidden" />
-                      </div>
-                    </div>
-
-                    <div class="form-group">
-                      <label class="control-label col-md-3 col-sm-3 col-xs-12">背景图<span class="required">*</span>
-                      </label>
-                      <div class="col-md-6 col-sm-6 col-xs-12">
-                        <input type="file" id="file2" name="file2" class="form-control col-md-7 col-xs-12">
-                        <input id="bk_img_url" name="bk_img_url" value="{{club['bk_img_url']}}" type="hidden" />
-                      </div>
-                    </div>
-
-                    <div class="ln_solid"></div>
-                    <div class="form-group">
-                      <div class="col-md-6 col-sm-6 col-xs-12 col-md-offset-3">
-                        <button type="submit" class="btn btn-primary">重置</button>
-                        <button type="submit" class="btn btn-success">提交</button>
-                      </div>
-                    </div>
-
-                  </form>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
         <!-- footer content -->
         {% module Template("vendor/footer-block.html",ops=ops) %}
         <!-- /footer content -->
-
       </div>
       <!-- /page content -->
     </div>
 
   </div>
 
-  <div id="custom_notifications" class="custom-notifications dsp_none">
-    <ul class="list-unstyled notifications clearfix" data-tabbed_notifications="notif-group">
-    </ul>
-    <div class="clearfix"></div>
-    <div id="notif-group" class="tabbed_notifications"></div>
-  </div>
-
   <script src="{{ static_url('admin/js/bootstrap.min.js') }}"></script>
-
   <!-- bootstrap progress js -->
   <script src="{{ static_url('admin/js/progressbar/bootstrap-progressbar.min.js') }}"></script>
   <!-- icheck -->
   <script src="{{ static_url('admin/js/icheck/icheck.min.js') }}"></script>
-
   <script src="{{ static_url('admin/js/custom.js') }}"></script>
   <!-- pace -->
   <script src="{{ static_url('admin/js/pace/pace.min.js') }}"></script>
-
+  <!-- bootstrap-wysiwyg -->
+  <script src="{{ static_url('gentelella/bootstrap-wysiwyg/src/bootstrap-wysiwyg.js') }}"></script>
+  <script src="{{ static_url('gentelella/jquery.hotkeys/jquery.hotkeys.js') }}"></script>
+  <script src="{{ static_url('gentelella/google-code-prettify/src/prettify.js') }}"></script>
   <!-- daterangepicker -->
   <script type="text/javascript" src="{{ static_url('admin/js/moment/moment.min.js') }}"></script>
   <script type="text/javascript" src="{{ static_url('admin/js/datepicker/daterangepicker.js') }}"></script>
-
   <!-- form validation -->
-  <script src="{{ static_url('admin/js/validator/validator.js') }}"></script>
+  <script type="text/javascript" src="{{ static_url('js/jquery.validate.min.js') }}"></script>
+  <!-- alert Scripts -->
+  <script src="{{ static_url('weui/js/jquery-weui.min.js') }}"></script>
+  <script src="{{ static_url('js/custom.js') }}" type="text/javascript"></script>
+  <script type="text/javascript" src="{{ static_url('js/json2.js') }}"></script>
+  <!-- fileinput -->
+  <script src="{{ static_url('upyun/js/fileinput.min.js') }}"></script>
+  <script src="{{ static_url('upyun/js/spark-md5.min.js') }}"></script>
+  <script src="{{ static_url('upyun/js/async.js') }}"></script>
+  <script src="{{ static_url('upyun/js/upyun-mu.js') }}"></script>
 
   <script>
-  function uuid() {
-    var s = [];
-    var hexDigits = "0123456789abcdef";
-    for (var i = 0; i < 36; i++) {
-      s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
-    }
-    s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
-    s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
-    s[8] = s[13] = s[18] = s[23] = "-";
+      // with plugin options
+      $("#file1").fileinput({
+          'showCaption': false, //是否显示标题
+          'showUpload': false, //是否显示上传按钮
+          'showRemove': false, //拖到图片区域
+          'initialPreview':
+            ['<img src="{{ club['img'] }}" class="file-preview-image" alt="Old picture" title="Old picture">'],
+      });
+      var element1 = document.getElementById("file1");
+      element1.addEventListener("change", uploadHandle, false);
 
-    var uuid = s.join("");
-    return uuid;
-  }
-
-  function uploadUpyun(file, elementId) {
-    console.log(file.name);
-    var ext = '.' + file.name.split('.').pop();
-    // console.log(ext);
-
-    var config = {
-      // 空间名称
-      bucket : 'tripc2c-club-title',
-      // 上传请求过期时间
-      expiration : parseInt((new Date().getTime() + 3600000) / 1000),
-      // 尽量不要使用直接传表单 API 的方式，以防泄露造成安全隐患
-      form_api_secret : 'CRKAOsKHGbbCnU+yztBxUT0bYR0='
-    };
-
-    var instance = new Sand(config);
-    var options = {
-      'notify_url' : 'http://upyun.com'
-    };
-    instance.setOptions(options);
-    instance.setElementId(elementId);
-    var d = new Date();
-    var month = d.getMonth() + 1;
-    var filename = '/activity/' + d.getFullYear() + '/' + month + '/' + d.getDate() + '/' + uuid() + ext;
-    console.log(filename);
-    instance.upload(filename);
-
-    return 'https://tripc2c-club-title.b0.upaiyun.com' + filename;
-  }
-
-    // with plugin options
-    var fileElement = document.getElementById("file");
-    $("#file").fileinput({
-      'showCaption': false,
-      'showUpload': false,
-      'showRemove': false,
-      'initialPreview':
-        ['<img src="{{club['logo_img_url']}}" class="file-preview-image" alt="Old picture" title="Old picture">']
-    });
-    fileElement.addEventListener("change",uploadHandle,false);
-
-    function uploadHandle() {
-      var file = document.getElementById('file').files[0];
-      var imgUrl = uploadUpyun(file);
-      console.log('imgUrl:'+imgUrl);
-      document.getElementById("logo_img_url").value = imgUrl;
-    }
-
-    // with plugin options
-    var fileElement2 = document.getElementById("file2");
-    $("#file2").fileinput({
-      'showCaption': false,
-      'showUpload': false,
-      'showRemove': false,
-      'initialPreview':
-        ['<img src="{{club['bk_img_url']}}" class="file-preview-image" alt="Old picture" title="Old picture">'],
-    });
-    fileElement2.addEventListener("change",uploadHandle2,false);
-
-    function uploadHandle2() {
-      var file2 = document.getElementById('file2').files[0];
-      var imgUrl2 = uploadUpyun(file2,'file2');
-      document.getElementById("bk_img_url").value = imgUrl2;
-    }
-
-    document.addEventListener('uploaded',function(e) {
-      console.log(e+': uploaded');
-    });
-
-    // initialize the validator function
-    validator.message['date'] = 'not a real date';
-
-    // validate a field on "blur" event, a 'select' on 'change' event & a '.reuired' classed multifield on 'keyup':
-    $('form')
-      .on('blur', 'input[required], input.optional, select.required', validator.checkField)
-      .on('change', 'select.required', validator.checkField)
-      .on('keypress', 'input[required][pattern]', validator.keypress);
-
-    $('.multi.required')
-      .on('keyup blur', 'input', function() {
-        validator.checkField.apply($(this).siblings().last()[0]);
+      function uploadHandle() {
+          var file1 = document.getElementById('file1').files[0];
+          //alert(file.name);
+          var imgUrl = uploadUpyun(file1, 'file1');
+          $('#loadingToast').show();
+          document.getElementById("img").value = imgUrl;
+      }
+      document.addEventListener('uploaded',function(e) {
+        //alert('uploaded');
+        $('#loadingToast').hide();
       });
 
-    $('form').submit(function(e) {
-      e.preventDefault();
-      var submit = true;
-      // evaluate the form using generic validaing
-      if (!validator.checkAll($(this))) {
-        submit = false;
+      function uuid() {
+          var s = [];
+          var hexDigits = "0123456789abcdef";
+          for (var i = 0; i < 36; i++) {
+              s[i] = hexDigits.substr(Math.floor(Math.random() * 0x10), 1);
+          }
+          s[14] = "4"; // bits 12-15 of the time_hi_and_version field to 0010
+          s[19] = hexDigits.substr((s[19] & 0x3) | 0x8, 1); // bits 6-7 of the clock_seq_hi_and_reserved to 01
+          s[8] = s[13] = s[18] = s[23] = "-";
+
+          var uuid = s.join("");
+          return uuid;
       }
 
-      if (submit) {
-        this.submit();
+      function uploadUpyun(file, elementId) {
+          var ext = '.' + file.name.split('.').pop();
+
+          var config = {
+              // 空间名称
+              bucket: '{{upyun_bucket}}',
+              // 上传请求过期时间
+              expiration: parseInt((new Date().getTime() + 3600000) / 1000),
+              // 尽量不要使用直接传表单 API 的方式，以防泄露造成安全隐患
+              form_api_secret: '{{upyun_form_api_secret}}'
+          };
+
+          var instance = new Sand(config);
+          var options = {
+              'notify_url': '{{upyun_notify_url}}'
+          };
+          instance.setOptions(options);
+          instance.setElementId(elementId);
+
+          var d = new Date();
+          var month = d.getMonth() + 1;
+          var filename = '/articles/bg/' + d.getFullYear() + '/' + month + '/' + d.getDate() + '/' + uuid() + ext;
+          console.log(filename);
+          instance.upload(filename);
+
+          return '{{upyun_domain}}' + filename;
       }
-      return false;
-    });
-
-
   </script>
 
+  <script>
+    $(function() {
+      // Create Form
+      //----------------------------------------------
+      // Validation
+      //修改文章内容
+      $("#create-form").validate({
+        rules: {
+          paragraphs: {
+            required: true,
+          },
+        },
+        errorClass: "form-invalid",
+        submitHandler: function(form) {
+          console.log('create article');
 
+          var paragraphs = $("#editor").html();
+          console.log(paragraphs);
+          var data = {
+            "paragraphs": paragraphs,
+          };
+          var json = JSON.stringify(data);
+          // console.log(json);
 
+          $.ajax({
+            type: "PUT",
+            url: "{{api_domain}}/api/clubs/{{ club['_id'] }}",
+            data: json,
+            dataType: "json",
+            headers: {"Authorization":"Bearer {{ access_token }}"},
+            contentType: 'application/json',
+            success: function(data, status, xhr) {
+              $.toast("操作成功");
+              // weui.alert("保存成功！","提示信息",function(){
+              //       location.href = "/ops/edit";
+              // });
+
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+              console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+              $('.lostpwd-form-main-message').addClass('show error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+            },
+            complete: function(XMLHttpRequest, textStatus) {
+              this; // 调用本次AJAX请求时传递的options参数
+            }
+          });
+        }
+      });
+
+      //修改title
+      $("#title-form").validate({
+        rules: {
+          title: {
+            required: true,
+          },
+          subtitle: {
+            required: true,
+          },
+          img: {
+            required: true,
+          },
+        },
+        errorClass: "form-invalid",
+        submitHandler: function(form) {
+          console.log(prov);
+          var title = $("#title").val();
+          var subtitle = $("#subtitle").val();
+          var prov=$("#prov option:selected").text();
+          var city=$("#city option:selected").text();
+          var img = $("#img").val();
+          var data = {
+            "name": title,
+            "introduction": subtitle,
+            "img": img,
+            "province":prov,
+            "city":city
+          };
+          var json = JSON.stringify(data);
+          // console.log(json);
+
+          $.ajax({
+            type: "PUT",
+            url: "{{api_domain}}/api/clubs/{{ club['_id'] }}",
+            data: json,
+            dataType: "json",
+            headers: {"Authorization":"Bearer {{ access_token }}"},
+            contentType: 'application/json',
+            success: function(data, status, xhr) {
+              $.toast("操作成功");
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+              console.log("XMLHttpRequest.status:" + XMLHttpRequest.status);
+                $('.lostpwd-form-main-message').addClass('show error').html(XMLHttpRequest.status + ": 服务器异常,请稍后重试!");
+            },
+            complete: function(XMLHttpRequest, textStatus) {
+              this; // 调用本次AJAX请求时传递的options参数
+            }
+          });
+        }
+      });
+
+    });
+
+  </script>
+  <!-- bootstrap-wysiwyg -->
+  <script>
+  function html_decode(str)
+      {
+        var s = "";
+        if (str.length == 0) return "";
+        s = str;
+        s = s.replace(/&lt;/g, "<");
+        s = s.replace(/&gt;/g, ">");
+        s = s.replace(/&nbsp;/g, " ");
+        s = s.replace(/&#39;/g, "\'");
+        s = s.replace(/&quot;/g, "\"");
+        s = s.replace(/<br>/g, "\n");
+        s = s.replace(/&amp;/g, "&");
+        s = s.replace(/\\/g, "");
+        return s;
+      }
+  var html = html_decode("{{ club['paragraphs'] }}");
+  var html1 = html.replace(/(img)/g,"img class='wysiwyg-img'");
+  $("#editor").html(html1);
+
+      $(document).ready(function() {
+
+          function initToolbarBootstrapBindings() {
+              var fonts = ['Serif', 'Sans', 'Arial', 'Arial Black', 'Courier',
+                      'Courier New', 'Comic Sans MS', 'Helvetica', 'Impact', 'Lucida Grande', 'Lucida Sans', 'Tahoma', 'Times',
+                      'Times New Roman', 'Verdana'
+                  ],
+                  fontTarget = $('[title=Font]').siblings('.dropdown-menu');
+              $.each(fonts, function(idx, fontName) {
+                  fontTarget.append($('<li><a data-edit="fontName ' + fontName + '" style="font-family:\'' + fontName + '\'">' + fontName + '</a></li>'));
+              });
+              $('a[title]').tooltip({
+                  container: 'body'
+              });
+              $('.dropdown-menu input').click(function() {
+                      return false;
+                  })
+                  .change(function() {
+                      $(this).parent('.dropdown-menu').siblings('.dropdown-toggle').dropdown('toggle');
+                  })
+                  .keydown('esc', function() {
+                      this.value = '';
+                      $(this).change();
+                  });
+
+              $('[data-role=magic-overlay]').each(function() {
+                  var overlay = $(this),
+                      target = $(overlay.data('target'));
+                  overlay.css('opacity', 0).css('position', 'absolute').offset(target.offset()).width(target.outerWidth()).height(target.outerHeight());
+              });
+
+              if ("onwebkitspeechchange" in document.createElement("input")) {
+                  var editorOffset = $('#editor').offset();
+                  $('.voiceBtn').css('position', 'absolute').offset({
+                      top: editorOffset.top,
+                      left: editorOffset.left + $('#editor').innerWidth() - 35
+                  });
+              } else {
+                  $('.voiceBtn').hide();
+              }
+          }
+
+          function showErrorAlert(reason, detail) {
+              var msg = '';
+              if (reason === 'unsupported-file-type') {
+                  msg = "Unsupported format " + detail;
+              } else {
+                  console.log("error uploading file", reason, detail);
+              }
+              $('<div class="alert"> <button type="button" class="close" data-dismiss="alert">&times;</button>' +
+                  '<strong>File upload error</strong> ' + msg + ' </div>').prependTo('#alerts');
+          }
+
+          initToolbarBootstrapBindings();
+
+          $('#editor').wysiwyg({
+              fileUploadError: showErrorAlert
+          });
+
+          window.prettyPrint;
+          prettyPrint();
+      });
+  </script>
 </body>
 </html>
