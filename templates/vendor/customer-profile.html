@@ -373,7 +373,7 @@
                             <img src="{{ higher['avatar'] }}" class="avatar" alt="Avatar">
                             </li>
                           </ul>
-                          <a href="#">{{ higher['nickname'] }}</a>
+                          <a href="/vendors/{{ vendor_id }}/customers/{{ higher['higher_level'] }}">{{ higher['nickname'] }}</a>
                         </td>
                         <td>{{ higher['ctime'] }}</td>
                       </tr>
@@ -682,7 +682,7 @@
               inner_html += '<img src="'+ajaxobj[i].avatar+'" class="avatar" alt="Avatar">';
               inner_html += '</li>';
               inner_html += '</ul>';
-              inner_html += '<a href="#">'+ajaxobj[i].nickname+'</a>';
+              inner_html += '<a href="'+ajaxobj[i].lower_level+'">'+ajaxobj[i].nickname+'</a>';
               inner_html += '<br />';
               inner_html += '</td>';
               inner_html += '<td>'+getLocalTime(ajaxobj[i].ctime)+'</td>';
