@@ -489,8 +489,12 @@
                 if (pageData[i].pay_status == 20)
                   inner_html += '<br />微信订单号:' + pageData[i].prepay_id;
                 else if (pageData[i].pay_status > 20) {
-                  inner_html += '<br />微信订单号:' + pageData[i].prepay_id;
-                  inner_html += '<br />微信交易号:' + pageData[i].transaction_id;
+                  if (pageData[i].prepay_id != "00000000000000000000000000000000") {
+                    inner_html += '<br />微信订单号:' + pageData[i].prepay_id;
+                  }
+                  if (pageData[i].transaction_id != "00000000000000000000000000000000") {
+                    inner_html += '<br />微信交易号:' + pageData[i].transaction_id;
+                  }
                 }
                 inner_html += '</td>';
                 inner_html += '<td class=" ">'+parseFloat(pageData[i].amount).toFixed(2)+'元<br /></td>';
