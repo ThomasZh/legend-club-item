@@ -228,11 +228,6 @@ class VendorSetupClubHandler(AuthorizationHandler):
         access_token = self.get_secure_cookie("access_token")
         ops = self.get_ops_info()
 
-        UPYUN_DOMAIN = "https://tripc2c-club-title.b0.upaiyun.com"
-        UPYUN_NOTIFY_URL = "http://upyun.com"
-        UPYUN_FORM_API_SECRET = "CRKAOsKHGbbCnU+yztBxUT0bYR0="
-        UPYUN_BUCKET = "tripc2c-club-title"
-
         url = API_DOMAIN+"/api/clubs/"+ops['club_id']
         http_client = HTTPClient()
         response = http_client.fetch(url, method="GET")
