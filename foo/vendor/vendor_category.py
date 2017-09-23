@@ -68,8 +68,7 @@ class VendorCategoryListHandler(AuthorizationHandler):
         access_token = self.get_access_token()
         logging.info("GET access_token %r", access_token)
 
-        params = {'_type':"item"}
-        url = url_concat(API_DOMAIN + "/api/def/leagues/"+ LEAGUE_ID +"/categories",params)
+        url = API_DOMAIN + "/api/def/leagues/"+ LEAGUE_ID +"/categories"
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
         response = http_client.fetch(url, method="GET", headers=headers)
@@ -155,7 +154,7 @@ class VendorCategoryCreateHandler(AuthorizationHandler):
         logging.debug("got param title %r", title)
 
         categroy = {"league_id":LEAGUE_ID, "parent_id":"00000000000000000000000000000000", "level":1,
-                    "title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png","_type":"item"}
+                    "title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png"}
 
         url = API_DOMAIN+"/api/def/categories"
         http_client = HTTPClient()
