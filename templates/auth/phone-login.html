@@ -137,6 +137,7 @@
         errorClass: "form-invalid",
         submitHandler: function(form) {
           var pwd = $("#lg_pwd").val();
+          console.log(pwd);
           var md5pwd = SparkMD5.hash(pwd);
           $("#lg_pwd").val(md5pwd);
           form.submit();
