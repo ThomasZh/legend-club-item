@@ -65,7 +65,10 @@ class VendorActivityExpressFeeHandler(AuthorizationHandler):
         access_token = self.get_access_token()
         logging.info("GET access_token %r", access_token)
 
-        url = API_DOMAIN + "/api/item-recommend/leagues/"+ LEAGUE_ID +"/categories"
+        club = self.get_club_basic_info(vendor_id)
+        league_id = club['league_id']
+
+        url = API_DOMAIN + "/api/item-recommend/leagues/"+ league_id +"/categories"
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
         response = http_client.fetch(url, method="GET", headers=headers)
@@ -78,7 +81,7 @@ class VendorActivityExpressFeeHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 access_token=access_token,
                 API_DOMAIN=API_DOMAIN,
-                LEAGUE_ID=LEAGUE_ID,
+                LEAGUE_ID=league_id,
                 ops=ops,
                 counter=counter,
                 recommend_categorys=recommend_categorys)
@@ -92,6 +95,9 @@ class VendorCouponsHandler(AuthorizationHandler):
 
         ops = self.get_ops_info()
 
+        club = self.get_club_basic_info(vendor_id)
+        league_id = club['league_id']
+
         access_token = self.get_access_token()
         logging.info("GET access_token %r", access_token)
 
@@ -100,7 +106,7 @@ class VendorCouponsHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 access_token=access_token,
                 API_DOMAIN=API_DOMAIN,
-                LEAGUE_ID=LEAGUE_ID,
+                LEAGUE_ID=league_id,
                 ops=ops,
                 counter=counter)
 
@@ -114,6 +120,9 @@ class VendorRecommendProductsListHandler(AuthorizationHandler):
         ops = self.get_ops_info()
         recommend_category_id = self.get_argument('recommend_category_id','')
         logging.info("got recommend_category_id %r", recommend_category_id)
+
+        club = self.get_club_basic_info(vendor_id)
+        league_id = club['league_id']
 
         access_token = self.get_access_token()
         logging.info("GET access_token %r", access_token)
@@ -139,7 +148,7 @@ class VendorRecommendProductsListHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 access_token=access_token,
                 API_DOMAIN=API_DOMAIN,
-                LEAGUE_ID=LEAGUE_ID,
+                LEAGUE_ID=league_id,
                 ops=ops,
                 counter=counter,
                 _category=_category,
@@ -157,7 +166,10 @@ class VendorRecommendCategoryCreateHandler(AuthorizationHandler):
         recommend_category_id = self.get_argument('recommend_category_id','')
         logging.info('got recommend_category_id %r',recommend_category_id)
 
-        url = API_DOMAIN + "/api/def/leagues/"+ LEAGUE_ID +"/categories"
+        club = self.get_club_basic_info(vendor_id)
+        league_id = club['league_id']
+
+        url = API_DOMAIN + "/api/def/leagues/"+ league_id +"/categories"
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
         response = http_client.fetch(url, method="GET", headers=headers)

@@ -60,8 +60,11 @@ class VendorOrdersMeAllHandler(AuthorizationHandler):
         ops = self.get_ops_info()
         logging.info("get ops %r",ops)
 
+        club = self.get_club_basic_info(vendor_id)
+        league_id = club['league_id']
+
         params = {"filter":"league","franchise_type":"供应商","page":1,"limit":20}
-        url = url_concat(API_DOMAIN +"/api/leagues/"+ LEAGUE_ID +"/clubs",params)
+        url = url_concat(API_DOMAIN +"/api/leagues/"+ league_id +"/clubs",params)
         http_client = HTTPClient()
         headers={"Authorization":"Bearer "+access_token}
         response = http_client.fetch(url, method="GET", headers=headers)
@@ -275,8 +278,11 @@ class VendorOrderInfoHandler(AuthorizationHandler):
             applys['total_fee'] = float(applys['amount'])*float(applys['quantity']) / 100
             applys['amount'] = float(applys['amount']) / 100
 
+        club = self.get_club_basic_info(vendor_id)
+        league_id = club['league_id']
+
         params = {"filter":"league","franchise_type":"供应商","page":1,"limit":20}
-        url = url_concat(API_DOMAIN +"/api/leagues/"+ LEAGUE_ID +"/clubs",params)
+        url = url_concat(API_DOMAIN +"/api/leagues/"+ league_id +"/clubs",params)
         http_client = HTTPClient()
         headers={"Authorization":"Bearer "+access_token}
         response = http_client.fetch(url, method="GET", headers=headers)
@@ -313,6 +319,9 @@ class VendorOrdersCouponsHandler(AuthorizationHandler):
 
         ops = self.get_ops_info()
 
+        club = self.get_club_basic_info(vendor_id)
+        league_id = club['league_id']
+
         access_token = self.get_access_token()
         logging.info("GET access_token %r", access_token)
 
@@ -330,7 +339,7 @@ class VendorOrdersCouponsHandler(AuthorizationHandler):
                 vendor_id=vendor_id,
                 access_token=access_token,
                 API_DOMAIN=API_DOMAIN,
-                LEAGUE_ID=LEAGUE_ID,
+                LEAGUE_ID=league_id,
                 ops=ops,
                 counter=counter)
 

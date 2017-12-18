@@ -510,7 +510,10 @@ class VendorActivityCreateStep1Handler(AuthorizationHandler):
         access_token = self.get_access_token()
         logging.info("GET access_token %r", access_token)
 
-        url = API_DOMAIN + "/api/def/leagues/"+ LEAGUE_ID +"/categories"
+        club = self.get_club_basic_info(vendor_id)
+        league_id = club['league_id']
+
+        url = API_DOMAIN + "/api/def/leagues/"+ league_id +"/categories"
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
         response = http_client.fetch(url, method="GET", headers=headers)
@@ -613,7 +616,10 @@ class VendorActivityDetailStep1Handler(AuthorizationHandler):
         # data = json_decode(response.body)
         # second_category_info = data['rs']
 
-        url = API_DOMAIN + "/api/def/leagues/"+ LEAGUE_ID +"/categories"
+        club = self.get_club_basic_info(vendor_id)
+        league_id = club['league_id']
+
+        url = API_DOMAIN + "/api/def/leagues/"+ league_id +"/categories"
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
         response = http_client.fetch(url, method="GET", headers=headers)

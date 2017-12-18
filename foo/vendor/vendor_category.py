@@ -68,7 +68,10 @@ class VendorCategoryListHandler(AuthorizationHandler):
         access_token = self.get_access_token()
         logging.info("GET access_token %r", access_token)
 
-        url = API_DOMAIN + "/api/def/leagues/"+ LEAGUE_ID +"/categories"
+        club = self.get_club_basic_info(vendor_id)
+        league_id = club['league_id']
+
+        url = API_DOMAIN + "/api/def/leagues/"+ league_id +"/categories"
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
         response = http_client.fetch(url, method="GET", headers=headers)
@@ -153,7 +156,10 @@ class VendorCategoryCreateHandler(AuthorizationHandler):
         title = self.get_argument("title", "")
         logging.debug("got param title %r", title)
 
-        categroy = {"league_id":LEAGUE_ID, "parent_id":"00000000000000000000000000000000", "level":1,
+        club = self.get_club_basic_info(vendor_id)
+        league_id = club['league_id']
+
+        categroy = {"league_id":league_id, "parent_id":"00000000000000000000000000000000", "level":1,
                     "title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png"}
 
         url = API_DOMAIN+"/api/def/categories"
@@ -200,7 +206,10 @@ class VendorCategoryCreateSecondHandler(AuthorizationHandler):
         parent_id = self.get_argument('category_id','')
         logging.info("get parent_id",parent_id)
 
-        categroy = {"league_id":LEAGUE_ID, "parent_id":parent_id, "level":2,
+        club = self.get_club_basic_info(vendor_id)
+        league_id = club['league_id']
+
+        categroy = {"league_id":league_id, "parent_id":parent_id, "level":2,
                     "title":title, "img":"http://tripc2c-club-title.b0.upaiyun.com/default/banner4.png"}
 
         url = API_DOMAIN+"/api/def/categories"
@@ -406,7 +415,10 @@ class VendorCategoryCreateProductHandler(AuthorizationHandler):
         second_categorys_id = self.get_argument('second_categorys_id','')
         logging.info("GET second_categorys_id %r", second_categorys_id)
 
-        url = API_DOMAIN + "/api/def/leagues/"+ LEAGUE_ID +"/categories"
+        club = self.get_club_basic_info(vendor_id)
+        league_id = club['league_id']
+
+        url = API_DOMAIN + "/api/def/leagues/"+ league_id +"/categories"
         http_client = HTTPClient()
         headers = {"Authorization":"Bearer " + access_token}
         response = http_client.fetch(url, method="GET", headers=headers)
